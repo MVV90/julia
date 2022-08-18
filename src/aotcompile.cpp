@@ -588,7 +588,9 @@ void jl_dump_native_impl(void *native_code,
     // do the actual work
     auto add_output = [&] (Module &M, StringRef unopt_bc_Name, StringRef bc_Name, StringRef obj_Name, StringRef asm_Name) {
         preopt.run(M, empty.MAM);
+        assert(!verifyModule(M, &errs()));
         optimizer.run(M);
+        assert(!verifyModule(M, &errs()));
 
         // We would like to emit an alias or an weakref alias to redirect these symbols
         // but LLVM doesn't let us emit a GlobalAlias to a declaration...
@@ -1064,6 +1066,7 @@ void jl_get_llvmf_defn_impl(jl_llvmf_dump_t* dump, jl_method_instance_t *mi, siz
             // and will better match what's actually in sysimg.
             for (auto &global : output.globals)
                 global.second->setLinkage(GlobalValue::ExternalLinkage);
+            assert(!verifyModule(*m.getModuleUnlocked(), &errs()));
             if (optimize) {
                 legacy::PassManager PM;
                 addTargetPasses(&PM, jl_ExecutionEngine->getTargetTriple(), jl_ExecutionEngine->getTargetIRAnalysis());
@@ -1071,6 +1074,7 @@ void jl_get_llvmf_defn_impl(jl_llvmf_dump_t* dump, jl_method_instance_t *mi, siz
                 addMachinePasses(&PM, jl_options.opt_level);
                 //Safe b/c context lock is held by output
                 PM.run(*m.getModuleUnlocked());
+                assert(!verifyModule(*m.getModuleUnlocked(), &errs()));
             }
             const std::string *fname;
             if (decls.functionObject == "jl_fptr_args" || decls.functionObject == "jl_fptr_sparam")

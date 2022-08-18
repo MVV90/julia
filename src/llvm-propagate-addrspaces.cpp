@@ -320,7 +320,7 @@ Pass *createPropagateJuliaAddrspaces() {
 
 PreservedAnalyses PropagateJuliaAddrspacesPass::run(Function &F, FunctionAnalysisManager &AM) {
     bool modified = propagateJuliaAddrspaces(F);
-    
+
 #ifdef JL_VERIFY_PASSES
     assert(!verifyFunction(F, &errs()));
 #endif
