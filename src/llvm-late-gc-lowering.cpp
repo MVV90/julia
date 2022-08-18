@@ -2719,7 +2719,11 @@ bool LateLowerGCFrameLegacy::runOnFunction(Function &F) {
         return getAnalysis<DominatorTreeWrapperPass>().getDomTree();
     };
     auto lateLowerGCFrame = LateLowerGCFrame(GetDT);
-    return lateLowerGCFrame.runOnFunction(F);
+    bool modified = lateLowerGCFrame.runOnFunction(F);
+#ifdef JL_VERIFY_PASSES
+    assert(!verifyFunction(F, &errs()));
+#endif
+    return modified;
 }
 
 PreservedAnalyses LateLowerGC::run(Function &F, FunctionAnalysisManager &AM)
@@ -2729,7 +2733,11 @@ PreservedAnalyses LateLowerGC::run(Function &F, FunctionAnalysisManager &AM)
     };
     auto lateLowerGCFrame = LateLowerGCFrame(GetDT);
     bool CFGModified = false;
-    if (lateLowerGCFrame.runOnFunction(F, &CFGModified)) {
+    bool modified = lateLowerGCFrame.runOnFunction(F, &CFGModified);
+#ifdef JL_VERIFY_PASSES
+    assert(!verifyFunction(F, &errs()));
+#endif
+    if (modified) {
         if (CFGModified) {
             return PreservedAnalyses::none();
         } else {
