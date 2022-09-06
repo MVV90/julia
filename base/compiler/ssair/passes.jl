@@ -1100,32 +1100,42 @@ end
 
 is_nothrow(ir::IRCode, pc::Int) = ir.stmts[pc][:flag] & (IR_FLAG_EFFECT_FREE | IR_FLAG_NOTHROW) ≠ 0
 
-function try_resolve_finalizer!(ir::IRCode, idx::Int, finalizer_idx::Int, defuse::SSADefUse, inlining::InliningState)
-    # For now: Require that all uses and defs are in the same basic block,
-    # so that live range calculations are easy.
-    bb = ir.cfg.blocks[block_for_inst(ir.cfg, first(defuse.uses).idx)]
+function try_resolve_finalizer!(ir::IRCode, idx::Int, finalizer_idx::Int, defuse::SSADefUse, inlining::InliningState, lazydomtree::LazyDomtree)
+    # For now: Require that all the uses and defs are dominated by `finalizer` block
+    # TODO: further relax this restriction by allowing a case when `finalizer` block post-dominates them
     minval::Int = typemax(Int)
     maxval::Int = 0
-
-    function check_in_range(x::Union{Int,SSAUse})
-        if isa(x, SSAUse)
-            didx = x.idx
-        else
-            didx = x
+    function update_idx!(duidx::Int)
+        if duidx < minval
+            minval = duidx
         end
-        didx in bb.stmts || return false
-        if didx < minval
-            minval = didx
+        if duidx > maxval
+            maxval = duidx
         end
-        if didx > maxval
-            maxval = didx
-        end
-        return true
     end
 
-    check_in_range(idx) || return nothing
-    all(check_in_range, defuse.uses) || return nothing
-    all(check_in_range, defuse.defs) || return nothing
+    domtree = get!(lazydomtree)
+    finalizer_bb = block_for_inst(ir, finalizer_idx)
+    update_idx!(finalizer_idx)
+    alloc_bb = block_for_inst(ir, idx)
+    dominates(domtree, alloc_bb, finalizer_bb) || return nothing
+    update_idx!(idx)
+    function check_defuse(x::Union{Int,SSAUse})
+        duidx = x isa SSAUse ? x.idx : x
+        duidx == finalizer_idx && return true
+        bb = block_for_inst(ir, duidx)
+        if dominates(domtree, finalizer_bb, bb)
+            update_idx!(duidx)
+            return true
+        # TODO elseif post_dominates(domtree, finalizer_bb, bb)
+        #     update_idx!(duidx)
+        #     return true
+        else
+            return false
+        end
+    end
+    all(check_defuse, defuse.uses) || return nothing
+    all(check_defuse, defuse.defs) || return nothing
 
     # For now: Require all statements in the basic block range to be nothrow.
     all(minval:maxval) do idx::Int
@@ -1184,7 +1194,7 @@ function sroa_mutables!(ir::IRCode, defuses::IdDict{Int, Tuple{SPCSet, SSADefUse
             end
         end
         if finalizer_idx !== nothing && inlining !== nothing
-            try_resolve_finalizer!(ir, idx, finalizer_idx, defuse, inlining)
+            try_resolve_finalizer!(ir, idx, finalizer_idx, defuse, inlining, lazydomtree)
             continue
         end
         # Partition defuses by field

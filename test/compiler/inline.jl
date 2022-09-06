@@ -1361,6 +1361,14 @@ mutable struct DoAllocWithField
         end
     end
 end
+mutable struct DoAllocWithFieldInter
+    x::Int
+end
+function register_finalizer!(obj::DoAllocWithFieldInter)
+    finalizer(obj) do this
+        add_finalization_count!(this.x)
+    end
+end
 
 function const_finalization(io)
     for i = 1:1000
@@ -1375,6 +1383,103 @@ let
     init_finalization_count!()
     const_finalization(IOBuffer())
     @test get_finalization_count() == 1000
+end
+
+# tests finalizer inlining when def/uses involve control flow
+function cfg_finalization1(io)
+    for i = -999:1000
+        o = DoAllocWithField(i)
+        if i == 1000
+            safeprint(io, o.x, '\n')
+        elseif i > 0
+            safeprint(io, o.x)
+        end
+    end
+end
+let src = code_typed1(cfg_finalization1, (IO,))
+    @test count(isinvoke(:add_finalization_count!), src.code) == 1
+end
+let
+    init_finalization_count!()
+    cfg_finalization1(IOBuffer())
+    @test get_finalization_count() == 1000
+end
+
+function cfg_finalization2(io)
+    for i = -999:1000
+        o = DoAllocWithField(0)
+        o.x = i # with `setfield!`
+        if i == 1000
+            safeprint(io, o.x, '\n')
+        elseif i > 0
+            safeprint(io, o.x)
+        end
+    end
+end
+let src = code_typed1(cfg_finalization2, (IO,))
+    @test count(isinvoke(:add_finalization_count!), src.code) == 1
+end
+let
+    init_finalization_count!()
+    cfg_finalization2(IOBuffer())
+    @test get_finalization_count() == 1000
+end
+
+function cfg_finalization3(io)
+    for i = -999:1000
+        o = DoAllocWithFieldInter(i)
+        register_finalizer!(o)
+        if i == 1000
+            safeprint(io, o.x, '\n')
+        elseif i > 0
+            safeprint(io, o.x)
+        end
+    end
+end
+let src = code_typed1(cfg_finalization3, (IO,))
+    @test count(isinvoke(:add_finalization_count!), src.code) == 1
+end
+let
+    init_finalization_count!()
+    cfg_finalization3(IOBuffer())
+    @test get_finalization_count() == 1000
+end
+
+function cfg_finalization4(io)
+    for i = -999:1000
+        o = DoAllocWithFieldInter(0)
+        o.x = i # with `setfield!`
+        register_finalizer!(o)
+        if i == 1000
+            safeprint(io, o.x, '\n')
+        elseif i > 0
+            safeprint(io, o.x)
+        end
+    end
+end
+let src = code_typed1(cfg_finalization4, (IO,))
+    @test count(isinvoke(:add_finalization_count!), src.code) == 1
+end
+let
+    init_finalization_count!()
+    cfg_finalization4(IOBuffer())
+    @test get_finalization_count() == 1000
+end
+
+function cfg_finalization5(io)
+    for i = -999:1000
+        o = DoAllocWithFieldInter(i)
+        if i == 1000
+            safeprint(io, o.x, '\n')
+        elseif i > 0
+            safeprint(io, o.x)
+        end
+        register_finalizer!(o)
+    end
+end
+let src = code_typed1(cfg_finalization5, (IO,))
+    # TODO we can fix this case by checking a case when a finalizer block is post-dominated by all the def/uses
+    @test_broken count(isinvoke(:nothrow_side_effect), src.code) == 1
 end
 
 # optimize `[push!|pushfirst!](::Vector{Any}, x...)`
