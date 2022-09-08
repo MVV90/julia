@@ -261,6 +261,12 @@ static jl_callptr_t _jl_compile_codeinst(
                 this_code->isspecsig = isspecsig;
             }
             jl_atomic_store_release(&this_code->invoke, addr);
+
+            //Set up speculative compilation calls after all other work is done
+            jl_ExecutionEngine->speculate(decls.functionObject);
+            if (!decls.specFunctionObject.empty()) {
+                jl_ExecutionEngine->speculate(decls.specFunctionObject);
+            }
         }
         else if (jl_atomic_load_relaxed(&this_code->invoke) == jl_fptr_const_return_addr && !decls.specFunctionObject.empty()) {
             // hack to export this pointer value to jl_dump_method_disasm
@@ -506,7 +512,7 @@ jl_value_t *jl_dump_method_asm_impl(jl_method_instance_t *mi, size_t world,
     if (codeinst) {
         uintptr_t fptr = (uintptr_t)jl_atomic_load_relaxed(&codeinst->invoke);
         if (getwrapper)
-            return jl_dump_fptr_asm(fptr, raw_mc, asm_variant, debuginfo, binary);
+            return jl_dump_fptr_asm(jl_ExecutionEngine->getAssemblyPointer(fptr), raw_mc, asm_variant, debuginfo, binary);
         uintptr_t specfptr = (uintptr_t)jl_atomic_load_relaxed(&codeinst->specptr.fptr);
         if (fptr == (uintptr_t)jl_fptr_const_return_addr && specfptr == 0) {
             // normally we prevent native code from being generated for these functions,
@@ -547,7 +553,7 @@ jl_value_t *jl_dump_method_asm_impl(jl_method_instance_t *mi, size_t world,
             JL_UNLOCK(&jl_codegen_lock);
         }
         if (specfptr != 0)
-            return jl_dump_fptr_asm(specfptr, raw_mc, asm_variant, debuginfo, binary);
+            return jl_dump_fptr_asm(jl_ExecutionEngine->getAssemblyPointer(specfptr), raw_mc, asm_variant, debuginfo, binary);
     }
 
     // whatever, that didn't work - use the assembler output instead
@@ -1395,6 +1401,12 @@ StringRef JuliaOJIT::getFunctionAtAddress(JITTargetAddress Addr, jl_code_instanc
     stream_fname << unadorned_name << "_" << RLST_inc++;
     addGlobalMapping(stream_fname.str(), Addr, true);
     return *ReverseLocalSymbolTable[Addr];
+}
+
+JITTargetAddress JuliaOJIT::getAssemblyPointer(JITTargetAddress Addr) {
+    //Without compile-on-demand the assembly pointer is the same one as the
+    //input pointer
+    return Addr;
 }
 
 void JuliaOJIT::registerGlobalAtAddress(orc::SymbolStringPtr Mangled, JITTargetAddress Addr, bool prelocked) {

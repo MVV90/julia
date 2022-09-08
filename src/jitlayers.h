@@ -419,6 +419,13 @@ public:
     JITTargetAddress getGlobalValueAddressUnmangled(StringRef Name);
     JITTargetAddress getFunctionAddress(StringRef Name);
     StringRef getFunctionAtAddress(JITTargetAddress Addr, jl_code_instance_t *codeinst);
+
+    //Lazy compilation hook
+    JITTargetAddress getAssemblyPointer(JITTargetAddress Addr);
+    //This is going to be a no-op for the forseeable future
+    //but it serves as an annotation for future work
+    void speculate(StringRef/* Name*/) {}
+
     auto getContext() {
         return *ContextPool;
     }
