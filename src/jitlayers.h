@@ -410,14 +410,14 @@ public:
 #endif
 
     orc::SymbolStringPtr mangle(StringRef Name);
-    void addGlobalMapping(StringRef Name, uint64_t Addr);
+    void addGlobalMapping(StringRef Name, JITTargetAddress Addr);
     void addModule(orc::ThreadSafeModule M);
 
     JL_JITSymbol findSymbol(StringRef Name, bool ExportedSymbolsOnly);
     JL_JITSymbol findUnmangledSymbol(StringRef Name);
-    uint64_t getGlobalValueAddress(StringRef Name);
-    uint64_t getFunctionAddress(StringRef Name);
-    StringRef getFunctionAtAddress(uint64_t Addr, jl_code_instance_t *codeinst);
+    JITTargetAddress getGlobalValueAddress(StringRef Name);
+    JITTargetAddress getFunctionAddress(StringRef Name);
+    StringRef getFunctionAtAddress(JITTargetAddress Addr, jl_code_instance_t *codeinst);
     auto getContext() {
         return *ContextPool;
     }

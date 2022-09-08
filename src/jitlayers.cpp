@@ -136,7 +136,7 @@ void jl_dump_llvm_opt_impl(void *s)
 
 static void jl_add_to_ee(orc::ThreadSafeModule &M, StringMap<orc::ThreadSafeModule*> &NewExports);
 static void jl_decorate_module(Module &M);
-static uint64_t getAddressForFunction(StringRef fname);
+static JITTargetAddress getAddressForFunction(StringRef fname);
 
 void jl_link_global(GlobalVariable *GV, void *addr)
 {
@@ -239,7 +239,7 @@ static jl_callptr_t _jl_compile_codeinst(
 
     for (auto &def : emitted) {
         jl_code_instance_t *this_code = def.first;
-        jl_llvm_functions_t decls = std::get<1>(def.second);
+        jl_llvm_functions_t &decls = std::get<1>(def.second);
         jl_callptr_t addr;
         bool isspecsig = false;
         if (decls.functionObject == "jl_fptr_args") {
@@ -249,21 +249,23 @@ static jl_callptr_t _jl_compile_codeinst(
             addr = jl_fptr_sparam_addr;
         }
         else {
-            addr = (jl_callptr_t)getAddressForFunction(decls.functionObject);
+            addr = jitTargetAddressToFunction<jl_callptr_t>(getAddressForFunction(decls.functionObject));
             isspecsig = true;
         }
         if (jl_atomic_load_relaxed(&this_code->invoke) == NULL) {
             // once set, don't change invoke-ptr, as that leads to race conditions
             // with the (not) simultaneous updates to invoke and specptr
             if (!decls.specFunctionObject.empty()) {
-                jl_atomic_store_release(&this_code->specptr.fptr, (void*)getAddressForFunction(decls.specFunctionObject));
+                jl_atomic_store_release(&this_code->specptr.fptr,
+                    jitTargetAddressToPointer<void*>(getAddressForFunction(decls.specFunctionObject)));
                 this_code->isspecsig = isspecsig;
             }
             jl_atomic_store_release(&this_code->invoke, addr);
         }
         else if (jl_atomic_load_relaxed(&this_code->invoke) == jl_fptr_const_return_addr && !decls.specFunctionObject.empty()) {
             // hack to export this pointer value to jl_dump_method_disasm
-            jl_atomic_store_release(&this_code->specptr.fptr, (void*)getAddressForFunction(decls.specFunctionObject));
+            jl_atomic_store_release(&this_code->specptr.fptr,
+                jitTargetAddressToPointer<void*>(getAddressForFunction(decls.specFunctionObject)));
         }
         if (this_code== codeinst)
             fptr = addr;
@@ -1277,9 +1279,10 @@ orc::SymbolStringPtr JuliaOJIT::mangle(StringRef Name)
     return ES.intern(MangleName);
 }
 
-void JuliaOJIT::addGlobalMapping(StringRef Name, uint64_t Addr)
+void JuliaOJIT::addGlobalMapping(StringRef Name, JITTargetAddress Addr)
 {
-    cantFail(JD.define(orc::absoluteSymbols({{mangle(Name), JITEvaluatedSymbol::fromPointer((void*)Addr)}})));
+    cantFail(JD.define(orc::absoluteSymbols({{mangle(Name),
+        JITEvaluatedSymbol::fromPointer(jitTargetAddressToPointer<void*>(Addr))}})));
 }
 
 void JuliaOJIT::addModule(orc::ThreadSafeModule TSM)
@@ -1340,7 +1343,7 @@ JL_JITSymbol JuliaOJIT::findUnmangledSymbol(StringRef Name)
     return findSymbol(getMangledName(Name), true);
 }
 
-uint64_t JuliaOJIT::getGlobalValueAddress(StringRef Name)
+JITTargetAddress JuliaOJIT::getGlobalValueAddress(StringRef Name)
 {
     auto addr = findSymbol(getMangledName(Name), false);
     if (!addr) {
@@ -1350,7 +1353,7 @@ uint64_t JuliaOJIT::getGlobalValueAddress(StringRef Name)
     return cantFail(addr.getAddress());
 }
 
-uint64_t JuliaOJIT::getFunctionAddress(StringRef Name)
+JITTargetAddress JuliaOJIT::getFunctionAddress(StringRef Name)
 {
     auto addr = findSymbol(getMangledName(Name), false);
     if (!addr) {
@@ -1360,10 +1363,10 @@ uint64_t JuliaOJIT::getFunctionAddress(StringRef Name)
     return cantFail(addr.getAddress());
 }
 
-StringRef JuliaOJIT::getFunctionAtAddress(uint64_t Addr, jl_code_instance_t *codeinst)
+StringRef JuliaOJIT::getFunctionAtAddress(JITTargetAddress Addr, jl_code_instance_t *codeinst)
 {
     std::lock_guard<std::mutex> lock(RLST_mutex);
-    std::string *fname = &ReverseLocalSymbolTable[(void*)(uintptr_t)Addr];
+    std::string *fname = &ReverseLocalSymbolTable[jitTargetAddressToPointer<void*>(Addr)];
     if (fname->empty()) {
         std::string string_fname;
         raw_string_ostream stream_fname(string_fname);
@@ -1725,7 +1728,7 @@ static void jl_add_to_ee(orc::ThreadSafeModule &M, StringMap<orc::ThreadSafeModu
 }
 
 
-static uint64_t getAddressForFunction(StringRef fname)
+static JITTargetAddress getAddressForFunction(StringRef fname)
 {
     auto addr = jl_ExecutionEngine->getFunctionAddress(fname);
     assert(addr);
@@ -1735,7 +1738,7 @@ static uint64_t getAddressForFunction(StringRef fname)
 // helper function for adding a DLLImport (dlsym) address to the execution engine
 void add_named_global(StringRef name, void *addr)
 {
-    jl_ExecutionEngine->addGlobalMapping(name, (uint64_t)(uintptr_t)addr);
+    jl_ExecutionEngine->addGlobalMapping(name, pointerToJITTargetAddress(addr));
 }
 
 extern "C" JL_DLLEXPORT
