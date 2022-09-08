@@ -470,7 +470,7 @@ private:
     //Map and inc are guarded by RLST_mutex
     std::mutex RLST_mutex{};
     int RLST_inc = 0;
-    DenseMap<void*, std::string> ReverseLocalSymbolTable;
+    DenseMap<void*, orc::SymbolStringPtr> ReverseLocalSymbolTable;
 
     //Compilation streams
     jl_locked_stream dump_emitted_mi_name_stream;

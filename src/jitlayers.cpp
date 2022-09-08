@@ -1366,8 +1366,8 @@ JITTargetAddress JuliaOJIT::getFunctionAddress(StringRef Name)
 StringRef JuliaOJIT::getFunctionAtAddress(JITTargetAddress Addr, jl_code_instance_t *codeinst)
 {
     std::lock_guard<std::mutex> lock(RLST_mutex);
-    std::string *fname = &ReverseLocalSymbolTable[jitTargetAddressToPointer<void*>(Addr)];
-    if (fname->empty()) {
+    auto &fname = ReverseLocalSymbolTable[jitTargetAddressToPointer<void*>(Addr)];
+    if (!fname) {
         std::string string_fname;
         raw_string_ostream stream_fname(string_fname);
         // try to pick an appropriate name that describes it
@@ -1386,7 +1386,7 @@ StringRef JuliaOJIT::getFunctionAtAddress(JITTargetAddress Addr, jl_code_instanc
         }
         const char* unadorned_name = jl_symbol_name(codeinst->def->def.method->name);
         stream_fname << unadorned_name << "_" << RLST_inc++;
-        *fname = std::move(stream_fname.str()); // store to ReverseLocalSymbolTable
+        fname = ES.intern(std::move(stream_fname.str())); // store to ReverseLocalSymbolTable
         addGlobalMapping(*fname, Addr);
     }
     return *fname;
