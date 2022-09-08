@@ -410,12 +410,13 @@ public:
 #endif
 
     orc::SymbolStringPtr mangle(StringRef Name);
-    void addGlobalMapping(StringRef Name, JITTargetAddress Addr);
+    void addGlobalMapping(StringRef Name, JITTargetAddress Addr, bool prelocked);
     void addModule(orc::ThreadSafeModule M);
 
     JL_JITSymbol findSymbol(StringRef Name, bool ExportedSymbolsOnly);
     JL_JITSymbol findUnmangledSymbol(StringRef Name);
     JITTargetAddress getGlobalValueAddress(StringRef Name);
+    JITTargetAddress getGlobalValueAddressUnmangled(StringRef Name);
     JITTargetAddress getFunctionAddress(StringRef Name);
     StringRef getFunctionAtAddress(JITTargetAddress Addr, jl_code_instance_t *codeinst);
     auto getContext() {
@@ -456,6 +457,7 @@ public:
 private:
     std::string getMangledName(StringRef Name);
     std::string getMangledName(const GlobalValue *GV);
+    void registerGlobalAtAddress(orc::SymbolStringPtr Mangled, JITTargetAddress Addr, bool prelocked);
     void shareStrings(Module &M);
 
     const std::unique_ptr<TargetMachine> TM;
@@ -470,7 +472,7 @@ private:
     //Map and inc are guarded by RLST_mutex
     std::mutex RLST_mutex{};
     int RLST_inc = 0;
-    DenseMap<void*, orc::SymbolStringPtr> ReverseLocalSymbolTable;
+    DenseMap<JITTargetAddress, orc::SymbolStringPtr> ReverseLocalSymbolTable;
 
     //Compilation streams
     jl_locked_stream dump_emitted_mi_name_stream;

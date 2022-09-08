@@ -318,7 +318,7 @@ int jl_compile_extern_c_impl(LLVMOrcThreadSafeModuleRef llvmmod, void *p, void *
     const char *name = jl_generate_ccallable(wrap(into), sysimg, declrt, sigt, *pparams);
     bool success = true;
     if (!sysimg) {
-        if (jl_ExecutionEngine->getGlobalValueAddress(name)) {
+        if (jl_ExecutionEngine->getGlobalValueAddressUnmangled(name)) {
             success = false;
         }
         if (success && p == NULL) {
@@ -1279,23 +1279,25 @@ orc::SymbolStringPtr JuliaOJIT::mangle(StringRef Name)
     return ES.intern(MangleName);
 }
 
-void JuliaOJIT::addGlobalMapping(StringRef Name, JITTargetAddress Addr)
+void JuliaOJIT::addGlobalMapping(StringRef Name, JITTargetAddress Addr, bool prelocked)
 {
-    cantFail(JD.define(orc::absoluteSymbols({{mangle(Name),
+    auto mangled = mangle(Name);
+    cantFail(JD.define(orc::absoluteSymbols({{mangled,
         JITEvaluatedSymbol::fromPointer(jitTargetAddressToPointer<void*>(Addr))}})));
+    registerGlobalAtAddress(std::move(mangled), Addr, prelocked);
 }
 
 void JuliaOJIT::addModule(orc::ThreadSafeModule TSM)
 {
     JL_TIMING(LLVM_MODULE_FINISH);
     ++ModulesAdded;
-    std::vector<std::string> NewExports;
+    std::vector<orc::SymbolStringPtr> NewExports;
     TSM.withModuleDo([&](Module &M) {
         jl_decorate_module(M);
         shareStrings(M);
         for (auto &F : M.global_values()) {
             if (!F.isDeclaration() && F.getLinkage() == GlobalValue::ExternalLinkage) {
-                NewExports.push_back(getMangledName(F.getName()));
+                NewExports.push_back(mangle(F.getName()));
             }
         }
 #if !defined(JL_NDEBUG) && !defined(JL_USE_JITLINK)
@@ -1323,8 +1325,11 @@ void JuliaOJIT::addModule(orc::ThreadSafeModule TSM)
     cantFail(OptSelLayer.add(JD, std::move(TSM)));
     // force eager compilation (for now), due to memory management specifics
     // (can't handle compilation recursion)
-    for (auto Name : NewExports)
-        cantFail(ES.lookup({&JD}, Name));
+    for (auto &Name : NewExports) {
+        auto Addr = getFunctionAddress(*Name);
+        assert(Addr && "Error while materializing function!");
+        registerGlobalAtAddress(std::move(Name), Addr, false);
+    }
 
 }
 
@@ -1345,53 +1350,63 @@ JL_JITSymbol JuliaOJIT::findUnmangledSymbol(StringRef Name)
 
 JITTargetAddress JuliaOJIT::getGlobalValueAddress(StringRef Name)
 {
-    auto addr = findSymbol(getMangledName(Name), false);
+    auto addr = findSymbol(Name, false);
     if (!addr) {
         consumeError(addr.takeError());
         return 0;
     }
     return cantFail(addr.getAddress());
+}
+
+JITTargetAddress JuliaOJIT::getGlobalValueAddressUnmangled(StringRef Name)
+{
+    return getGlobalValueAddress(getMangledName(Name));
 }
 
 JITTargetAddress JuliaOJIT::getFunctionAddress(StringRef Name)
 {
-    auto addr = findSymbol(getMangledName(Name), false);
-    if (!addr) {
-        consumeError(addr.takeError());
-        return 0;
-    }
-    return cantFail(addr.getAddress());
+    return getGlobalValueAddressUnmangled(Name);
 }
 
 StringRef JuliaOJIT::getFunctionAtAddress(JITTargetAddress Addr, jl_code_instance_t *codeinst)
 {
-    std::lock_guard<std::mutex> lock(RLST_mutex);
-    auto &fname = ReverseLocalSymbolTable[jitTargetAddressToPointer<void*>(Addr)];
-    if (!fname) {
-        std::string string_fname;
-        raw_string_ostream stream_fname(string_fname);
-        // try to pick an appropriate name that describes it
-        jl_callptr_t invoke = jl_atomic_load_relaxed(&codeinst->invoke);
-        if (Addr == (uintptr_t)invoke) {
-            stream_fname << "jsysw_";
-        }
-        else if (invoke == jl_fptr_args_addr) {
-            stream_fname << "jsys1_";
-        }
-        else if (invoke == jl_fptr_sparam_addr) {
-            stream_fname << "jsys3_";
-        }
-        else {
-            stream_fname << "jlsys_";
-        }
-        const char* unadorned_name = jl_symbol_name(codeinst->def->def.method->name);
-        stream_fname << unadorned_name << "_" << RLST_inc++;
-        fname = ES.intern(std::move(stream_fname.str())); // store to ReverseLocalSymbolTable
-        addGlobalMapping(*fname, Addr);
+    std::unique_lock<std::mutex> lock(RLST_mutex);
+    auto it = ReverseLocalSymbolTable.find(Addr);
+    if (it != ReverseLocalSymbolTable.end()) {
+        return *it->second;
     }
-    return *fname;
+    std::string string_fname;
+    raw_string_ostream stream_fname(string_fname);
+    // try to pick an appropriate name that describes it
+    jl_callptr_t invoke = jl_atomic_load_relaxed(&codeinst->invoke);
+    if (Addr == pointerToJITTargetAddress(invoke)) {
+        stream_fname << "jsysw_";
+    }
+    else if (invoke == jl_fptr_args_addr) {
+        stream_fname << "jsys1_";
+    }
+    else if (invoke == jl_fptr_sparam_addr) {
+        stream_fname << "jsys3_";
+    }
+    else {
+        stream_fname << "jlsys_";
+    }
+    const char* unadorned_name = jl_symbol_name(codeinst->def->def.method->name);
+    stream_fname << unadorned_name << "_" << RLST_inc++;
+    addGlobalMapping(stream_fname.str(), Addr, true);
+    return *ReverseLocalSymbolTable[Addr];
 }
 
+void JuliaOJIT::registerGlobalAtAddress(orc::SymbolStringPtr Mangled, JITTargetAddress Addr, bool prelocked) {
+    std::unique_lock<std::mutex> lock(RLST_mutex, std::defer_lock);
+    if (!prelocked) {
+        lock.lock();
+    }
+    /*auto retval = */ReverseLocalSymbolTable.insert({Addr, std::move(Mangled)});
+    //Either we successfully inserted or we inserted the same name already
+    //TODO is this actually a valid assertion?
+    // assert((retval.second || retval.first->second == Mangled) && "Produced two different names for the same pointer!");
+}
 
 #ifdef JL_USE_JITLINK
 # if JL_LLVM_VERSION < 140000
@@ -1738,7 +1753,7 @@ static JITTargetAddress getAddressForFunction(StringRef fname)
 // helper function for adding a DLLImport (dlsym) address to the execution engine
 void add_named_global(StringRef name, void *addr)
 {
-    jl_ExecutionEngine->addGlobalMapping(name, pointerToJITTargetAddress(addr));
+    jl_ExecutionEngine->addGlobalMapping(name, pointerToJITTargetAddress(addr), false);
 }
 
 extern "C" JL_DLLEXPORT
