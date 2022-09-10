@@ -423,4 +423,3 @@ end
 minimum(s::BitSet) = first(s)
 maximum(s::BitSet) = last(s)
 extrema(s::BitSet) = (first(s), last(s))
-issorted(s::BitSet) = true
