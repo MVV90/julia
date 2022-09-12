@@ -1465,13 +1465,13 @@ function deserialize_string(s::AbstractSerializer, len::Int)
 end
 
 # default DataType deserializer
-function deserialize(s::AbstractSerializer, t::DataType)
-    nf = length(t.types)
-    if nf == 0 && t.size > 0
+function deserialize(s::AbstractSerializer, ::Type{T}) where {T}
+    nf = length(T.types)
+    if nf == 0 && T.size > 0
         # bits type
-        return read(s.io, t)
-    elseif ismutabletype(t)
-        x = ccall(:jl_new_struct_uninit, Any, (Any,), t)
+        return read(s.io, T)
+    elseif ismutabletype(T)
+        x = ccall(:jl_new_struct_uninit, Any, (Any,), T)
         deserialize_cycle(s, x)
         for i in 1:nf
             tag = Int32(read(s.io, UInt8)::UInt8)
@@ -1481,7 +1481,7 @@ function deserialize(s::AbstractSerializer, t::DataType)
         end
         return x
     elseif nf == 0
-        return ccall(:jl_new_struct_uninit, Any, (Any,), t)
+        return ccall(:jl_new_struct_uninit, Any, (Any,), T)
     else
         na = nf
         vflds = Vector{Any}(undef, nf)
@@ -1494,7 +1494,7 @@ function deserialize(s::AbstractSerializer, t::DataType)
                 na >= i && (na = i - 1) # rest of tail must be undefined values
             end
         end
-        return ccall(:jl_new_structv, Any, (Any, Ptr{Any}, UInt32), t, vflds, na)
+        return ccall(:jl_new_structv, Any, (Any, Ptr{Any}, UInt32), T, vflds, na)
     end
 end
 
