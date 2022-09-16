@@ -1,46 +1,9 @@
-#define _GNU_SOURCE
 #include "libsupport.h"
 #include <stdlib.h>
-#include <locale.h>
-
-#if defined(__APPLE__) || defined(__FreeBSD__)
-#include <xlocale.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#if !defined(_OS_WINDOWS_)
-// This code path should be used for systems that support the strtod_l function
-
-// Cache locale object
-static int c_locale_initialized = 0;
-static locale_t c_locale;
-
-locale_t get_c_locale(void)
-{
-    if (!c_locale_initialized) {
-        c_locale_initialized = 1;
-        c_locale = newlocale(LC_ALL_MASK, "C", NULL);
-    }
-    return c_locale;
-}
-
-JL_DLLEXPORT double jl_strtod_c(const char *nptr, char **endptr)
-{
-    return strtod_l(nptr, endptr, get_c_locale());
-}
-
-JL_DLLEXPORT float jl_strtof_c(const char *nptr, char **endptr)
-{
-    return strtof_l(nptr, endptr, get_c_locale());
-}
-
-
-#else
-// This code path should be used for systems that do not support the strtod_l function
-// Currently this is MinGW/Windows
 
 // The following code is derived from the Python function _PyOS_ascii_strtod
 // see https://github.com/python/cpython/blob/master/Python/pystrtod.c
@@ -55,6 +18,7 @@ JL_DLLEXPORT float jl_strtof_c(const char *nptr, char **endptr)
 
 #include <ctype.h>
 #include <errno.h>
+#include <locale.h>
 
 int case_insensitive_match(const char *s, const char *t)
 {
@@ -97,8 +61,7 @@ double parse_inf_or_nan(const char *p, char **endptr)
     return retval;
 }
 
-
-JL_DLLEXPORT double jl_strtod_c(const char *nptr, char **endptr)
+double _strtod_c(const char *nptr, char **endptr)
 {
     char *fail_pos;
     double val;
@@ -274,13 +237,15 @@ invalid_string:
     return -1.0;
 }
 
+JL_DLLEXPORT double jl_strtod_c(const char *nptr, char **endptr)
+{
+    return _strtod_c(nptr, endptr);
+}
 
 JL_DLLEXPORT float jl_strtof_c(const char *nptr, char **endptr)
 {
-    return (float) jl_strtod_c(nptr, endptr);
+    return (float) _strtod_c(nptr, endptr);
 }
-
-#endif
 
 #ifdef __cplusplus
 }
