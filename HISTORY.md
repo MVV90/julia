@@ -180,7 +180,6 @@ Standard library changes
   user preferences ([#39455]).
 * On aarch64, OpenBLAS now uses an ILP64 BLAS like all other 64-bit platforms ([#39436]).
 * OpenBLAS is updated to 0.3.13 ([#39216]).
-* SuiteSparse is updated to 5.8.1 ([#39455]).
 * The shape of an `UpperHessenberg` matrix is preserved under certain arithmetic operations,
   e.g. when multiplying or dividing by an `UpperTriangular` matrix ([#40039]).
 * Real quasitriangular Schur factorizations `S` can now be efficiently converted to complex
@@ -4534,9 +4533,6 @@ Deprecated or removed
     `pointer_to_array` has been renamed to `unsafe_wrap(Array, ...)` ([#16731]).
 
   * `sub` and `slice` have been deprecated in favor of `view` ([#16972]).
-
-  * Sparse matrix functions `etree`, `ereach`, `csc_permute`, and `symperm` have been moved
-    to the [SuiteSparse.jl package](https://github.com/JuliaSparse/SuiteSparse.jl) ([#12231], [#17033]).
 
   * The no-op `transpose` fallback for non-numeric arrays has been deprecated. Consider introducing suitable
     `transpose` methods or calling `permutedims(x, (2, 1))` for matrices and `reshape(x, 1, length(x))` for
