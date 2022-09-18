@@ -59,7 +59,6 @@ let
         :REPL,
         :SharedArrays,
         :Statistics,
-        :SuiteSparse,
         :TOML,
         :Test,
 

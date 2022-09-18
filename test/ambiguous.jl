@@ -166,7 +166,7 @@ ambs = detect_ambiguities(Ambig5)
 @test length(ambs) == 2
 
 
-using LinearAlgebra, SparseArrays, SuiteSparse
+using LinearAlgebra, SparseArrays
 
 # Test that Core and Base are free of ambiguities
 # not using isempty so this prints more information when it fails

@@ -309,7 +309,6 @@ of the Linear Algebra documentation.
 ## Standard functions
 
 Linear algebra functions in Julia are largely implemented by calling functions from [LAPACK](http://www.netlib.org/lapack/).
-Sparse matrix factorizations call functions from [SuiteSparse](http://suitesparse.com).
 Other sparse solvers are available as Julia packages.
 
 ```@docs

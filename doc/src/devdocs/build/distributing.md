@@ -9,11 +9,8 @@ platform has specific gotchas and processes that must be followed in
 order to create a portable, working Julia distribution, we have
 separated most of the notes by OS.
 
-Note that while the code for Julia is
-[MIT-licensed, with a few exceptions](https://github.com/JuliaLang/julia/blob/master/LICENSE.md),
-the distribution created by the techniques described herein will be
-GPL licensed, as various dependent libraries such as `SuiteSparse` are
-GPL licensed. We do hope to have a non-GPL distribution of Julia in the future.
+Note Julia is
+[MIT-licensed, with a few exceptions](https://github.com/JuliaLang/julia/blob/master/LICENSE.md).
 
 Versioning and Git
 ------------------
@@ -129,8 +126,7 @@ called `USE_BLAS64` is available as part of the Julia build. When doing
 `make USE_BLAS64=0`, Julia will call BLAS and LAPACK assuming a 32-bit
 API, where all integers are 32-bit wide, even on a 64-bit architecture.
 
-Other libraries that Julia uses, such as SuiteSparse also
-use BLAS and LAPACK internally. The APIs need to be consistent across
+Other libraries that Julia uses. The APIs need to be consistent across
 all libraries that depend on BLAS and LAPACK. The Julia build process
 will build all these libraries correctly, but when overriding defaults
 and using system provided libraries, this consistency must be ensured.
