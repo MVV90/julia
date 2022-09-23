@@ -12,7 +12,7 @@ _rand(::Type{T}) where {T <: AbstractFloat} = T(randn())
 _rand(::Type{T}) where {F, T <: Complex{F}} = T(_rand(F), _rand(F))
 _rand(::Type{T}) where {T <: Integer} =
     T(rand(max(typemin(T), -10):min(typemax(T), 10)))
-_rand(::Type{BigInt}) = BigInt(_rand(Int))
+_rand(::Type{Int128}) = Int128(_rand(Int))
 
 function _rand(A::Type{<:Array}, shape)
     T = eltype(A)
@@ -48,17 +48,15 @@ testdata = []
 sizecandidates = 1:4
 floattypes = [
     Float64, Float32, ComplexF64, ComplexF32,  # BlasFloat
-    BigFloat,
 ]
 inttypes = [
     Int,
-    BigInt,
 ]
 # `Bool` can be added to `inttypes` but it's hard to handle
 # `InexactError` bug that is mentioned in:
 # https://github.com/JuliaLang/julia/issues/30094#issuecomment-440175887
 alleltypes = [floattypes; inttypes]
-celtypes = [Float64, ComplexF64, BigFloat, Int]
+celtypes = [Float64, ComplexF64, Int]
 
 mattypes = [
     Matrix,
@@ -88,21 +86,6 @@ function sample(S, n::Real)
     return length(xs) > 0 ? xs : rand(S, 1)  # sample at least one
 end
 
-function inputeltypes(celt, alleltypes = alleltypes)
-    # Skip if destination type is "too small"
-    celt <: Bool && return []
-    filter(alleltypes) do aelt
-        celt <: Real && aelt <: Complex && return false
-        !(celt <: BigFloat) && aelt <: BigFloat && return false
-        !(celt <: BigInt) && aelt <: BigInt && return false
-        celt <: IntegerOrC && aelt <: FloatOrC && return false
-        if celt <: IntegerOrC && !(celt <: BigInt)
-            typemin(celt) > typemin(aelt) && return false
-            typemax(celt) < typemax(aelt) && return false
-        end
-        return true
-    end
-end
 # Note: using `randsubseq` instead of `rand` to avoid repetition.
 
 function inputmattypes(cmat, mattypes = mattypes)
@@ -124,9 +107,6 @@ for cmat in mattypes,
     amat in sample(inputmattypes(cmat), n_samples),
     bmat in sample(inputmattypes(cmat), n_samples),
     celt in celtypes,
-    aelt in sample(inputeltypes(celt), n_samples),
-    belt in sample(inputeltypes(celt), n_samples)
-
     push!(testdata, (cmat{celt}, amat{aelt}, bmat{belt}))
 end
 

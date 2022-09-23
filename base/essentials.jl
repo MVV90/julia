@@ -190,9 +190,6 @@ julia> x = 1/3
 
 julia> convert(Float32, x)
 0.33333334f0
-
-julia> convert(BigFloat, x)
-0.333333333333333314829616256247390992939472198486328125
 ```
 
 If `T` is a collection type and `x` a collection, the result of

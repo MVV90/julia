@@ -121,7 +121,6 @@ end
                        Float16, Float32, Float64]
         @test sum(T[]) === T(0)
     end
-    @test sum(BigInt[]) == big(0) && sum(BigInt[]) isa BigInt
 end
 
 @test sum(Bool[]) === sum(Bool[false]) === sum(Bool[false, false]) === 0
@@ -215,7 +214,6 @@ end
 @test prod(fz) === 120.0
 
 @test prod(1:big(16)) == big(20922789888000)
-@test prod(big(typemax(Int64)):big(typemax(Int64))+16) == parse(BigInt,"25300281663413827620486300433089141956148633919452440329174083959168114253708467653081909888307573358090001734956158476311046124934597861626299416732205795533726326734482449215730132757595422510465791525610410023802664753402501982524443370512346073948799084936298007821432734720004795146875180123558814648586972474376192000")
 
 @test typeof(prod(Array(trues(10)))) == Bool
 
@@ -574,12 +572,6 @@ struct NonFunctionIsZero end
 ## cumsum, cummin, cummax
 
 z = rand(10^6)
-let es = sum(BigFloat.(z)), es2 = sum(BigFloat.(z[1:10^5]))
-    @test (es - sum(z)) < es * 1e-13
-    cs = cumsum(z)
-    @test (es - cs[end]) < es * 1e-13
-    @test (es2 - cs[10^5]) < es2 * 1e-13
-end
 
 @test sum(Vector(map(UInt8,0:255))) == 32640
 @test sum(Vector(map(UInt8,254:255))) == 509

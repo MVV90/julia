@@ -41,7 +41,7 @@ end
 end
 
 @testset "arithmetic" begin
-    @testset for T in (Float16, Float32, Float64, BigFloat)
+    @testset for T in (Float16, Float32, Float64)
         t = true
         f = false
 
@@ -99,9 +99,6 @@ end
 end
 
 @testset "basic math functions" begin
-    # We compare to BigFloat instead of hard-coding
-    # values, assuming that BigFloat has an independent and independently
-    # tested implementation.
     @testset for T in (Float32, Float64)
         x = Complex{T}(1//3 + 1//4*im)
         y = Complex{T}(1//2 + 1//5*im)
@@ -850,32 +847,6 @@ harddivs = ((1.0+im*1.0, 1.0+im*2^1023.0, 2^-1023.0-im*2^-1023.0), #1
       (2^-622.0+im*2^-1071., 2^-343.0+im*2^-798.0, z10) #10
       )
 
-# calculate "accurate bits" in range 0:53 by algorithm given in arxiv.1210.4539
-function sb_accuracy(x,expected)
-    min(logacc(real(x),real(expected)),
-        logacc(imag(x),imag(expected)))
-end
-relacc(x,expected) = abs(x-expected)/abs(expected)
-function logacc(x::Float64,expected::Float64)
-    x == expected && (return 53)
-    expected == 0 && (return 0)
-    (x == Inf || x == -Inf) && (return 0)
-    isnan(x) && (return 0)
-    ra = relacc(BigFloat(x),BigFloat(expected))
-    max(floor(Int,-log2(ra)),0)
-end
-# the robust division algorithm should have 53 or 52
-# bits accuracy for each of the hard divisions
-@test 52 <= minimum([sb_accuracy(h[1]/h[2],h[3]) for h in harddivs])
-
-# division of non-Float64
-function cdiv_test(a,b)
-    c=convert(ComplexF64,a)/convert(ComplexF64,b)
-    50 <= sb_accuracy(c,convert(ComplexF64,a/b))
-end
-@test cdiv_test(complex(1//2, 3//4), complex(17//13, 4//5))
-@test cdiv_test(complex(1,2), complex(8997,2432))
-
 @testset "inv" begin
     @test inv(1e300+0im) == 1e-300 - 0.0im
     @test inv(0+1e300im) == 0.0 - 1e-300im
@@ -1039,7 +1010,7 @@ end
 @testset "corner cases of division, issue #22983" begin
     # These results abide by ISO/IEC 10967-3:2006(E) and
     # mathematical definition of division of complex numbers.
-    for T in (Float16, Float32, Float64, BigFloat)
+    for T in (Float16, Float32, Float64)
         @test isequal(one(T) / zero(Complex{T}), one(Complex{T}) / zero(Complex{T}))
         @test isequal(one(T) / zero(Complex{T}), Complex{T}(NaN, NaN))
         @test isequal(one(Complex{T}) / zero(T), Complex{T}(Inf, NaN))
@@ -1050,7 +1021,7 @@ end
 end
 
 @testset "division by Inf, issue#23134" begin
-    @testset "$T" for T in (Float16, Float32, Float64, BigFloat)
+    @testset "$T" for T in (Float16, Float32, Float64)
         @test isequal(one(T) / complex(T(Inf)),         complex(zero(T), -zero(T)))
         @test isequal(one(T) / complex(T(Inf), one(T)), complex(zero(T), -zero(T)))
         @test isequal(one(T) / complex(T(Inf), T(NaN)), complex(zero(T), -zero(T)))
@@ -1096,7 +1067,7 @@ end
 end
 
 @testset "complex^real, issue #14342" begin
-    for T in (Float32, Float64, BigFloat), p in (T(-21//10), -21//10)
+    for T in (Float32, Float64), p in (T(-21//10), -21//10)
         z = T(2)+0im
         @test real(z^p) ≈ 2^p
         @test signbit(imag(z^p))
@@ -1183,7 +1154,7 @@ end
 end
 
 @testset "issue #29840" begin
-    @testset "$T" for T in (ComplexF32, ComplexF64, Complex{BigFloat})
+    @testset "$T" for T in (ComplexF32, ComplexF64)
         @test isequal(ComplexF64(sec(T(-10, 1000))), ComplexF64(-0.0, 0.0))
         @test isequal(ComplexF64(csc(T(-10, 1000))), ComplexF64(0.0, 0.0))
         @test isequal(ComplexF64(sech(T(1000, 10))), ComplexF64(-0.0, 0.0))

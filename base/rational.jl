@@ -126,7 +126,7 @@ Rational(x::Float32) = Rational{Int}(x)
 
 big(q::Rational) = unsafe_rational(big(numerator(q)), big(denominator(q)))
 
-big(z::Complex{<:Rational{<:Integer}}) = Complex{Rational{BigInt}}(z)
+big(z::Complex{<:Rational{<:Integer}}) = Complex{Rational{Int128}}(z)
 
 promote_rule(::Type{Rational{T}}, ::Type{S}) where {T<:Integer,S<:Integer} = Rational{promote_type(T,S)}
 promote_rule(::Type{Rational{T}}, ::Type{Rational{S}}) where {T<:Integer,S<:Integer} = Rational{promote_type(T,S)}
@@ -147,11 +147,11 @@ of the given integer type. The result will differ from `x` by no more than `tol`
 julia> rationalize(5.6)
 28//5
 
-julia> a = rationalize(BigInt, 10.3)
+julia> a = rationalize(Int128, 10.3)
 103//10
 
 julia> typeof(numerator(a))
-BigInt
+Int128
 ```
 """
 function rationalize(::Type{T}, x::AbstractFloat, tol::Real) where T<:Integer

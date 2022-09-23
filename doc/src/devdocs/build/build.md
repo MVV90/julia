@@ -178,8 +178,6 @@ uses are listed in [`deps/Versions.make`](https://github.com/JuliaLang/julia/blo
 - **[LAPACK]**               — library of linear algebra routines for solving systems of simultaneous linear equations, least-squares solutions of linear systems of equations, eigenvalue problems, and singular value problems.
 - **[MKL]** (optional)       – OpenBLAS and LAPACK may be replaced by Intel's MKL library.
 - **[PCRE]**                 — Perl-compatible regular expressions library.
-- **[GMP]**                  — GNU multiple precision arithmetic library, needed for `BigInt` support.
-- **[MPFR]**                 — GNU multiple precision floating point library, needed for arbitrary precision floating point (`BigFloat`) support.
 - **[libgit2]**              — Git linkable library, used by Julia's package manager.
 - **[curl]**                 — libcurl provides download and proxy support.
 - **[libssh2]**              — library for SSH transport, used by libgit2 for packages with SSH remotes.
@@ -209,8 +207,6 @@ uses are listed in [`deps/Versions.make`](https://github.com/JuliaLang/julia/blo
 [LLVM]:         https://www.llvm.org
 [LLVM libunwind]: https://github.com/llvm/llvm-project/tree/main/libunwind
 [FemtoLisp]:    https://github.com/JeffBezanson/femtolisp
-[GMP]:          https://gmplib.org
-[MPFR]:         https://www.mpfr.org
 [libuv]:        https://github.com/JuliaLang/libuv
 [libgit2]:      https://libgit2.org/
 [utf8proc]:     https://julialang.org/utf8proc/

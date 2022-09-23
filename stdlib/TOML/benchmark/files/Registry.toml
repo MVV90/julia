@@ -994,7 +994,6 @@ some amount of consideration when choosing package names.
 3a865a2d-5b23-5a0f-bc46-62713ec82fae = { name = "CuArrays", path = "C/CuArrays" }
 3a884ed6-31ef-47d7-9d2a-63182c4928ed = { name = "UnPack", path = "U/UnPack" }
 3a90a9a9-52f9-452b-94bd-193d585bd84f = { name = "BaremetalPi", path = "B/BaremetalPi" }
-3a97d323-0669-5f0c-9066-3539efd106a3 = { name = "MPFR_jll", path = "M/MPFR_jll" }
 3a985190-f512-4703-8d38-2a7944ed5916 = { name = "FranklinTemplates", path = "F/FranklinTemplates" }
 3a9c7681-b7ab-4d38-9bb7-f7834a016733 = { name = "SimpleQuaternions", path = "S/SimpleQuaternions" }
 3aa97884-90e5-11e8-2134-af657ec4f203 = { name = "GenomeGraphs", path = "G/GenomeGraphs" }
@@ -1986,7 +1985,6 @@ some amount of consideration when choosing package names.
 77ec8976-b24b-556a-a1bf-49a033a670a6 = { name = "GTK3_jll", path = "G/GTK3_jll" }
 77f5812f-bd1f-5f6e-9b72-07b28d8bbbc3 = { name = "SingularSpectrumAnalysis", path = "S/SingularSpectrumAnalysis" }
 7806a523-6efd-50cb-b5f6-3fa6f1930dbb = { name = "DecisionTree", path = "D/DecisionTree" }
-781609d7-10c4-51f6-84f2-b8444358ff6d = { name = "GMP_jll", path = "G/GMP_jll" }
 7820620d-95fb-4739-93b3-b0a14dd83f9a = { name = "AgentsPlots", path = "A/AgentsPlots" }
 78421dfc-ac16-5d69-8300-c22153e3d0b6 = { name = "ProperOrthogonalDecomposition", path = "P/ProperOrthogonalDecomposition" }
 78472c14-d0da-49a8-bd95-2e052d09304f = { name = "PCloud", path = "P/PCloud" }
@@ -3383,7 +3381,6 @@ cdb1efd8-3f30-48e6-a1f7-a3d77bf376b8 = { name = "DSPopt", path = "D/DSPopt" }
 cdddcdb0-9152-4a09-a978-84456f9df70a = { name = "ChainRulesTestUtils", path = "C/ChainRulesTestUtils" }
 cde9dba0-b1de-11e9-2c62-0bab9446c55c = { name = "InfiniteLinearAlgebra", path = "I/InfiniteLinearAlgebra" }
 cdeeb48b-bcdf-5b3f-98c4-7a29487f695f = { name = "libexif_jll", path = "L/libexif_jll" }
-cdf4abc8-5239-43db-b7bc-12a39a6062cc = { name = "MPFR_wrap", path = "M/MPFR_wrap" }
 cdf55027-1209-57fc-8789-28745714751d = { name = "SEAL_jll", path = "S/SEAL_jll" }
 cdff3cb4-2c4b-5bf5-8db2-d08d991b0013 = { name = "SimpleLife", path = "S/SimpleLife" }
 ce1b76f3-601c-5192-adf8-a07e935792b9 = { name = "AvailablePotentialEnergyFramework", path = "A/AvailablePotentialEnergyFramework" }

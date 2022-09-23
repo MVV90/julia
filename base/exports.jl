@@ -25,8 +25,6 @@ export
     AbstractMatch,
     AbstractPattern,
     AbstractDict,
-    BigFloat,
-    BigInt,
     BitArray,
     BitMatrix,
     BitVector,
@@ -646,7 +644,7 @@ export
     @warn,
     @error,
 
-# bigfloat & precision
+# float & precision
     precision,
     rounding,
     setprecision,

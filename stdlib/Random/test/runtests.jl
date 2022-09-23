@@ -85,7 +85,7 @@ let B = zeros(ComplexF64, 2)
                 ComplexF64(0.027155338009193845,-0.29948409035891055)] * 0.7071067811865475244008
 end
 
-for T in (Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Int128, UInt128, BigInt,
+for T in (Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Int128, UInt128,
           Float16, Float32, Float64, Rational{Int})
     r = rand(convert(T, 97):convert(T, 122))
     @test typeof(r) == T
@@ -95,7 +95,7 @@ for T in (Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Int128, UInt
     @test 97 <= r <= 122
     @test mod(r,2)==1
 
-    if T<:Integer && !(T===BigInt)
+    if T<:Integer
         x = rand(typemin(T):typemax(T))
         @test isa(x,T)
         @test typemin(T) <= x <= typemax(T)
@@ -120,17 +120,16 @@ if sizeof(Int32) < sizeof(Int)
     end
 end
 
-# BigInt specific
 for T in [UInt32, UInt64, UInt128, Int128]
     local r, s
     s = big(typemax(T)-1000) : big(typemax(T)) + 10000
     # s is a 11001-length array
-    @test rand(s) isa BigInt
+    @test rand(s) isa Int128
     @test sum(rand(s, 1000) .== rand(s, 1000)) <= 20
     @test big(typemax(T)-1000) <= rand(s) <= big(typemax(T)) + 10000
     r = rand(s, 1, 2)
     @test size(r) == (1, 2)
-    @test typeof(r) == Matrix{BigInt}
+    @test typeof(r) == Matrix{Int128}
     guardseed() do
         Random.seed!(0)
         r = rand(s)
@@ -139,83 +138,6 @@ for T in [UInt32, UInt64, UInt128, Int128]
     end
 end
 
-# Test ziggurat tables
-ziggurat_table_size = 256
-nmantissa           = Int64(2)^51 # one bit for the sign
-ziggurat_nor_r      = parse(BigFloat,"3.65415288536100879635194725185604664812733315920964488827246397029393565706474")
-erfc_zigg_root2     = parse(BigFloat,"2.580324876539008898343885504487203185398584536409033046076029509351995983934371e-04")
-nor_section_area    = ziggurat_nor_r*exp(-ziggurat_nor_r^2/2) + erfc_zigg_root2*sqrt(big(π)/2)
-emantissa           = Int64(2)^52
-ziggurat_exp_r      = parse(BigFloat,"7.69711747013104971404462804811408952334296818528283253278834867283241051210533")
-exp_section_area    = (ziggurat_exp_r + 1)*exp(-ziggurat_exp_r)
-
-ki = Vector{UInt64}(undef, ziggurat_table_size)
-wi = Vector{Float64}(undef, ziggurat_table_size)
-fi = Vector{Float64}(undef, ziggurat_table_size)
-# Tables for exponential variates
-ke = Vector{UInt64}(undef, ziggurat_table_size)
-we = Vector{Float64}(undef, ziggurat_table_size)
-fe = Vector{Float64}(undef, ziggurat_table_size)
-function randmtzig_fill_ziggurat_tables() # Operates on the global arrays
-    wib = big.(wi)
-    fib = big.(fi)
-    web = big.(we)
-    feb = big.(fe)
-    # Ziggurat tables for the normal distribution
-    x1 = ziggurat_nor_r
-    wib[256] = x1/nmantissa
-    fib[256] = exp(-0.5*x1*x1)
-    # Index zero is special for tail strip, where Marsaglia and Tsang
-    # defines this as
-    # k_0 = 2^31 * r * f(r) / v, w_0 = 0.5^31 * v / f(r), f_0 = 1,
-    # where v is the area of each strip of the ziggurat.
-    ki[1] = trunc(UInt64,x1*fib[256]/nor_section_area*nmantissa)
-    wib[1] = nor_section_area/fib[256]/nmantissa
-    fib[1] = one(BigFloat)
-
-    for i = 255:-1:2
-        # New x is given by x = f^{-1}(v/x_{i+1} + f(x_{i+1})), thus
-        # need inverse operator of y = exp(-0.5*x*x) -> x = sqrt(-2*ln(y))
-        x = sqrt(-2.0*log(nor_section_area/x1 + fib[i+1]))
-        ki[i+1] = trunc(UInt64,x/x1*nmantissa)
-        wib[i] = x/nmantissa
-        fib[i] = exp(-0.5*x*x)
-        x1 = x
-    end
-
-    ki[2] = UInt64(0)
-
-    # Zigurrat tables for the exponential distribution
-    x1 = ziggurat_exp_r
-    web[256] = x1/emantissa
-    feb[256] = exp(-x1)
-
-    # Index zero is special for tail strip, where Marsaglia and Tsang
-    # defines this as
-    # k_0 = 2^32 * r * f(r) / v, w_0 = 0.5^32 * v / f(r), f_0 = 1,
-    # where v is the area of each strip of the ziggurat.
-    ke[1] = trunc(UInt64,x1*feb[256]/exp_section_area*emantissa)
-    web[1] = exp_section_area/feb[256]/emantissa
-    feb[1] = one(BigFloat)
-
-    for i = 255:-1:2
-        # New x is given by x = f^{-1}(v/x_{i+1} + f(x_{i+1})), thus
-        # need inverse operator of y = exp(-x) -> x = -ln(y)
-        x = -log(exp_section_area/x1 + feb[i+1])
-        ke[i+1] = trunc(UInt64,x/x1*emantissa)
-        web[i] = x/emantissa
-        feb[i] = exp(-x)
-        x1 = x
-    end
-    ke[2] = zero(UInt64)
-
-    wi[:] = wib
-    fi[:] = fib
-    we[:] = web
-    fe[:] = feb
-    return nothing
-end
-randmtzig_fill_ziggurat_tables()
 @test all(ki == Random.ki)
 @test all(wi == Random.wi)
 @test all(fi == Random.fi)
@@ -311,7 +233,7 @@ end
 for rng in ([], [MersenneTwister(0)], [RandomDevice()], [Xoshiro()])
     ftypes = [Float16, Float32, Float64]
     cftypes = [ComplexF16, ComplexF32, ComplexF64, ftypes...]
-    types = [Bool, Char, BigFloat, Base.BitInteger_types..., ftypes...]
+    types = [Bool, Char, Base.BitInteger_types..., ftypes...]
     randset = Set(rand(Int, 20))
     randdict = Dict(zip(rand(Int,10), rand(Int, 10)))
     collections = [BitSet(rand(1:100, 20))          => Int,
@@ -413,8 +335,6 @@ for rng in ([], [MersenneTwister(0)], [RandomDevice()], [Xoshiro()])
         @test_throws MethodError r(Bool)
         @test_throws MethodError r(String)
         @test_throws MethodError r(AbstractFloat)
-        # TODO(#17627): Consider adding support for randn(BigFloat) and removing this test.
-        @test_throws MethodError r(BigFloat)
 
         @test_throws MethodError r(Int64, (2,3))
         @test_throws MethodError r(String, 1)
@@ -430,20 +350,6 @@ function hist(X, n)
         v[floor(Int, x*n) + 1] += 1
     end
     v
-end
-
-# test uniform distribution of floats
-for rng in [MersenneTwister(), RandomDevice(), Xoshiro()],
-    T in [Float16, Float32, Float64, BigFloat],
-        prec in (T == BigFloat ? [3, 53, 64, 100, 256, 1000] : [256])
-    setprecision(BigFloat, prec) do
-        # array version
-        counts = hist(rand(rng, T, 2000), 4)
-        @test minimum(counts) > 300 # should fail with proba < 1e-26
-        # scalar version
-        counts = hist([rand(rng, T) for i in 1:2000], 4)
-        @test minimum(counts) > 300
-    end
 end
 
 @testset "rand(Bool) uniform distribution" begin
@@ -915,53 +821,6 @@ end
     @testset "RandomDevice" begin
         @test string(RandomDevice()) == "$RandomDevice()"
     end
-end
-
-@testset "rand[!] for BigInt/BigFloat" begin
-    rng = MersenneTwister()
-    s = Random.SamplerBigInt(MersenneTwister, 1:big(9))
-    x = rand(s)
-    @test x isa BigInt
-    y = rand!(rng, x, s)
-    @test y === x
-    @test x in 1:9
-
-    for t = BigInt[0, 10, big(2)^100]
-        s = Random.Sampler(rng, t:t) # s.nlimbs == 0
-        @test rand(rng, s) == t
-        @test x === rand!(rng, x, s) == t
-
-        s = Random.Sampler(rng, big(-1):t) # s.nlimbs != 0
-        @test rand(rng, s) ∈ -1:t
-        @test x === rand!(rng, x, s) ∈ -1:t
-
-    end
-
-    s = Random.Sampler(MersenneTwister, Random.CloseOpen01(BigFloat))
-    x = rand(s)
-    @test x isa BigFloat
-    y = rand!(rng, x, s)
-    @test y === x
-    @test 0 <= x < 1
-    s = Random.Sampler(MersenneTwister, Random.CloseOpen12(BigFloat))
-    y = rand!(rng, x, s)
-    @test y === x
-    @test 1 <= x < 2
-
-    old_prec = precision(BigFloat)
-    setprecision(100) do
-        x = rand(s) # should use precision of s
-        @test precision(x) == old_prec
-        x = BigFloat()
-        @test_throws ArgumentError rand!(rng, x, s) # incompatible precision
-    end
-    s = setprecision(100) do
-        Random.Sampler(MersenneTwister, Random.CloseOpen01(BigFloat))
-    end
-    x = rand(s) # should use precision of s
-    @test precision(x) == 100
-    x = BigFloat()
-    @test_throws ArgumentError rand!(rng, x, s) # incompatible precision
 end
 
 @testset "shuffle! for BitArray" begin

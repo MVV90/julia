@@ -297,20 +297,6 @@ end
     @test checked_cld(false, true) === false
     @test_throws DivideError checked_cld(true, false)
 end
-@testset "BigInt" begin
-    @test checked_abs(BigInt(-1)) == BigInt(1)
-    @test checked_abs(BigInt(1)) == BigInt(1)
-    @test checked_neg(BigInt(-1)) == BigInt(1)
-    @test checked_neg(BigInt(1)) == BigInt(-1)
-    @test checked_add(BigInt(1), BigInt(1)) == BigInt(2)
-    @test checked_sub(BigInt(1), BigInt(2)) == BigInt(-1)
-    @test checked_mul(BigInt(2), BigInt(10)) == BigInt(20)
-    @test checked_div(BigInt(10), BigInt(2)) == BigInt(5)
-    @test checked_rem(BigInt(9), BigInt(4)) == BigInt(1)
-    @test checked_fld(BigInt(10), BigInt(3)) == BigInt(3)
-    @test checked_mod(BigInt(9), BigInt(4)) == BigInt(1)
-    @test checked_cld(BigInt(10), BigInt(3)) == BigInt(4)
-end
 
 @testset "Additional tests" begin
     # test promotions

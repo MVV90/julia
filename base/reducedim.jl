@@ -153,8 +153,8 @@ for (f1, f2, initval, typeextreme) in ((:min, :max, :Inf, :typemax), (:max, :min
             elseif isunordered(v0)
                 # v0 is missing or a third-party unordered value
                 Tnm = nonmissingtype(Tr)
-                # TODO: Some types, like BigInt, don't support typemin/typemax.
-                # So a Matrix{Union{BigInt, Missing}} can still error here.
+                # TODO: Some types, like Int128, don't support typemin/typemax.
+                # So a Matrix{Union{Int128, Missing}} can still error here.
                 v0 = $typeextreme(Tnm)
             end
             # v0 may have changed type.
@@ -189,8 +189,8 @@ function reducedim_init(f::ExtremaMap, op::typeof(_extrema_rf), A::AbstractArray
         v0 = oftype(v0[1], Inf), oftype(v0[2], -Inf)
     elseif isunordered(v0[1])
         # v0 is missing or a third-party unordered value
-        # TODO: Some types, like BigInt, don't support typemin/typemax.
-        # So a Matrix{Union{BigInt, Missing}} can still error here.
+        # TODO: Some types, like Int128, don't support typemin/typemax.
+        # So a Matrix{Union{Int128, Missing}} can still error here.
         v0 = typemax(nonmissingtype(Tmin)), typemin(nonmissingtype(Tmax))
     end
     # v0 may have changed type.

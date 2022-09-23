@@ -343,17 +343,9 @@ function deepcopy_internal end
 include("Enums.jl")
 using .Enums
 
-# BigInts
-include("gmp.jl")
-using .GMP
-
-# float printing: requires BigInt
+# float printing
 include("ryu/Ryu.jl")
 using .Ryu
-
-# BigFloats
-include("mpfr.jl")
-using .MPFR
 
 include("combinatorics.jl")
 

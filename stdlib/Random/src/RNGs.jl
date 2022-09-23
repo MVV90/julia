@@ -53,7 +53,7 @@ mutable struct MersenneTwister <: AbstractRNG
 
     # counters for show
     adv::Int64          # state of advance at the DSFMT_state level
-    adv_jump::BigInt    # number of skipped Float64 values via randjump
+    adv_jump::Int128    # number of skipped Float64 values via randjump
     adv_vals::Int64     # state of advance when vals is filled-up
     adv_ints::Int64     # state of advance when ints is filled-up
 
@@ -303,7 +303,7 @@ function make_seed(n::Integer)
 end
 
 # inverse of make_seed(::Integer)
-from_seed(a::Vector{UInt32})::BigInt = sum(a[i] * big(2)^(32*(i-1)) for i in 1:length(a))
+from_seed(a::Vector{UInt32})::Int128 = sum(a[i] * big(2)^(32*(i-1)) for i in 1:length(a))
 
 
 #### seed!()
@@ -762,7 +762,7 @@ function _advance_I!(r::MersenneTwister, adv_ints, idxI, work)
 end
 
 function advance!(r::MersenneTwister, adv_jump, adv, adv_vals, idxF, adv_ints, idxI)
-    adv_jump = BigInt(adv_jump)
+    adv_jump = Int128(adv_jump)
     adv, adv_vals, adv_ints = Int64.((adv, adv_vals, adv_ints))
     idxF, idxI = Int.((idxF, idxI))
 

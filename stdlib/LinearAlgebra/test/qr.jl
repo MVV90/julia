@@ -24,7 +24,7 @@ bimg  = randn(n,2)/2
 squareQ(Q::LinearAlgebra.AbstractQ) = (sq = size(Q.factors, 1); lmul!(Q, Matrix{eltype(Q)}(I, sq, sq)))
 rectangularQ(Q::LinearAlgebra.AbstractQ) = convert(Array, Q)
 
-@testset for eltya in (Float32, Float64, ComplexF32, ComplexF64, BigFloat, Int)
+@testset for eltya in (Float32, Float64, ComplexF32, ComplexF64, Int)
     raw_a = eltya == Int ? rand(1:7, n, n) : convert(Matrix{eltya}, eltya <: Complex ? complex.(areal, aimg) : areal)
     raw_a2 = eltya == Int ? rand(1:7, n, n) : convert(Matrix{eltya}, eltya <: Complex ? complex.(a2real, a2img) : a2real)
     asym = raw_a' + raw_a                  # symmetric indefinite

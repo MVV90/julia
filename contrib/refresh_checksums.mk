@@ -3,7 +3,7 @@
 # Invoke this with no arguments to refresh all tarballs, or with a project name to refresh only that project.
 #
 # Example:
-#   make -f contrib/refresh_checksums.mk gmp
+#   make -f contrib/refresh_checksums.mk library
 
 SRCDIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 JULIAHOME := $(abspath $(SRCDIR)/..)
@@ -24,9 +24,9 @@ CLANG_TRIPLETS=$(filter %-darwin %-freebsd,$(TRIPLETS))
 NON_CLANG_TRIPLETS=$(filter-out %-darwin %-freebsd,$(TRIPLETS))
 
 # These are the projects currently using BinaryBuilder; both GCC-expanded and non-GCC-expanded:
-BB_PROJECTS=mbedtls libssh2 nghttp2 mpfr curl libgit2 pcre libuv unwind llvmunwind dsfmt objconv p7zip zlib openlibm blastrampoline
+BB_PROJECTS=mbedtls libssh2 nghttp2 curl libgit2 pcre libuv unwind llvmunwind dsfmt objconv p7zip zlib openlibm blastrampoline
 BB_GCC_EXPANDED_PROJECTS=openblas csl
-BB_CXX_EXPANDED_PROJECTS=gmp llvm clang llvm-tools
+BB_CXX_EXPANDED_PROJECTS=llvm clang llvm-tools
 # These are non-BB source-only deps
 NON_BB_PROJECTS=patchelf mozillacert lapack libwhich utf8proc
 

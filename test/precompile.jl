@@ -222,11 +222,6 @@ precompile_test_harness(false) do dir
               g() = override(1.0)
               Test.@test g() === 2.0 # compile this
 
-              const abigfloat_f() = big"12.34"
-              const abigfloat_x = big"43.21"
-              const abigint_f() = big"123"
-              const abigint_x = big"124"
-
               # issue #31488
               _v31488 = Base.StringVector(2)
               resize!(_v31488, 0)
@@ -268,12 +263,6 @@ precompile_test_harness(false) do dir
         @test Foo.override(1.0e0) == Float64('a')
         @test Foo.override(1.0f0) == 'b'
         @test Foo.override(UInt(1)) == 2
-
-        # Issue #15722
-        @test Foo.abigfloat_f()::BigFloat == big"12.34"
-        @test (Foo.abigfloat_x::BigFloat + 21) == big"64.21"
-        @test Foo.abigint_f()::BigInt == big"123"
-        @test Foo.abigint_x::BigInt + 1 == big"125"
 
         @test Foo.x28297.result === missing
 

@@ -38,7 +38,7 @@ One is already pre-computed for `steps=big(10)^20`.
 """
 function randjump(r::MersenneTwister, steps::Integer)
     j = Random._randjump(r, Random.DSFMT.calc_jump(steps))
-    j.adv_jump += 2*big(steps) # convert to BigInt to prevent overflow
+    j.adv_jump += 2*big(steps)
     j
 end
 

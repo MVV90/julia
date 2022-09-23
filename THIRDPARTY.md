@@ -28,12 +28,10 @@ Julia's `stdlib` uses the following external libraries, which have their own lic
 
 - [DSFMT](https://github.com/MersenneTwister-Lab/dSFMT/blob/master/LICENSE.txt) [BSD-3]
 - [OPENLIBM](https://github.com/JuliaMath/openlibm/blob/master/LICENSE.md) [MIT, BSD-2, ISC]
-- [GMP](https://gmplib.org/manual/Copying.html#Copying) [LGPL3+ or GPL2+]
 - [LIBGIT2](https://github.com/libgit2/libgit2/blob/development/COPYING) [GPL2+ with unlimited linking exception]
 - [CURL](https://curl.haxx.se/docs/copyright.html) [MIT/X derivative]
 - [LIBSSH2](https://github.com/libssh2/libssh2/blob/master/COPYING) [BSD-3]
 - [MBEDTLS](https://github.com/ARMmbed/mbedtls/blob/development/LICENSE) [Apache 2.0]
-- [MPFR](https://www.mpfr.org/mpfr-current/mpfr.html#Copying) [LGPL3+]
 - [OPENBLAS](https://raw.github.com/xianyi/OpenBLAS/master/LICENSE) [BSD-3]
 - [LAPACK](https://netlib.org/lapack/LICENSE.txt) [BSD-3]
 - [PCRE](https://www.pcre.org/licence.txt) [BSD-3]

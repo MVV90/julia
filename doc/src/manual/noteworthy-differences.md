@@ -238,8 +238,7 @@ For users coming to Julia from R, these are some noteworthy differences:
     signature leading to a `MethodError` or calling of the wrong method.
   * In Julia `%` is the remainder operator, whereas in Python it is the modulus.
   * In Julia, the commonly used `Int` type corresponds to the machine integer type (`Int32` or `Int64`), unlike in Python, where `int` is an arbitrary length integer.
-    This means in Julia the `Int` type will overflow, such that `2^64 == 0`. If you need larger values use another appropriate type,
-    such as `Int128`, [`BigInt`](@ref) or a floating point type like `Float64`.
+    This means in Julia the `Int` type will overflow, such that `2^64 == 0`. If you need larger values use another appropriate type, such as `Int128`.
   * The imaginary unit `sqrt(-1)` is represented in Julia as `im`, not `j` as in Python.
   * In Julia, the exponentiation operator is `^`, not `**` as in Python.
   * Julia uses `nothing` of type `Nothing` to represent a null value, whereas Python uses `None` of type `NoneType`.
@@ -278,21 +277,17 @@ For users coming to Julia from R, these are some noteworthy differences:
     whitespace from a Julia program.
   * In Julia, literal numbers without a decimal point (such as `42`) create signed integers, of type
     `Int`, but literals too large to fit in the machine word size will automatically be promoted to
-    a larger size type, such as `Int64` (if `Int` is `Int32`), `Int128`, or the arbitrarily large
-    `BigInt` type. There are no numeric literal suffixes, such as `L`, `LL`, `U`, `UL`, `ULL` to indicate
+    a larger size type, such as `Int64` (if `Int` is `Int32`), or `Int128`. There are no numeric literal suffixes, such as `L`, `LL`, `U`, `UL`, `ULL` to indicate
     unsigned and/or signed vs. unsigned. Decimal literals are always signed, and hexadecimal literals
-    (which start with `0x` like C/C++), are unsigned, unless when they encode more than 128 bits,
-    in which case they are of type `BigInt`. Hexadecimal literals also, unlike C/C++/Java
+    (which start with `0x` like C/C++), are unsigned, unless when they encode more than 128 bits. Hexadecimal literals also, unlike C/C++/Java
     and unlike decimal literals in Julia, have a type based on the *length* of the literal, including
     leading 0s. For example, `0x0` and `0x00` have type [`UInt8`](@ref), `0x000` and `0x0000` have type
     [`UInt16`](@ref), then literals with 5 to 8 hex digits have type `UInt32`, 9 to 16 hex digits type
-    `UInt64`, 17 to 32 hex digits type `UInt128`, and more that 32 hex digits type `BigInt`.
+    `UInt64`, 17 to 32 hex digits type `UInt128`.
     This needs to be taken into account when defining
     hexadecimal masks, for example `~0xf == 0xf0` is very different from `~0x000f == 0xfff0`. 64 bit `Float64`
-    and 32 bit [`Float32`](@ref) bit literals are expressed as `1.0` and `1.0f0` respectively. Floating point
-    literals are rounded (and not promoted to the `BigFloat` type) if they can not be exactly represented.
      Floating point literals are closer in behavior to C/C++. Octal (prefixed with `0o`) and binary
-    (prefixed with `0b`) literals are also treated as unsigned (or `BigInt` for more than 128 bits).
+    (prefixed with `0b`) literals are also treated as unsigned.
   * In Julia, the division operator [`/`](@ref) returns a floating point number when both operands
     are of integer type.  To perform integer division, use [`div`](@ref) or [`÷`](@ref div).
   * Indexing an `Array` with floating point types is generally an error in Julia. The Julia

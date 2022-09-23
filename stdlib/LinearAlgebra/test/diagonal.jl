@@ -15,7 +15,7 @@ using .Main.OffsetArrays
 n=12 #Size of matrix problem to test
 Random.seed!(1)
 
-@testset for relty in (Float32, Float64, BigFloat), elty in (relty, Complex{relty})
+@testset for relty in (Float32, Float64), elty in (relty, Complex{relty})
     dd=convert(Vector{elty}, randn(n))
     vv=convert(Vector{elty}, randn(n))
     UU=convert(Matrix{elty}, randn(n,n))
@@ -121,7 +121,6 @@ Random.seed!(1)
             @test transpose(U)*D ≈ transpose(U)*Array(D)
             @test U'*D ≈ U'*Array(D)
 
-            if relty != BigFloat
                 atol_two = 2n^2 * eps(relty) * (1 + (elty <: Complex))
                 atol_three = 2n^3 * eps(relty) * (1 + (elty <: Complex))
                 @test D\v ≈ DM\v atol=atol_two
@@ -166,7 +165,6 @@ Random.seed!(1)
                 @test_throws DimensionMismatch ldiv!(D, copy(b))
                 b = view(rand(elty, n+1), Vector(1:n+1))
                 @test_throws DimensionMismatch ldiv!(D, b)
-            end
         end
     end
     d = convert(Vector{elty}, randn(n))
@@ -257,42 +255,42 @@ Random.seed!(1)
             end
         end
 
-        alpha = elty(randn())  # randn(elty) does not work with BigFloat
+        alpha = elty(randn())
         beta = elty(randn())
         @test begin
             vvv = similar(vv)
-            vvv .= randn(size(vvv))  # randn!(vvv) does not work with BigFloat
+            vvv .= randn(size(vvv))
             r = alpha * Matrix(D) * vv + beta * vvv
             mul!(vvv, D, vv, alpha, beta)  ≈ r ≈ vvv
         end
         @test begin
             vvv = similar(vv)
-            vvv .= randn(size(vvv))  # randn!(vvv) does not work with BigFloat
+            vvv .= randn(size(vvv))
             r = alpha * Matrix(D)' * vv + beta * vvv
             mul!(vvv, adjoint(D), vv, alpha, beta) ≈ r ≈ vvv
         end
         @test begin
             vvv = similar(vv)
-            vvv .= randn(size(vvv))  # randn!(vvv) does not work with BigFloat
+            vvv .= randn(size(vvv))
             r = alpha * transpose(Matrix(D)) * vv + beta * vvv
             mul!(vvv, transpose(D), vv, alpha, beta) ≈ r ≈ vvv
         end
 
         @test begin
             UUU = similar(UU)
-            UUU .= randn(size(UUU))  # randn!(UUU) does not work with BigFloat
+            UUU .= randn(size(UUU))
             r = alpha * Matrix(D) * UU + beta * UUU
             mul!(UUU, D, UU, alpha, beta) ≈ r ≈ UUU
         end
         @test begin
             UUU = similar(UU)
-            UUU .= randn(size(UUU))  # randn!(UUU) does not work with BigFloat
+            UUU .= randn(size(UUU))
             r = alpha * Matrix(D)' * UU + beta * UUU
             mul!(UUU, adjoint(D), UU, alpha, beta) ≈ r ≈ UUU
         end
         @test begin
             UUU = similar(UU)
-            UUU .= randn(size(UUU))  # randn!(UUU) does not work with BigFloat
+            UUU .= randn(size(UUU))
             r = alpha * transpose(Matrix(D)) * UU + beta * UUU
             mul!(UUU, transpose(D), UU, alpha, beta) ≈ r ≈ UUU
         end
@@ -608,41 +606,6 @@ let D1 = Diagonal(rand(5)), D2 = Diagonal(rand(5))
     @test LinearAlgebra.lmul!(transpose(D1),copy(D2)) == transpose(D1)*D2
     @test LinearAlgebra.rmul!(copy(D1),adjoint(D2)) == D1*adjoint(D2)
     @test LinearAlgebra.lmul!(adjoint(D1),copy(D2)) == adjoint(D1)*D2
-end
-
-@testset "multiplication of a Diagonal with a Matrix" begin
-    A = collect(reshape(1:8, 4, 2));
-    B = BigFloat.(A);
-    DL = Diagonal(collect(axes(A, 1)));
-    DR = Diagonal(Float16.(collect(axes(A, 2))));
-
-    @test DL * A == collect(DL) * A
-    @test A * DR == A * collect(DR)
-    @test DL * B == collect(DL) * B
-    @test B * DR == B * collect(DR)
-
-    A = reshape([ones(2,2), ones(2,2)*2, ones(2,2)*3, ones(2,2)*4], 2, 2)
-    Ac = collect(A)
-    D = Diagonal([collect(reshape(1:4, 2, 2)), collect(reshape(5:8, 2, 2))])
-    Dc = collect(D)
-    @test A * D == Ac * Dc
-    @test D * A == Dc * Ac
-    @test D * D == Dc * Dc
-
-    AS = similar(A)
-    mul!(AS, A, D, true, false)
-    @test AS == A * D
-
-    D2 = similar(D)
-    mul!(D2, D, D)
-    @test D2 == D * D
-
-    copyto!(D2, D)
-    lmul!(D, D2)
-    @test D2 == D * D
-    copyto!(D2, D)
-    rmul!(D2, D)
-    @test D2 == D * D
 end
 
 @testset "multiplication of QR Q-factor and Diagonal (#16615 spot test)" begin

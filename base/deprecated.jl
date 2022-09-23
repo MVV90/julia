@@ -176,11 +176,6 @@ end
 @deprecate one(i::CartesianIndex)                    oneunit(i)
 @deprecate one(I::Type{CartesianIndex{N}}) where {N} oneunit(I)
 
-@deprecate BigFloat(x, prec::Int)                               BigFloat(x; precision=prec)
-@deprecate BigFloat(x, prec::Int, rounding::RoundingMode)       BigFloat(x, rounding; precision=prec)
-@deprecate BigFloat(x::Real, prec::Int)                         BigFloat(x; precision=prec)
-@deprecate BigFloat(x::Real, prec::Int, rounding::RoundingMode) BigFloat(x, rounding; precision=prec)
-
 # END 1.0 deprecations
 
 # BEGIN 1.5 deprecations

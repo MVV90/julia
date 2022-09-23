@@ -339,8 +339,8 @@ for (tup, rval, rind) in [((1,), [Inf Inf Inf -Inf], [CartesianIndex(1,1) Cartes
     @test isequal(maximum!(copy(rval), A, init=false), rval)
 end
 
-A = [BigInt(10)]
-for (tup, rval, rind) in [((2,), [BigInt(10)], [1])]
+A = [Int128(10)]
+for (tup, rval, rind) in [((2,), [Int128(10)], [1])]
     @test isequal(findmin(A, dims=tup), (rval, rind))
     @test isequal(findmin!(similar(rval), similar(rind), A), (rval, rind))
     @test isequal(minimum(A, dims=tup), rval)
@@ -348,7 +348,7 @@ for (tup, rval, rind) in [((2,), [BigInt(10)], [1])]
     @test isequal(minimum!(copy(rval), A, init=false), rval)
 end
 
-for (tup, rval, rind) in [((2,), [BigInt(10)], [1])]
+for (tup, rval, rind) in [((2,), [Int128(10)], [1])]
     @test isequal(findmax(A, dims=tup), (rval, rind))
     @test isequal(findmax!(similar(rval), similar(rind), A), (rval, rind))
     @test isequal(maximum(A, dims=tup), rval)
@@ -356,8 +356,8 @@ for (tup, rval, rind) in [((2,), [BigInt(10)], [1])]
     @test isequal(maximum!(copy(rval), A, init=false), rval)
 end
 
-A = [BigInt(-10)]
-for (tup, rval, rind) in [((2,), [BigInt(-10)], [1])]
+A = [Int128(-10)]
+for (tup, rval, rind) in [((2,), [Int128(-10)], [1])]
     @test isequal(findmin(A, dims=tup), (rval, rind))
     @test isequal(findmin!(similar(rval), similar(rind), A), (rval, rind))
     @test isequal(minimum(A, dims=tup), rval)
@@ -365,7 +365,7 @@ for (tup, rval, rind) in [((2,), [BigInt(-10)], [1])]
     @test isequal(minimum!(copy(rval), A, init=false), rval)
 end
 
-for (tup, rval, rind) in [((2,), [BigInt(-10)], [1])]
+for (tup, rval, rind) in [((2,), [Int128(-10)], [1])]
     @test isequal(findmax(A, dims=tup), (rval, rind))
     @test isequal(findmax!(similar(rval), similar(rind), A), (rval, rind))
     @test isequal(maximum(A, dims=tup), rval)
@@ -373,8 +373,8 @@ for (tup, rval, rind) in [((2,), [BigInt(-10)], [1])]
     @test isequal(maximum!(copy(rval), A, init=false), rval)
 end
 
-A = [BigInt(10) BigInt(-10)]
-for (tup, rval, rind) in [((2,), reshape([BigInt(-10)], 1, 1), reshape([CartesianIndex(1,2)], 1, 1))]
+A = [Int128(10) Int128(-10)]
+for (tup, rval, rind) in [((2,), reshape([Int128(-10)], 1, 1), reshape([CartesianIndex(1,2)], 1, 1))]
     @test isequal(findmin(A, dims=tup), (rval, rind))
     @test isequal(findmin!(similar(rval), similar(rind), A), (rval, rind))
     @test isequal(minimum(A, dims=tup), rval)
@@ -382,7 +382,7 @@ for (tup, rval, rind) in [((2,), reshape([BigInt(-10)], 1, 1), reshape([Cartesia
     @test isequal(minimum!(copy(rval), A, init=false), rval)
 end
 
-for (tup, rval, rind) in [((2,), reshape([BigInt(10)], 1, 1), reshape([CartesianIndex(1,1)], 1, 1))]
+for (tup, rval, rind) in [((2,), reshape([Int128(10)], 1, 1), reshape([CartesianIndex(1,1)], 1, 1))]
     @test isequal(findmax(A, dims=tup), (rval, rind))
     @test isequal(findmax!(similar(rval), similar(rind), A), (rval, rind))
     @test isequal(maximum(A, dims=tup), rval)
@@ -439,7 +439,7 @@ end
 end
 
 # check type of result
-@testset "type of sum(::Array{$T}" for T in [UInt8, Int8, Int32, Int64, BigInt]
+@testset "type of sum(::Array{$T}" for T in [UInt8, Int8, Int32, Int64]
     result = sum(T[1 2 3; 4 5 6; 7 8 9], dims=2)
     @test result == hcat([6, 15, 24])
     @test eltype(result) === (T <: Base.SmallSigned ? Int :
@@ -486,7 +486,7 @@ end
 end
 @testset "NaN/missing test for extrema with dims #43599" begin
     for sz = (3, 10, 100)
-        for T in (Int, Float64, BigFloat)
+        for T in (Int, Float64)
             Aₘ = Matrix{Union{T, Missing}}(rand(-sz:sz, sz, sz))
             Aₘ[rand(1:sz*sz, sz)] .= missing
             unordered_test_for_extrema(Aₘ)
@@ -500,9 +500,6 @@ end
         end
     end
 end
-@test_broken minimum([missing;BigInt(1)], dims = 1)
-@test_broken maximum([missing;BigInt(1)], dims = 1)
-@test_broken extrema([missing;BigInt(1)], dims = 1)
 
 # issue #26709
 @testset "dimensional reduce with custom non-bitstype types" begin
@@ -531,8 +528,8 @@ end
 @test @inferred(count(false:true, dims=:, init=0x0004)) === 0x0005
 @test @inferred(count(isodd, reshape(1:9, 3, 3), dims=:, init=Int128(0))) === Int128(5)
 
-@testset "reduced_index for BigInt (issue #39995)" begin
-    for T in [Int8, Int16, Int32, Int64, Int128, BigInt]
+@testset "reduced_index (issue #39995)" begin
+    for T in [Int8, Int16, Int32, Int64, Int128]
         r = T(1):T(2)
         ax = axes(r, 1)
         axred = Base.reduced_index(ax)

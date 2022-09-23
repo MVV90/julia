@@ -37,7 +37,7 @@ Currently supported rounding modes are:
 - [`RoundNearestTiesAway`](@ref)
 - [`RoundNearestTiesUp`](@ref)
 - [`RoundToZero`](@ref)
-- [`RoundFromZero`](@ref) ([`BigFloat`](@ref) only)
+- [`RoundFromZero`](@ref)
 - [`RoundUp`](@ref)
 - [`RoundDown`](@ref)
 """
@@ -76,15 +76,14 @@ const RoundDown = RoundingMode{:Down}()
     RoundFromZero
 
 Rounds away from zero.
-This rounding mode may only be used with `T == BigFloat` inputs to [`round`](@ref).
 
 # Examples
 ```jldoctest
-julia> BigFloat("1.0000000000000001", 5, RoundFromZero)
+julia> Float64("1.0000000000000001", 5, RoundFromZero)
 1.06
 ```
 """
-const RoundFromZero = RoundingMode{:FromZero}() # mpfr only
+const RoundFromZero = RoundingMode{:FromZero}()
 
 """
     RoundNearestTiesAway
@@ -129,8 +128,6 @@ arithmetic functions ([`+`](@ref), [`-`](@ref), [`*`](@ref),
 [`/`](@ref) and [`sqrt`](@ref)) and type conversion. Other numerical
 functions may give incorrect or invalid values when using rounding modes other than the
 default [`RoundNearest`](@ref).
-
-Note that this is currently only supported for `T == BigFloat`.
 
 !!! warning
 
@@ -196,7 +193,6 @@ end
 # but explicit checks are currently quicker (~20x).
 # Assumes conversion is performed by rounding to nearest value.
 
-# To avoid ambiguous dispatch with methods in mpfr.jl:
 (::Type{T})(x::Real, r::RoundingMode) where {T<:AbstractFloat} = _convert_rounding(T,x,r)::T
 
 _convert_rounding(::Type{T}, x::Real, r::RoundingMode{:Nearest}) where {T<:AbstractFloat} = convert(T,x)::T

@@ -1277,11 +1277,6 @@ end
     @test Base.rest(a, st) == [3, 2, 4]
 end
 
-@testset "issue #37741, non-int cat" begin
-    @test [1; 1:BigInt(5)] == [1; 1:5]
-    @test [1:BigInt(5); 1] == [1:5; 1]
-end
-
 @testset "Base.isstored" begin
     a = rand(3, 4, 5)
     @test Base.isstored(a, 1, 2, 3)
@@ -1316,34 +1311,6 @@ end
     @test Int[t...; 3 4] == [1 2; 3 4]
     @test Int[0 t...; t... 0] == [0 1 2; 1 2 0]
     @test_throws ArgumentError Int[t...; 3 4 5]
-end
-
-@testset "issue #39896, modified getindex " begin
-    for arr = ([1:10;], reshape([1.0:16.0;],4,4), reshape(['a':'h';],2,2,2))
-        for inds = (2:5, Base.OneTo(5), BigInt(3):BigInt(5), UInt(4):UInt(3),
-            Base.IdentityUnitRange(Base.OneTo(4)))
-            @test arr[inds] == arr[collect(inds)]
-            @test arr[inds] isa AbstractVector{eltype(arr)}
-        end
-    end
-    # Test that ranges and arrays behave identically for indices with 1-based axes
-    for r in (1:10, 1:1:10, Base.OneTo(10),
-        Base.IdentityUnitRange(Base.OneTo(10)), Base.IdentityUnitRange(1:10))
-        for inds = (2:5, Base.OneTo(5), BigInt(3):BigInt(5), UInt(4):UInt(3),
-            Base.IdentityUnitRange(Base.OneTo(4)))
-            @test r[inds] == r[collect(inds)] == collect(r)[inds] == collect(r)[collect(inds)]
-        end
-    end
-    for arr = ([1], reshape([1.0],1,1), reshape(['a'],1,1,1))
-        @test arr[true:true] == [arr[1]]
-        @test arr[true:true] isa AbstractVector{eltype(arr)}
-        @test arr[false:false] == []
-        @test arr[false:false] isa AbstractVector{eltype(arr)}
-    end
-    for arr = ([1:10;], reshape([1.0:16.0;],4,4), reshape(['a':'h';],2,2,2))
-        @test_throws BoundsError arr[true:true]
-        @test_throws BoundsError arr[false:false]
-    end
 end
 
 using Base: typed_hvncat

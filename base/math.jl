@@ -73,12 +73,6 @@ See also [`clamp!`](@ref), [`min`](@ref), [`max`](@ref).
 
 # Examples
 ```jldoctest
-julia> clamp.([pi, 1.0, big(10)], 2.0, 9.0)
-3-element Vector{BigFloat}:
- 3.141592653589793238462643383279502884197169399375105820974944592307816406286198
- 2.0
- 9.0
-
 julia> clamp.([11, 8, 5], 10, 6)  # an example where lo > hi
 3-element Vector{Int64}:
   6
@@ -605,16 +599,6 @@ See also: [`hypot`](@ref).
 julia> sqrt(big(81))
 9.0
 
-julia> sqrt(big(-81))
-ERROR: DomainError with -81.0:
-NaN result for non-NaN input.
-Stacktrace:
- [1] sqrt(::BigFloat) at ./mpfr.jl:501
-[...]
-
-julia> sqrt(big(complex(-81)))
-0.0 + 9.0im
-
 julia> .√(1:4)
 4-element Vector{Float64}:
  1.0
@@ -1086,17 +1070,17 @@ function add22condh(xh::Float64, xl::Float64, yh::Float64, yl::Float64)
 end
 
 # multiples of pi/2, as double-double (ie with "tail")
-const pi1o2_h  = 1.5707963267948966     # convert(Float64, pi * BigFloat(1/2))
-const pi1o2_l  = 6.123233995736766e-17  # convert(Float64, pi * BigFloat(1/2) - pi1o2_h)
+const pi1o2_h  = 1.5707963267948966     
+const pi1o2_l  = 6.123233995736766e-17 
 
-const pi2o2_h  = 3.141592653589793      # convert(Float64, pi * BigFloat(1))
-const pi2o2_l  = 1.2246467991473532e-16 # convert(Float64, pi * BigFloat(1) - pi2o2_h)
+const pi2o2_h  = 3.141592653589793      
+const pi2o2_l  = 1.2246467991473532e-16 
 
-const pi3o2_h  = 4.71238898038469       # convert(Float64, pi * BigFloat(3/2))
-const pi3o2_l  = 1.8369701987210297e-16 # convert(Float64, pi * BigFloat(3/2) - pi3o2_h)
+const pi3o2_h  = 4.71238898038469       
+const pi3o2_l  = 1.8369701987210297e-16 
 
-const pi4o2_h  = 6.283185307179586      # convert(Float64, pi * BigFloat(2))
-const pi4o2_l  = 2.4492935982947064e-16 # convert(Float64, pi * BigFloat(2) - pi4o2_h)
+const pi4o2_h  = 6.283185307179586      
+const pi4o2_l  = 2.4492935982947064e-16
 
 """
     rem2pi(x, r::RoundingMode)

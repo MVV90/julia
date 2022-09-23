@@ -251,7 +251,6 @@ function mul_with_overflow(x::T, y::T) where T<:BrokenUnsignedIntMul
 end
 end
 if Int128 <: BrokenSignedIntMul
-    # Avoid BigInt
     function mul_with_overflow(x::T, y::T) where T<:Int128
         f = if y > 0
             # x * y > typemax(T)
@@ -269,7 +268,6 @@ if Int128 <: BrokenSignedIntMul
     end
 end
 if UInt128 <: BrokenUnsignedIntMul
-    # Avoid BigInt
     function mul_with_overflow(x::T, y::T) where T<:UInt128
         # x * y > typemax(T)
         x * y, y > 0 && x > fld(typemax(T), y)

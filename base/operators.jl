@@ -730,9 +730,6 @@ julia> bitstring(Int8(60))
 "00111100"
 ```
 
-[`BigInt`](@ref)s are treated as if having infinite size, so no filling is required and this
-is equivalent to [`>>`](@ref).
-
 See also [`>>`](@ref), [`<<`](@ref).
 """
 function >>>(x::Integer, c::Integer)

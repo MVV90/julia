@@ -253,7 +253,7 @@ end
     nnorm = 10
     mmat = 10
     nmat = 8
-    @testset "For $elty" for elty in (Float32, Float64, BigFloat, ComplexF32, ComplexF64, Complex{BigFloat}, Int32, Int64, BigInt)
+    @testset "For $elty" for elty in (Float32, Float64, ComplexF32, ComplexF64, Int32, Int64)
         x = fill(elty(1),10)
         @testset "Vector" begin
             xs = view(x,1:2:10)
@@ -333,57 +333,6 @@ end
             end
         end
 
-        @testset "Matrix (Operator) opnorm" begin
-            A = fill(elty(1),10,10)
-            As = view(A,1:5,1:5)
-            @test opnorm(A, 1) ≈ 10
-            elty <: Union{BigFloat,Complex{BigFloat},BigInt} || @test opnorm(A, 2) ≈ 10
-            @test opnorm(A, Inf) ≈ 10
-            @test opnorm(As, 1) ≈ 5
-            elty <: Union{BigFloat,Complex{BigFloat},BigInt} || @test opnorm(As, 2) ≈ 5
-            @test opnorm(As, Inf) ≈ 5
-        end
-
-        @testset "Absolute homogeneity, triangle inequality, & norm" begin
-            for i = 1:10
-                Ainit = elty <: Integer ? convert(Matrix{elty}, rand(1:10, mmat, nmat)) :
-                        elty <: Complex ? convert(Matrix{elty}, complex.(randn(mmat, nmat), randn(mmat, nmat))) :
-                        convert(Matrix{elty}, randn(mmat, nmat))
-                Binit = elty <: Integer ? convert(Matrix{elty}, rand(1:10, mmat, nmat)) :
-                        elty <: Complex ? convert(Matrix{elty}, complex.(randn(mmat, nmat), randn(mmat, nmat))) :
-                        convert(Matrix{elty}, randn(mmat, nmat))
-                α = elty <: Integer ? randn() :
-                    elty <: Complex ? convert(elty, complex(randn(),randn())) :
-                    convert(elty, randn())
-                for (A, B) in ((copy(Ainit), copy(Binit)), (view(Ainit,1:nmat,1:nmat), view(Binit,1:nmat,1:nmat)))
-                    # Absolute homogeneity
-                    @test norm(α*A,1) ≈ abs(α)*norm(A,1)
-                    elty <: Union{BigFloat,Complex{BigFloat},BigInt} || @test norm(α*A) ≈ abs(α)*norm(A) # two is default
-                    @test norm(α*A,Inf) ≈ abs(α)*norm(A,Inf)
-
-                    # Triangle inequality
-                    @test norm(A + B,1) <= norm(A,1) + norm(B,1)
-                    elty <: Union{BigFloat,Complex{BigFloat},BigInt} || @test norm(A + B) <= norm(A) + norm(B) # two is default
-                    @test norm(A + B,Inf) <= norm(A,Inf) + norm(B,Inf)
-
-                    # norm
-                    for p in (-Inf, Inf, (-2:3)...)
-                        @test norm(A, p) == norm(vec(A), p)
-                    end
-                end
-            end
-
-            @testset "issue #10234" begin
-                if elty <: AbstractFloat || elty <: Complex
-                    z = zeros(elty, 100)
-                    z[1] = -Inf
-                    for p in [-2,-1.5,-1,-0.5,0.5,1,1.5,2,Inf]
-                        @test norm(z, p) == (p < 0 ? 0 : Inf)
-                        @test norm(elty[Inf],p) == Inf
-                    end
-                end
-            end
-        end
     end
 
     @testset "issue #10234" begin
@@ -1053,8 +1002,7 @@ end
 
 @testset "issue #23366 (Int Matrix to Int power)" begin
     @testset "Tests for $elty" for elty in (Int128, Int16, Int32, Int64, Int8,
-                                            UInt128, UInt16, UInt32, UInt64, UInt8,
-                                            BigInt)
+                                            UInt128, UInt16, UInt32, UInt64, UInt8)
         #@info "Testing $elty"
         @test elty[1 1;1 0]^-1 == [0  1;  1 -1]
         @test elty[1 1;1 0]^-2 == [1 -1; -1  2]
@@ -1067,9 +1015,7 @@ end
         end
         # make sure that type promotion for ^(::Matrix{<:Integer}, ::Integer)
         # is analogous to type promotion for ^(::Integer, ::Integer)
-        # e.g. [1 1;1 0]^big(10000) should return Matrix{BigInt}, the same
-        # way as 2^big(10000) returns BigInt
-        for elty2 = (Int64, BigInt)
+        for elty2 = (Int64)
             TT = Base.promote_op(^, elty, elty2)
             @test (@inferred elty[1 1;1 0]^elty2(1))::Matrix{TT} == [1 1;1 0]
         end

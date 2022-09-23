@@ -17,12 +17,11 @@ Random.seed!(123)
 
 n = 5 # should be odd
 
-@testset for elty in (Int, Rational{BigInt}, Float32, Float64, BigFloat, ComplexF32, ComplexF64, Complex{BigFloat})
+@testset for elty in (Int, Float32, Float64, ComplexF32, ComplexF64)
     # In the long run, these tests should step through Strang's
     #  axiomatic definition of determinants.
     # If all axioms are satisfied and all the composition rules work,
     #  all determinants will be correct except for floating point errors.
-    if elty != Rational{BigInt}
         @testset "det(A::Matrix)" begin
             # The determinant of the identity matrix should always be 1.
             for i = 1:10
@@ -46,11 +45,8 @@ n = 5 # should be odd
                 end
             end
         end
-    end
     if elty <: Int
         A = rand(-n:n, n, n) + 10I
-    elseif elty <: Rational
-        A = Rational{BigInt}[rand(-n:n)/rand(1:n) for i = 1:n, j = 1:n] + 10I
     elseif elty <: Real
         A = convert(Matrix{elty}, randn(n,n)) + 10I
     else
@@ -166,10 +162,6 @@ end
     @test isequal(Float32[1.0] * 2.0f0im,    ComplexF32[2.0im])
     @test isequal(Float32[1.0] * 2.0im,      ComplexF64[2.0im])
     @test isequal(Float64[1.0] * 2.0f0im,    ComplexF64[2.0im])
-    @test isequal(Float32[1.0] * big(2.0)im, Complex{BigFloat}[2.0im])
-    @test isequal(Float64[1.0] * big(2.0)im, Complex{BigFloat}[2.0im])
-    @test isequal(BigFloat[1.0] * 2.0im,     Complex{BigFloat}[2.0im])
-    @test isequal(BigFloat[1.0] * 2.0f0im,   Complex{BigFloat}[2.0im])
 end
 @testset "* and mul! for non-commutative scaling" begin
     q = Quaternion(0.44567, 0.755871, 0.882548, 0.423612)
@@ -380,11 +372,6 @@ end
     @test [[1,2, [3,4]], 5.0, [6im, [7.0, 8.0]]] ≈ [[1,2, [3,4]], 5.0, [6im, [7.0, 8.0]]]
 end
 
-@testset "Issue 40128" begin
-    @test det(BigInt[9 1 8 0; 0 0 8 7; 7 6 8 3; 2 9 7 7])::BigInt == -1
-    @test det(BigInt[1 big(2)^65+1; 3 4])::BigInt == (4 - 3*(big(2)^65+1))
-end
-
 # Minimal modulo number type - but not subtyping Number
 struct ModInt{n}
     k
@@ -524,7 +511,7 @@ end
 end
 
 @testset "generalized dot #32739" begin
-    for elty in (Int, Float32, Float64, BigFloat, ComplexF32, ComplexF64, Complex{BigFloat})
+    for elty in (Int, Float32, Float64, ComplexF32, ComplexF64)
         n = 10
         if elty <: Int
             A = rand(-n:n, n, n)

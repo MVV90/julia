@@ -38,7 +38,7 @@ end
     n = 10
     areal = randn(n,n)/2
     aimg  = randn(n,n)/2
-    @testset for eltya in (Float32, Float64, ComplexF32, ComplexF64, BigFloat, Int)
+    @testset for eltya in (Float32, Float64, ComplexF32, ComplexF64, Int)
         a = eltya == Int ? rand(1:7, n, n) : convert(Matrix{eltya}, eltya <: Complex ? complex.(areal, aimg) : areal)
         asym = transpose(a) + a                 # symmetric indefinite
         aherm = a' + a                 # Hermitian indefinite
@@ -255,7 +255,6 @@ end
             end
 
             # Revisit when implemented in julia
-            if eltya != BigFloat
                 @testset "cond" begin
                     if eltya <: Real #svdvals! has no method for Symmetric{Complex}
                         @test cond(Symmetric(asym)) ≈ cond(asym)
@@ -330,7 +329,6 @@ end
                     @test (aherm)^-2.5 ≈ (Hermitian(aherm)^-2.5)#::Hermitian
                     @test (apos)^2.5   ≈ (Hermitian(apos)^2.5)::Hermitian
                 end
-            end
         end
 
         @testset "linalg binary ops" begin
@@ -408,7 +406,7 @@ end
                 msymau = Matrix(symau)
                 msymal = Matrix(symal)
                 @test_throws DimensionMismatch dot(symau, mtype(zeros(eltya, n-1, n-1)))
-                for eltyc in (Float32, Float64, ComplexF32, ComplexF64, BigFloat, Int)
+                for eltyc in (Float32, Float64, ComplexF32, ComplexF64, Int)
                     creal = randn(n, n)/2
                     cimag = randn(n, n)/2
                     c = eltya == Int ? rand(1:7, n, n) : convert(Matrix{eltya}, eltya <: Complex ? complex.(creal, cimag) : creal)
@@ -708,7 +706,7 @@ end
 end
 
 @testset "Multiplications symmetric/hermitian for $T and $S" for T in
-        (Float16, Float32, Float64, BigFloat), S in (ComplexF16, ComplexF32, ComplexF64)
+        (Float16, Float32, Float64), S in (ComplexF16, ComplexF32, ComplexF64)
     let A = transpose(Symmetric(rand(S, 3, 3))), Bv = Vector(rand(T, 3)), Bm = Matrix(rand(T, 3,3))
         @test A * Bv ≈ Matrix(A) * Bv
         @test A * Bm ≈ Matrix(A) * Bm

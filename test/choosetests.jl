@@ -13,10 +13,10 @@ const TESTNAMES = [
         "arrayops", "tuple", "reduce", "reducedim", "abstractarray",
         "intfuncs", "simdloop", "vecelement", "rational",
         "bitarray", "copy", "math", "fastmath", "functional", "iterators",
-        "operators", "ordering", "path", "ccall", "parse", "loading", "gmp",
+        "operators", "ordering", "path", "ccall", "parse", "loading"
         "sorting", "spawn", "backtrace", "exceptions",
         "file", "read", "version", "namedtuple",
-        "mpfr", "broadcast", "complex",
+        "broadcast", "complex",
         "floatapprox", "stdlib", "reflection", "regex", "float16",
         "combinatorics", "sysinfo", "env", "rounding", "ranges", "mod2pi",
         "euler", "show", "client",

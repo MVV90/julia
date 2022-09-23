@@ -109,20 +109,6 @@ const JL_MASK = typemax(UInt64)>>8
 const JU_CONST = 0x3FF0000000000000
 const JL_CONST = 0x3C00000000000000
 
-
-#function make_table(size)
-#    t_array = zeros(UInt64, size);
-#    for j in 1:size
-#        val = 2.0^(BigFloat(j-1)/size)
-#        valU = Float64(val, RoundDown)
-#        valL = Float64(val-valU)
-#        valU = reinterpret(UInt64, valU) & JU_MASK
-#        valL = ((reinterpret(UInt64, valL) & JL_MASK)>>44)<<52
-#        t_array[j] = valU | valL
-#    end
-#    return Tuple(t_array)
-#end
-#const J_TABLE = make_table(256);
 const J_TABLE = (0x0000000000000000, 0xaac00b1afa5abcbe, 0x9b60163da9fb3335, 0xab502168143b0280, 0xadc02c9a3e778060,
                  0x656037d42e11bbcc, 0xa7a04315e86e7f84, 0x84c04e5f72f654b1, 0x8d7059b0d3158574, 0xa510650a0e3c1f88,
                  0xa8d0706b29ddf6dd, 0x83207bd42b72a836, 0x6180874518759bc8, 0xa4b092bdf66607df, 0x91409e3ecac6f383,

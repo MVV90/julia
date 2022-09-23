@@ -40,8 +40,6 @@ using Main.MacroCalls
 @test UInt8(apple) === 0x00
 @test UInt16(orange) === 0x0001
 @test UInt128(kiwi) === 0x00000000000000000000000000000002
-@test typeof(BigInt(apple)) <: BigInt
-@test BigInt(apple) == 0
 @test Bool(apple) == false
 @test Bool(orange) == true
 @test_throws InexactError Bool(kiwi)
@@ -80,8 +78,6 @@ end
 
 @test_throws ArgumentError("invalid value for Enum Test1, _zerofp = 0.0; values must be integers") @macrocall(@enum Test1 _zerofp=0.0)
 @test_throws ArgumentError("invalid value for Enum Test11, _zerofp2 = 0.5; values must be integers") @macrocall(@enum Test11 _zerofp2=0.5)
-@enum Test111 _zerobi=BigInt(1)
-@test Integer(_zerobi) == 1
 
 # can't use non-identifiers as enum members
 @test_throws ArgumentError("""invalid argument for Enum Test2: if x

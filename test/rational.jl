@@ -45,7 +45,6 @@ using Test
 
     @test_throws InexactError Rational(UInt(1), typemin(Int32))
     @test iszero(Rational{Int}(UInt(0), 1))
-    @test Rational{BigInt}(UInt(1), Int(-1)) == -1
     @test_broken Rational{Int64}(UInt(1), typemin(Int32)) == Int64(1) // Int64(typemin(Int32))
 
     for a = -5:5, b = -5:5
@@ -85,15 +84,6 @@ using Test
     @test 0.1 == 3602879701896397//36028797018963968
     @test Inf == 1//0 == 2//0 == typemax(Int)//0
     @test -Inf == -1//0 == -2//0 == -typemax(Int)//0
-    @test floatmin() != 1//(BigInt(2)^1022+1)
-    @test floatmin() == 1//(BigInt(2)^1022)
-    @test floatmin() != 1//(BigInt(2)^1022-1)
-    @test floatmin()/2 != 1//(BigInt(2)^1023+1)
-    @test floatmin()/2 == 1//(BigInt(2)^1023)
-    @test floatmin()/2 != 1//(BigInt(2)^1023-1)
-    @test nextfloat(0.0) != 1//(BigInt(2)^1074+1)
-    @test nextfloat(0.0) == 1//(BigInt(2)^1074)
-    @test nextfloat(0.0) != 1//(BigInt(2)^1074-1)
 
     @test 1/3 < 1//3
     @test !(1//3 < 1/3)
@@ -129,7 +119,7 @@ end
 @testset "Rational methods" begin
     rand_int = rand(Int8)
 
-    for T in [Int8, Int16, Int32, Int128, BigInt]
+    for T in [Int8, Int16, Int32, Int128]
         @test numerator(convert(T, rand_int)) == rand_int
         @test denominator(convert(T, rand_int)) == 1
 
@@ -157,11 +147,6 @@ end
     @test (Complex(rand_int, 4) == Rational(rand_int)) == false
     @test (Rational(rand_int) == Complex(rand_int, 4)) == false
 
-    @test trunc(Rational(BigInt(rand_int), BigInt(3))) == Rational(trunc(BigInt, Rational(BigInt(rand_int),BigInt(3))))
-    @test  ceil(Rational(BigInt(rand_int), BigInt(3))) == Rational( ceil(BigInt, Rational(BigInt(rand_int),BigInt(3))))
-    @test round(Rational(BigInt(rand_int), BigInt(3))) == Rational(round(BigInt, Rational(BigInt(rand_int),BigInt(3))))
-
-
     for a = -3:3
         @test Rational(Float32(a)) == Rational(a)
         @test Rational(a)//2 == a//2
@@ -187,66 +172,6 @@ end
 # issue #7564
 @test typeof(convert(Rational{Integer},1)) === Rational{Integer}
 
-@testset "issue #15205" begin
-    T = Rational
-    x = Complex{T}(1//3 + 1//4*im)
-    y = Complex{T}(1//2 + 1//5*im)
-    xf = Complex{BigFloat}(1//3 + 1//4*im)
-    yf = Complex{BigFloat}(1//2 + 1//5*im)
-    yi = 4
-
-    @test x^y ≈ xf^yf
-    @test x^yi ≈ xf^yi
-    @test x^true ≈ xf^true
-    @test x^false == xf^false
-    @test x^1 ≈ xf^1
-    @test xf^Rational(2, 1) ≈ xf*xf
-    @test Complex(1., 1.)^Rational(2,1) == Complex(1., 1.)*Complex(1.,1.) == Complex(0., 2.)
-
-    for Tf = (Float16, Float32, Float64), Ti = (Int16, Int32, Int64)
-        almost_half  = Rational(div(typemax(Ti),Ti(2))  , typemax(Ti))
-        over_half    = Rational(div(typemax(Ti),Ti(2))+one(Ti), typemax(Ti))
-        exactly_half = Rational(one(Ti)  , Ti(2))
-
-        @test round( almost_half) == 0//1
-        @test round(-almost_half) == 0//1
-        @test round(Tf,  almost_half, RoundNearestTiesUp) == 0.0
-        @test round(Tf, -almost_half, RoundNearestTiesUp) == 0.0
-        @test round(Tf,  almost_half, RoundNearestTiesAway) == 0.0
-        @test round(Tf, -almost_half, RoundNearestTiesAway) == 0.0
-
-        @test round( exactly_half) == 0//1 # rounds to closest _even_ integer
-        @test round(-exactly_half) == 0//1 # rounds to closest _even_ integer
-        @test round(Tf,  exactly_half, RoundNearestTiesUp) == 1.0
-        @test round(Tf, -exactly_half, RoundNearestTiesUp) == 0.0
-        @test round(Tf,  exactly_half, RoundNearestTiesAway) == 1.0
-        @test round(Tf, -exactly_half, RoundNearestTiesAway) == -1.0
-
-
-        @test round(over_half) == 1//1
-        @test round(-over_half) == -1//1
-        @test round(Tf,  over_half, RoundNearestTiesUp) == 1.0
-        @test round(Tf,  over_half, RoundNearestTiesAway) == 1.0
-        @test round(Tf, -over_half, RoundNearestTiesUp) == -1.0
-        @test round(Tf, -over_half, RoundNearestTiesAway) == -1.0
-
-        @test round(Tf, 11//2, RoundNearestTiesUp) == 6.0
-        @test round(Tf, -11//2, RoundNearestTiesUp) == -5.0
-        @test round(Tf, 11//2, RoundNearestTiesAway) == 6.0
-        @test round(Tf, -11//2, RoundNearestTiesAway) == -6.0
-
-        @test round(Tf, Ti(-1)//zero(Ti)) == -Inf
-        @test round(Tf, one(1)//zero(Ti)) == Inf
-        @test round(Tf, Ti(-1)//zero(Ti), RoundNearestTiesUp) == -Inf
-        @test round(Tf, one(1)//zero(Ti), RoundNearestTiesUp) == Inf
-        @test round(Tf, Ti(-1)//zero(Ti), RoundNearestTiesAway) == -Inf
-        @test round(Tf, one(1)//zero(Ti), RoundNearestTiesAway) == Inf
-
-        @test round(Tf, zero(Ti)//one(Ti)) == 0
-        @test round(Tf, zero(Ti)//one(Ti), RoundNearestTiesUp) == 0
-        @test round(Tf, zero(Ti)//one(Ti), RoundNearestTiesAway) == 0
-    end
-end
 @testset "show and Rationals" begin
     io = IOBuffer()
     rational1 = Rational(1465, 8593)
@@ -375,59 +300,29 @@ end
 # issue 3412
 @test convert(Rational{Int32},0.5) === Int32(1)//Int32(2)
 
-@testset "issue 6712" begin
-    @test convert(Rational{BigInt},Float64(pi)) == Float64(pi)
-    @test convert(Rational{BigInt},big(pi)) == big(pi)
-
-    @test convert(Rational,0.0) == 0
-    @test convert(Rational,-0.0) == 0
-    @test convert(Rational,zero(BigFloat)) == 0
-    @test convert(Rational,-zero(BigFloat)) == 0
-    @test convert(Rational{BigInt},0.0) == 0
-    @test convert(Rational{BigInt},-0.0) == 0
-    @test convert(Rational{BigInt},zero(BigFloat)) == 0
-    @test convert(Rational{BigInt},-zero(BigFloat)) == 0
-    @test convert(Rational{BigInt},5e-324) == 5e-324
-    @test convert(Rational{BigInt},floatmin(Float64)) == floatmin(Float64)
-    @test convert(Rational{BigInt},floatmax(Float64)) == floatmax(Float64)
-
-    @test isa(convert(Float64, big(1)//2), Float64)
-end
 @testset "issue 16513" begin
     @test convert(Rational{Int32}, pi) == 1068966896 // 340262731
     @test convert(Rational{Int64}, pi) == 2646693125139304345 // 842468587426513207
     @test convert(Rational{Int128}, pi) == 60728338969805745700507212595448411044 // 19330430665609526556707216376512714945
-    @test_throws ArgumentError convert(Rational{BigInt}, pi)
 end
 @testset "issue 5935" begin
     @test rationalize(Int8,  nextfloat(0.1)) == 1//10
     @test rationalize(Int64, nextfloat(0.1)) == 300239975158034//3002399751580339
     @test rationalize(Int128,nextfloat(0.1)) == 300239975158034//3002399751580339
-    @test rationalize(BigInt,nextfloat(0.1)) == 300239975158034//3002399751580339
     @test rationalize(Int8,  nextfloat(0.1),tol=0.5eps(0.1)) == 1//10
     @test rationalize(Int64, nextfloat(0.1),tol=0.5eps(0.1)) == 379250494936463//3792504949364629
     @test rationalize(Int128,nextfloat(0.1),tol=0.5eps(0.1)) == 379250494936463//3792504949364629
-    @test rationalize(BigInt,nextfloat(0.1),tol=0.5eps(0.1)) == 379250494936463//3792504949364629
     @test rationalize(Int8,  nextfloat(0.1),tol=1.5eps(0.1)) == 1//10
     @test rationalize(Int64, nextfloat(0.1),tol=1.5eps(0.1)) == 1//10
     @test rationalize(Int128,nextfloat(0.1),tol=1.5eps(0.1)) == 1//10
-    @test rationalize(BigInt,nextfloat(0.1),tol=1.5eps(0.1)) == 1//10
-    @test rationalize(BigInt,nextfloat(parse(BigFloat,"0.1")),tol=1.5eps(big(0.1))) == 1//10
     @test rationalize(Int64, nextfloat(0.1),tol=0) == 7205759403792795//72057594037927936
     @test rationalize(Int128,nextfloat(0.1),tol=0) == 7205759403792795//72057594037927936
-    @test rationalize(BigInt,nextfloat(0.1),tol=0) == 7205759403792795//72057594037927936
 
     @test rationalize(Int8,  prevfloat(0.1)) == 1//10
     @test rationalize(Int64, prevfloat(0.1)) == 1//10
     @test rationalize(Int128,prevfloat(0.1)) == 1//10
-    @test rationalize(BigInt,prevfloat(0.1)) == 1//10
-    @test rationalize(BigInt,prevfloat(parse(BigFloat,"0.1"))) == 1//10
     @test rationalize(Int64, prevfloat(0.1),tol=0) == 7205759403792793//72057594037927936
     @test rationalize(Int128,prevfloat(0.1),tol=0) == 7205759403792793//72057594037927936
-    @test rationalize(BigInt,prevfloat(0.1),tol=0) == 7205759403792793//72057594037927936
-
-    @test rationalize(BigInt,nextfloat(parse(BigFloat,"0.1")),tol=0) == 46316835694926478169428394003475163141307993866256225615783033603165251855975//463168356949264781694283940034751631413079938662562256157830336031652518559744
-
 
     @test rationalize(Int8, 200f0) == 1//0
     @test rationalize(Int8, -200f0) == -1//0
@@ -480,7 +375,6 @@ end
 
 # issue #27039
 @testset "gcd, lcm, gcdx for Rational" begin
-    # TODO: Test gcd, lcm, gcdx for Rational{BigInt}.
     for T in (Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Int128, UInt128)
         a = T(6) // T(35)
         b = T(10) // T(21)
@@ -583,11 +477,10 @@ end
 
     @test Int8(1) + Int8(4)//(Int8(127)-Int8(1)) == Int8(65) // Int8(63)
     @test -Int32(1) // typemax(Int32) - Int32(1) == typemin(Int32) // typemax(Int32)
-    @test 1 // (typemax(Int128) + BigInt(1)) - 2 == (1 + BigInt(2)*typemin(Int128)) // (BigInt(1) + typemax(Int128))
 end
 
 @testset "Promotions on binary operations with Rationals (#36277)" begin
-    inttypes = (Base.BitInteger_types..., BigInt)
+    inttypes = (Base.BitInteger_types...)
     for T in inttypes, S in inttypes
         U = Rational{promote_type(T, S)}
         @test typeof(one(Rational{T}) + one(S)) == typeof(one(S) + one(Rational{T})) == typeof(one(Rational{T}) + one(Rational{S})) == U

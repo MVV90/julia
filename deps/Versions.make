@@ -3,7 +3,7 @@
 # To define a new dependency, you need to know the following pieces of information:
 #
 #  * The Makefile variable stem; for LibCURL this is just "CURL".
-#  * The JLL name; for GMP this is "GMP", while for LLVM it could be "LLVM_full" or "LLVM_full_assert"
+#  * The JLL name; for LLVM it could be "LLVM_full" or "LLVM_full_assert"
 #  * The upstream source version; for dSFMT this is currently "2.2.3"
 #
 # Everything else will be auto-generated.  In particular, the version listed here
@@ -20,10 +20,6 @@ CLANG_JLL_VER  := 13.0.1+3
 # DSFMT
 DSFMT_VER := 2.2.4
 DSFMT_JLL_NAME := dSFMT
-
-# GMP
-GMP_VER := 6.2.1
-GMP_JLL_NAME := GMP
 
 # LibCURL
 CURL_VER := 7.84.0
@@ -60,10 +56,6 @@ LLVMUNWIND_JLL_NAME := LLVMLibUnwind
 # MbedTLS
 MBEDTLS_VER := 2.28.0
 MBEDTLS_JLL_NAME := MbedTLS
-
-# MPFR
-MPFR_VER := 4.1.0
-MPFR_JLL_NAME := MPFR
 
 # nghttp2
 NGHTTP2_VER := 1.48.0

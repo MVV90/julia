@@ -86,7 +86,7 @@ end
 @testset "searchsorted" begin
     numTypes = [ Int8,  Int16,  Int32,  Int64,  Int128,
                 UInt8, UInt16, UInt32, UInt64, UInt128,
-                Float16, Float32, Float64, BigInt, BigFloat]
+                Float16, Float32, Float64]
 
     @test searchsorted([1:10;], 1, by=(x -> x >= 5)) == 1:4
     @test searchsorted([1:10;], 10, by=(x -> x >= 5)) == 5:10
@@ -344,7 +344,7 @@ end
 @testset "insorted" begin
     numTypes = [Int8,  Int16,  Int32,  Int64,  Int128,
                 UInt8, UInt16, UInt32, UInt64, UInt128,
-                Float16, Float32, Float64, BigInt, BigFloat]
+                Float16, Float32, Float64]
 
     @test insorted(1, collect(1:10), by=(>=(5)))
     @test insorted(10, collect(1:10), by=(>=(5)))
@@ -627,7 +627,7 @@ end
     end
 end
 
-@testset "sorting of views with strange axes" for T in (Int, UInt, Int128, UInt128, BigInt)
+@testset "sorting of views with strange axes" for T in (Int, UInt, Int128, UInt128)
     a = [8,6,7,5,3,0,9]
     b = @view a[T(2):T(5)]
     @test issorted(sort!(b))

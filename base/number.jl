@@ -252,9 +252,6 @@ See also [`promote`](@ref), [`Base.add_sum`](@ref).
 
 # Examples
 ```jldoctest
-julia> widemul(Float32(3.0), 4.0) isa BigFloat
-true
-
 julia> typemax(Int8) * typemax(Int8)
 1
 
@@ -366,13 +363,10 @@ Equivalent to `typeof(big(zero(T)))`.
 # Examples
 ```jldoctest
 julia> big(Rational)
-Rational{BigInt}
-
-julia> big(Float64)
-BigFloat
+Rational{Int128}
 
 julia> big(Complex{Int})
-Complex{BigInt}
+Complex{Int128}
 ```
 """
 big(::Type{T}) where {T<:Number} = typeof(big(zero(T)))

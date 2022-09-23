@@ -41,8 +41,7 @@ Base.iterate(::Issue29451String, i::Integer=1) = i == 1 ? ('0', 2) : nothing
 @test Issue29451String() == "0"
 @test parse(Int, Issue29451String()) == 0
 
-@testset "Issue 20587, T=$T" for T in Any[BigInt, Int128, Int16, Int32, Int64, Int8, UInt128, UInt16, UInt32, UInt64, UInt8]
-    T === BigInt && continue # TODO: make BigInt pass this test
+@testset "Issue 20587, T=$T" for T in Any[Int128, Int16, Int32, Int64, Int8, UInt128, UInt16, UInt32, UInt64, UInt8]
     for s in ["", " ", "  "]
         # Without a base (handles things like "0x00001111", etc)
         result = @test_throws ArgumentError parse(T, s)
@@ -219,7 +218,7 @@ end
 end
 
 # make sure base can be any Integer
-@testset "issue #15597, T=$T" for T in (Int, BigInt)
+@testset "issue #15597, T=$T" for T in (Int)
     let n = parse(T, "123", base = Int8(10))
         @test n == 123
         @test isa(n, T)
@@ -244,7 +243,7 @@ end
 end
 
 # issue #17333: tryparse should still throw on invalid base
-for T in (Int32, BigInt), base in (0,1,100)
+for T in (Int32), base in (0,1,100)
     @test_throws ArgumentError tryparse(T, "0", base = base)
 end
 
@@ -254,39 +253,6 @@ end
 @test tryparse(Float64, "1.23") === 1.23
 @test tryparse(Float32, "1.23") === 1.23f0
 @test tryparse(Float16, "1.23") === Float16(1.23)
-
-# parsing complex numbers (#22250)
-@testset "complex parsing" begin
-    for sign in ('-','+'), Im in ("i","j","im"), s1 in (""," "), s2 in (""," "), s3 in (""," "), s4 in (""," ")
-        for r in (1,0,-1), i in (1,0,-1),
-            n = Complex(r, sign == '+' ? i : -i)
-            s = string(s1, r, s2, sign, s3, i, Im, s4)
-            @test n === parse(Complex{Int}, s)
-            @test Complex(r) === parse(Complex{Int}, string(s1, r, s2))
-            @test Complex(0,i) === parse(Complex{Int}, string(s3, i, Im, s4))
-            for T in (Float64, BigFloat)
-                nT = parse(Complex{T}, s)
-                @test nT isa Complex{T}
-                @test nT == n
-                @test n == parse(Complex{T}, string(s1, r, ".0", s2, sign, s3, i, ".0", Im, s4))
-                @test n*parse(T,"1e-3") == parse(Complex{T}, string(s1, r, "e-3", s2, sign, s3, i, "e-3", Im, s4))
-            end
-        end
-        for r in (-1.0,-1e-9,Inf,-Inf,NaN), i in (-1.0,-1e-9,Inf,NaN)
-            n = Complex(r, sign == '+' ? i : -i)
-            s = lowercase(string(s1, r, s2, sign, s3, i, Im, s4))
-            @test n === parse(ComplexF64, s)
-            @test Complex(r) === parse(ComplexF64, string(s1, r, s2))
-            @test Complex(0,i) === parse(ComplexF64, string(s3, i, Im, s4))
-        end
-    end
-    @test parse(Complex{Float16}, "3.3+4i") === Complex{Float16}(3.3+4im)
-    @test parse(Complex{Int}, SubString("xxxxxx1+2imxxxx", 7, 10)) === 1+2im
-    for T in (Int, Float64), bad in ("3 + 4*im", "3 + 4", "1+2ij", "1im-3im", "++4im")
-        @test_throws ArgumentError parse(Complex{T}, bad)
-    end
-    @test_throws ArgumentError parse(Complex{Int}, "3 + 4.2im")
-end
 
 @testset "parse and tryparse type inference" begin
     @inferred parse(Int, "12")

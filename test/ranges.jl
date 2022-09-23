@@ -160,7 +160,7 @@ end
     #     end
     # end
 
-    for T in (Float16, Float32) # skip Float64 (bit representation of BigFloat is not available)
+    for T in (Float16, Float32) # skip Float64
         for i = 1:10^5
             x, y = rand(T), rand(T)
             highprec_pair(x, y)
@@ -833,7 +833,7 @@ function loop_range_values(::Type{T}) where T
     end
 end
 
-@testset "issue #7420 for type $T" for T = (Float32, Float64,) # BigFloat),
+@testset "issue #7420 for type $T" for T = (Float32, Float64)
     loop_range_values(T)
 end
 
@@ -1274,63 +1274,6 @@ end
         reverse([range(1.0, stop=27.0, length=1275);])
 end
 
-@testset "PR 12200 and related" begin
-    for _r in (1:2:100, 1:100, 1f0:2f0:100f0, 1.0:2.0:100.0,
-               range(1, stop=100, length=10), range(1f0, stop=100f0, length=10))
-        float_r = float(_r)
-        big_r = broadcast(big, _r)
-        big_rdot = big.(_r)
-        @test big_rdot == big_r
-        @test typeof(big_r) == typeof(big_rdot)
-        @test typeof(big_r).name === typeof(_r).name
-        if eltype(_r) <: AbstractFloat
-            @test isa(float_r, typeof(_r))
-            @test eltype(big_r) === BigFloat
-        else
-            @test isa(float_r, AbstractRange)
-            @test eltype(float_r) <: AbstractFloat
-            @test eltype(big_r) === BigInt
-        end
-    end
-
-    @test_throws DimensionMismatch range(1., stop=5., length=5) + range(1., stop=5., length=6)
-    @test_throws DimensionMismatch range(1., stop=5., length=5) - range(1., stop=5., length=6)
-    @test_throws DimensionMismatch range(1., stop=5., length=5) .* range(1., stop=5., length=6)
-    @test_throws DimensionMismatch range(1., stop=5., length=5) ./ range(1., stop=5., length=6)
-
-    @test_throws DimensionMismatch (1:5) + (1:6)
-    @test_throws DimensionMismatch (1:5) - (1:6)
-    @test_throws DimensionMismatch (1:5) .* (1:6)
-    @test_throws DimensionMismatch (1:5) ./ (1:6)
-
-    @test_throws DimensionMismatch (1.:5.) + (1.:6.)
-    @test_throws DimensionMismatch (1.:5.) - (1.:6.)
-    @test_throws DimensionMismatch (1.:5.) .* (1.:6.)
-    @test_throws DimensionMismatch (1.:5.) ./ (1.:6.)
-
-    function test_range_sum_diff(r1, r2, r_sum, r_diff)
-        @test r1 + r2 == r_sum
-        @test r2 + r1 == r_sum
-        @test r1 - r2 == r_diff
-        @test r2 - r1 == -r_diff
-
-        @test Vector(r1) + Vector(r2) == Vector(r_sum)
-        @test Vector(r2) + Vector(r1) == Vector(r_sum)
-        @test Vector(r1) - Vector(r2) == Vector(r_diff)
-        @test Vector(r2) - Vector(r1) == Vector(-r_diff)
-    end
-
-    test_range_sum_diff(1:5, 0:2:8, 1:3:13, 1:-1:-3)
-    test_range_sum_diff(1.:5., 0.:2.:8., 1.:3.:13., 1.:-1.:-3.)
-    test_range_sum_diff(range(1., stop=5., length=5), range(0., stop=-4., length=5),
-                        range(1., stop=1., length=5), range(1., stop=9., length=5))
-
-    test_range_sum_diff(1:5, 0.:2.:8., 1.:3.:13., 1.:-1.:-3.)
-    test_range_sum_diff(1:5, range(0, stop=8, length=5),
-                        range(1, stop=13, length=5), range(1, stop=-3, length=5))
-    test_range_sum_diff(1.:5., range(0, stop=8, length=5),
-                        range(1, stop=13, length=5), range(1, stop=-3, length=5))
-end
 # Issue #12388
 let r = 0x02:0x05
     @test r[2:3] == 0x03:0x04
@@ -1456,40 +1399,10 @@ end
     @test_throws InexactError(:Int16, Int16, 3.2) Base.OneTo{Int16}(3.2)
 end
 
-@testset "range of other types" begin
-    let r = range(0, stop=3//10, length=4)
-        @test eltype(r) == Rational{Int}
-        @test r[2] === 1//10
-    end
-
-    let a = 1.0,
-        b = nextfloat(1.0),
-        ba = BigFloat(a),
-        bb = BigFloat(b),
-        r = range(ba, stop=bb, length=3)
-        @test eltype(r) == BigFloat
-        @test r[1] == a && r[3] == b
-        @test r[2] == (ba+bb)/2
-    end
-
-    let (a, b) = (rand(10), rand(10)),
-        r = range(a, stop=b, length=5)
-        @test r[1] == a && r[5] == b
-        for i = 2:4
-            x = ((5 - i) // 4) * a + ((i - 1) // 4) * b
-            @test r[i] == x
-        end
-    end
-end
 @testset "issue #23178" begin
     r = range(Float16(0.1094), stop=Float16(0.9697), length=300)
     @test r[1] == Float16(0.1094)
     @test r[end] == Float16(0.9697)
-end
-
-# issue #20382
-let r = @inferred((:)(big(1.0),big(2.0),big(5.0)))
-    @test eltype(r) == BigFloat
 end
 
 @testset "issue #14420" begin
@@ -1498,11 +1411,6 @@ end
         @test r[1] === 0.10000000000000045
         @test r[end] === 1.0
     end
-end
-@testset "issue #20381" begin
-    r = range(-big(1.0), stop=big(1.0), length=4)
-    @test isa(@inferred(r[2]), BigFloat)
-    @test r[2] ≈ big(-1.0)/3
 end
 
 @testset "issue #20520" begin
@@ -1562,7 +1470,6 @@ end
     @test map(Float64, x) === -5.0:1.0:5.0
     @test map(Float32, x) === -5.0f0:1.0f0:5.0f0
     @test map(Float16, x) === Float16(-5.0):Float16(1.0):Float16(5.0)
-    @test map(BigFloat, x) === x
 end
 
 @testset "broadcasting returns ranges" begin
@@ -1596,14 +1503,6 @@ end
     @test_throws ArgumentError range(; stop=nothing)
     @test_throws ArgumentError range(; length=nothing)
     @test_throws TypeError range(; length=5.5)
-end
-
-@testset "issue #23300#issuecomment-371575548" begin
-    for (start, stop) in ((-5, 5), (-5.0, 5), (-5, 5.0), (-5.0, 5.0))
-        @test @inferred(range(big(start), stop=big(stop), length=11)) isa LinRange{BigFloat}
-        @test Float64.(@inferred(range(big(start), stop=big(stop), length=11))) == range(start, stop=stop, length=11)
-        @test Float64.(@inferred(map(exp, range(big(start), stop=big(stop), length=11)))) == map(exp, range(start, stop=stop, length=11))
-    end
 end
 
 @testset "Issue #26532" begin
@@ -1911,13 +1810,6 @@ end
     @test reverse(reverse(1.0:0.0)) === 1.0:0.0
 end
 
-@testset "Issue #30944 ranges with non-IEEEFloat types" begin
-    # We want to test the creation of a range with BigFloat start or step
-    @test range(big(1.0), length=10) == big(1.0):1:10
-    @test range(1, step = big(1.0), length=10) == big(1.0):1:10
-    @test range(1.0, step = big(1.0), length=10) == big(1.0):1:10
-end
-
 @testset "mod with ranges" begin
     for n in -10:10
         @test mod(n, 0:4) == mod(n, 5)
@@ -1970,7 +1862,7 @@ end
 end
 
 @testset "Type-stable intersect (#32410)" begin
-    for T = (StepRange{Int,Int}, StepRange{BigInt,Int}, StepRange{BigInt,BigInt})
+    for T = (StepRange{Int,Int}, StepRange{Int128,Int}, StepRange{Int128,Int128})
         @test @inferred(intersect(T(1:2:5), 1:5)) == 1:2:5
         @test @inferred(intersect(1:5, T(1:2:5))) == 1:2:5
         @test @inferred(intersect(T(5:-2:1), 1:5)) == 5:-2:1

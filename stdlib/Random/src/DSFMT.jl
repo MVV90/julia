@@ -3,7 +3,6 @@
 module DSFMT
 
 import Base: copy, copy!, ==, hash
-using Base.GMP.MPZ
 
 export DSFMT_state, dsfmt_get_min_array_size, dsfmt_get_idstring,
        dsfmt_init_gen_rand, dsfmt_init_by_array, dsfmt_gv_init_by_array,
@@ -101,10 +100,10 @@ end
 
 "Represents a polynomial in GF(2)[X]"
 struct GF2X
-    z::BigInt
+    z::Int128
 end
 
-GF2X(s::AbstractString) = GF2X(parse(BigInt, reverse(s), base = 16))
+GF2X(s::AbstractString) = GF2X(parse(Int128, reverse(s), base = 16))
 Base.string(f::GF2X) = reverse(string(f.z, base = 16))
 Base.:(==)(f::GF2X, g::GF2X) = f.z == g.z
 Base.copy(f::GF2X) = GF2X(MPZ.set(f.z))
@@ -143,7 +142,7 @@ function sqrmod!(f::GF2X, m::GF2X)::GF2X
 end
 
 # compute X^e mod m
-function powxmod(e::BigInt, m::GF2X)::GF2X
+function powxmod(e::Int128, m::GF2X)::GF2X
     e < 0 && throw(DomainError("e must be >= 0"))
     foldl(Base.ndigits0z(e, 2)-1:-1:0; init=GF2X(1)) do f, i
         MPZ.tstbit(e, i) ?
@@ -153,7 +152,7 @@ function powxmod(e::BigInt, m::GF2X)::GF2X
 end
 
 "Cached jump polynomials for `MersenneTwister`."
-const JumpPolys = Dict{BigInt,GF2X}()
+const JumpPolys = Dict{Int128,GF2X}()
 
 const CharPoly_ref = Ref{GF2X}()
 # Ref because it can not be initialized at load time

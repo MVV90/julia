@@ -642,8 +642,7 @@ end
     precision(T::Type; base::Integer=2)
 
 Get the precision of a floating point number, as defined by the effective number of bits in
-the significand, or the precision of a floating-point type `T` (its current default, if
-`T` is a variable-precision type like [`BigFloat`](@ref)).
+the significand, or the precision of a floating-point type `T`.
 
 If `base` is specified, then it returns the maximum corresponding
 number of significand digits in that base.

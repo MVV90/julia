@@ -2,7 +2,7 @@
 
 ## linalg.jl: Some generic Linear Algebra definitions
 
-# Elements of `out` may not be defined (e.g., for `BigFloat`). To make
+# Elements of `out` may not be defined (e.g., for `Float64`). To make
 # `mul!(out, A, B)` work for such cases, `out .*ₛ beta` short-circuits
 # `out * beta`.  Using `broadcasted` to avoid the multiplication
 # inside this function.
@@ -64,19 +64,19 @@ MulAddMul() = MulAddMul{true,true,Bool,Bool}(true, false)
 Short-circuiting version of `C[idx] = _add(x, C[idx])`.
 
 Short-circuiting the indexing `C[idx]` is necessary for avoiding `UndefRefError`
-when mutating an array of non-primitive numbers such as `BigFloat`.
+when mutating an array of non-primitive numbers such as `Float64`.
 
 # Examples
 ```jldoctest
 julia> using LinearAlgebra: MulAddMul, _modify!
 
 julia> _add = MulAddMul(1, 0);
-       C = Vector{BigFloat}(undef, 1);
+       C = Vector{Float64}(undef, 1);
 
 julia> _modify!(_add, 123, C, 1)
 
 julia> C
-1-element Vector{BigFloat}:
+1-element Vector{Float64}:
  123.0
 ```
 """
@@ -1551,7 +1551,7 @@ end
 det(x::Number) = x
 
 # Resolve Issue #40128
-det(A::AbstractMatrix{BigInt}) = det_bareiss(A)
+det(A::AbstractMatrix{Int128}) = det_bareiss(A)
 
 """
     logabsdet(M)

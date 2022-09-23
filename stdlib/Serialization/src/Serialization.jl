@@ -7,7 +7,7 @@ Provide serialization of Julia objects via the functions
 """
 module Serialization
 
-import Base: GMP, Bottom, unsafe_convert, uncompressed_ast
+import Base: Bottom, unsafe_convert, uncompressed_ast
 import Core: svec, SimpleVector
 using Base: unaliascopy, unwrap_unionall, require_one_based_indexing, ntupleany
 using Core.IR
@@ -319,8 +319,8 @@ function serialize(s::AbstractSerializer, r::Regex)
     serialize(s, r.match_options)
 end
 
-function serialize(s::AbstractSerializer, n::BigInt)
-    serialize_type(s, BigInt)
+function serialize(s::AbstractSerializer, n::Int128)
+    serialize_type(s, Int128)
     serialize(s, string(n, base = 62))
 end
 
@@ -1502,7 +1502,7 @@ function deserialize(s::AbstractSerializer, T::Type{Dict{K,V}}) where {K,V}
     return deserialize_dict(s, T)
 end
 
-deserialize(s::AbstractSerializer, ::Type{BigInt}) = parse(BigInt, deserialize(s), base = 62)
+deserialize(s::AbstractSerializer, ::Type{Int128}) = parse(Int128, deserialize(s), base = 62)
 
 function deserialize(s::AbstractSerializer, t::Type{Regex})
     pattern = deserialize(s)

@@ -309,7 +309,6 @@ end
     _test_field_undef(Ref{Any}(TT()))
     nothing
 end
-test_field_undef(ARefxy{BigInt})
 test_field_undef(ARefxy{Any})
 test_field_undef(ARefxy{Union{Nothing,Integer}})
 test_field_undef(ARefxy{UndefComplex{Any}})

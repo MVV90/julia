@@ -566,7 +566,7 @@ if nameof(@__MODULE__) === :Base
 
         Find `y::T` such that `x` ≡ `y` (mod n), where n is the number of integers representable
         in `T`, and `y` is an integer in `[typemin(T),typemax(T)]`.
-        If `T` can represent any integer (e.g. `T == BigInt`), then this operation corresponds to
+        If `T` can represent any integer, then this operation corresponds to
         a conversion to `T`.
 
         # Examples
@@ -679,7 +679,7 @@ end
     @big_str str
     @big_str(str)
 
-Parse a string into a [`BigInt`](@ref) or [`BigFloat`](@ref),
+Parse a string into a [`Int128`](@ref) or [`Float64`](@ref),
 and throw an `ArgumentError` if the string is not a valid number.
 For integers `_` is allowed in the string as a separator.
 
@@ -693,7 +693,7 @@ julia> big"7891.5"
 ```
 """
 macro big_str(s)
-    message = "invalid number format $s for BigInt or BigFloat"
+    message = "invalid number format $s for Int128 or Float64"
     throw_error =  :(throw(ArgumentError($message)))
     if '_' in s
         # remove _ in s[2:end-1]
@@ -712,9 +712,9 @@ macro big_str(s)
         print(bf, s[end])
         s = String(take!(bf))
     end
-    n = tryparse(BigInt, s)
+    n = tryparse(Int128, s)
     n === nothing || return n
-    n = tryparse(BigFloat, s)
+    n = tryparse(Float64, s)
     n === nothing || return n
     return throw_error
 end
@@ -930,12 +930,12 @@ if Core.sizeof(Int) == 4
 
     function div(x::Int128, y::Int128)
         (x == typemin(Int128)) & (y == -1) && throw(DivideError())
-        return Int128(div(BigInt(x), BigInt(y)))::Int128
+        return Int128(div(Int128(x), Int128(y)))::Int128
     end
     div(x::UInt128, y::UInt128) = divrem(x, y)[1]
 
     function rem(x::Int128, y::Int128)
-        return Int128(rem(BigInt(x), BigInt(y)))::Int128
+        return Int128(rem(Int128(x), Int128(y)))::Int128
     end
 
     function rem(x::UInt128, y::UInt128)
@@ -970,7 +970,7 @@ if Core.sizeof(Int) == 4
     end
 
     function mod(x::Int128, y::Int128)
-        return Int128(mod(BigInt(x), BigInt(y)))::Int128
+        return Int128(mod(Int128(x), Int128(y)))::Int128
     end
 else
     *(x::T, y::T) where {T<:Union{Int128,UInt128}}  = mul_int(x, y)

@@ -41,7 +41,7 @@ end
 end
 
 @testset "ispow2 and iseven/isodd" begin
-    for T in (Float16,Float32,Float64,BigFloat)
+    for T in (Float16,Float32,Float64)
         for x in (0.25, 1.0, 4.0, exp2(T(exponent(floatmax(T)))), exp2(T(exponent(floatmin(T)))))
             @test ispow2(T(x))
         end

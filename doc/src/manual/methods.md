@@ -223,12 +223,6 @@ julia> methods(+)
 [9] +(z::Complex{Bool}, x::Bool) in Base at complex.jl:228
 [10] +(z::Complex{Bool}, x::Real) in Base at complex.jl:242
 [11] +(x::Char, y::Integer) in Base at char.jl:40
-[12] +(c::BigInt, x::BigFloat) in Base.MPFR at mpfr.jl:307
-[13] +(a::BigInt, b::BigInt, c::BigInt, d::BigInt, e::BigInt) in Base.GMP at gmp.jl:392
-[14] +(a::BigInt, b::BigInt, c::BigInt, d::BigInt) in Base.GMP at gmp.jl:391
-[15] +(a::BigInt, b::BigInt, c::BigInt) in Base.GMP at gmp.jl:390
-[16] +(x::BigInt, y::BigInt) in Base.GMP at gmp.jl:361
-[17] +(x::BigInt, c::Union{UInt16, UInt32, UInt64, UInt8}) in Base.GMP at gmp.jl:398
 ...
 [180] +(a, b, c, xs...) in Base at operators.jl:424
 ```

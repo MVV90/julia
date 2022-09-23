@@ -43,7 +43,7 @@ fm_fast_64_upd(x) = @fastmath (r=x; r+=eps64_2; r+=eps64_2)
         @test @fastmath(one_eps * one_eps - 1) ≈ 2147483649/1152921504606846976
     end
 
-    for T in (Float32, Float64, BigFloat)
+    for T in (Float32, Float64)
         zero = convert(T, 0)
         one = convert(T, 1) + eps(T)
         two = convert(T, 2) + 1//10
@@ -69,7 +69,7 @@ fm_fast_64_upd(x) = @fastmath (r=x; r+=eps64_2; r+=eps64_2)
         end
     end
 
-    for T in (ComplexF32, ComplexF64, Complex{BigFloat})
+    for T in (ComplexF32, ComplexF64)
         zero = convert(T,0)
         one = convert(T,1) + im*eps(real(convert(T,1)))
         two = convert(T,2) + im//10
@@ -99,7 +99,7 @@ end
 # math functions
 
 @testset "real arithmetic" begin
-    for T in (Float16, Float32, Float64, BigFloat)
+    for T in (Float16, Float32, Float64)
         half = 1/convert(T,2)
         third = 1/convert(T,3)
 
@@ -159,7 +159,7 @@ end
     end
 end
 @testset "complex arithmetic" begin
-    for T in (ComplexF32, ComplexF64, Complex{BigFloat})
+    for T in (ComplexF32, ComplexF64)
         half = (1+1im)/T(2)
         third = (1-1im)/T(3)
 
@@ -185,7 +185,7 @@ end
     end
 end
 @testset "mixed real/complex arithmetic" begin
-    for T in (Float32, Float64, BigFloat)
+    for T in (Float32, Float64)
         CT = Complex{T}
         half = 1/T(2)
         third = 1/T(3)

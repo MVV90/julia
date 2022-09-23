@@ -3441,7 +3441,7 @@ void jl_gc_init(void)
     gc_mark_loop(NULL, sp);
 }
 
-// callback for passing OOM errors from gmp
+// callback for passing OOM errors (originally from gmp, but no longer used)
 JL_DLLEXPORT void jl_throw_out_of_memory_error(void)
 {
     jl_throw(jl_memory_exception);

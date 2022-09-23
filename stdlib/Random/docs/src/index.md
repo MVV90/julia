@@ -23,12 +23,11 @@ or tasks in order to be thread-safe. However, the default RNG is thread-safe as 
 (using a per-thread RNG up to version 1.6, and per-task thereafter).
 
 The provided RNGs can generate uniform random numbers of the following types:
-[`Float16`](@ref), [`Float32`](@ref), [`Float64`](@ref), [`BigFloat`](@ref), [`Bool`](@ref),
+[`Float16`](@ref), [`Float32`](@ref), [`Float64`](@ref), [`Bool`](@ref),
 [`Int8`](@ref), [`UInt8`](@ref), [`Int16`](@ref), [`UInt16`](@ref), [`Int32`](@ref),
-[`UInt32`](@ref), [`Int64`](@ref), [`UInt64`](@ref), [`Int128`](@ref), [`UInt128`](@ref),
-[`BigInt`](@ref) (or complex numbers of those types).
-Random floating point numbers are generated uniformly in ``[0, 1)``. As `BigInt` represents
-unbounded integers, the interval must be specified (e.g. `rand(big.(1:6))`).
+[`UInt32`](@ref), [`Int64`](@ref), [`UInt64`](@ref), [`Int128`](@ref), [`UInt128`](@ref)
+(or complex numbers of those types).
+Random floating point numbers are generated uniformly in ``[0, 1)``.
 
 Additionally, normal and exponential distributions are implemented for some `AbstractFloat` and
 `Complex` types, see [`randn`](@ref) and [`randexp`](@ref) for details.

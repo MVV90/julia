@@ -1356,7 +1356,7 @@ timesofar("find")
     @test_throws BoundsError findprev(Returns(true), b1, 11)
     @test_throws BoundsError findnext(Returns(true), b1, -1)
 
-    @testset "issue 32568" for T = (UInt, BigInt)
+    @testset "issue 32568" for T = (UInt)
         for x = (1, 2)
             @test findnext(evens, T(x)) isa keytype(evens)
             @test findnext(iseven, evens, T(x)) isa keytype(evens)
