@@ -96,10 +96,10 @@ end
 <(x::AbstractIrrational, y::Float16) = Float32(x,RoundUp) <= y
 <(x::Float16, y::AbstractIrrational) = x <= Float32(y,RoundDown)
 <(x::AbstractIrrational, y::Float64) = setprecision(precision(y)+32) do
-    big(x) < y
+    Float64(x) < y
 end
 <(x::Float64, y::AbstractIrrational) = setprecision(precision(x)+32) do
-    x < big(y)
+    x < Float64(y)
 end
 
 <=(x::AbstractIrrational, y::AbstractFloat) = x < y
@@ -107,12 +107,12 @@ end
 
 # Irrational vs Rational
 @pure function rationalize(::Type{T}, x::AbstractIrrational; tol::Real=0) where T
-    return rationalize(T, big(x), tol=tol)
+    return rationalize(T, Float64(x), tol=tol)
 end
 @pure function lessrational(rx::Rational{<:Integer}, x::AbstractIrrational)
     # an @pure version of `<` for determining if the rationalization of
     # an irrational number required rounding up or down
-    return rx < big(x)
+    return rx < Float64(x)
 end
 function <(x::AbstractIrrational, y::Rational{T}) where T
     T <: Unsigned && x < 0.0 && return true
@@ -132,8 +132,8 @@ function <(x::Rational{T}, y::AbstractIrrational) where T
         return x < ry
     end
 end
-<(x::AbstractIrrational, y::Rational{Int128}) = big(x) < y
-<(x::Rational{Int128}, y::AbstractIrrational) = x < big(y)
+<(x::AbstractIrrational, y::Rational{Int128}) = Float64(x) < y
+<(x::Rational{Int128}, y::AbstractIrrational) = x < Float64(y)
 
 <=(x::AbstractIrrational, y::Rational) = x < y
 <=(x::Rational, y::AbstractIrrational) = x < y
@@ -185,14 +185,14 @@ macro irrational(sym, val, def)
         $bigconvert
         Base.Float64(::Irrational{$qsym}) = $val
         Base.Float32(::Irrational{$qsym}) = $(Float32(val))
-        @assert isa(big($esym), Float64)
-        @assert Float64($esym) == Float64(big($esym))
-        @assert Float32($esym) == Float32(big($esym))
+        @assert isa(Float64($esym), Float64)
+        @assert Float64($esym) == Float64(Float64($esym))
+        @assert Float32($esym) == Float32(Float64($esym))
     end
 end
 
-big(x::AbstractIrrational) = Float64(x)
-big(::Type{<:AbstractIrrational}) = Float64
+Float64(x::AbstractIrrational) = Float64(x)
+Float64(::Type{<:AbstractIrrational}) = Float64
 
 # align along = for nice Array printing
 function alignment(io::IO, x::AbstractIrrational)
