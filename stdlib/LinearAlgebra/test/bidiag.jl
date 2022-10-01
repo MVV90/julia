@@ -128,7 +128,6 @@ Random.seed!(1)
             @test size(T) == (n, n)
             @test Array(T) == diagm(0 => dv, (uplo == :U ? 1 : -1) => ev)
             @test Bidiagonal(Array(T), uplo) == T
-            @test big.(T) == T
             @test Array(abs.(T)) == abs.(diagm(0 => dv, (uplo == :U ? 1 : -1) => ev))
             @test Array(real(T)) == real(diagm(0 => dv, (uplo == :U ? 1 : -1) => ev))
             @test Array(imag(T)) == imag(diagm(0 => dv, (uplo == :U ? 1 : -1) => ev))

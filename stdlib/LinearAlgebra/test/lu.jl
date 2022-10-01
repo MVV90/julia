@@ -71,7 +71,7 @@ dimg  = randn(n)/2
             # test conversion of LU factorization's numerical type
             bft = eltya <: Real ? LinearAlgebra.LU{Float64} : LinearAlgebra.LU{Complex{Float64}}
             bflua = convert(bft, lua)
-            @test bflua.L*bflua.U ≈ big.(a)[p,:] rtol=εa*norm(a)
+            @test bflua.L*bflua.U ≈ Float64.(a)[p,:] rtol=εa*norm(a)
             @test Factorization{eltya}(lua) === lua
             # test Factorization with different eltype
             if eltya <: BlasReal

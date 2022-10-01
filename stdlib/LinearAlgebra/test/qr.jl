@@ -213,7 +213,7 @@ end
 @testset "transpose errors" begin
     @test_throws MethodError transpose(qr(randn(3,3)))
     @test_throws MethodError transpose(qr(randn(3,3), NoPivot()))
-    @test_throws MethodError transpose(qr(big.(randn(3,3))))
+    @test_throws MethodError transpose(qr(Float64.(randn(3,3))))
 end
 
 @testset "Issue 7304" begin
