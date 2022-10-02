@@ -1140,11 +1140,6 @@ broadcasted(::DefaultArrayStyle{1}, ::typeof(\), x::Number, r::AbstractRange) = 
 broadcasted(::DefaultArrayStyle{1}, ::typeof(\), x::Number, r::StepRangeLen) = StepRangeLen(x\r.ref, x\r.step, length(r), r.offset)
 broadcasted(::DefaultArrayStyle{1}, ::typeof(\), x::Number, r::LinRange) = LinRange(x \ r.start, x \ r.stop, r.len)
 
-broadcasted(::DefaultArrayStyle{1}, ::typeof(big), r::UnitRange) = big(r.start):big(last(r))
-broadcasted(::DefaultArrayStyle{1}, ::typeof(big), r::StepRange) = big(r.start):big(r.step):big(last(r))
-broadcasted(::DefaultArrayStyle{1}, ::typeof(big), r::StepRangeLen) = StepRangeLen(big(r.ref), big(r.step), length(r), r.offset)
-broadcasted(::DefaultArrayStyle{1}, ::typeof(big), r::LinRange) = LinRange(big(r.start), big(r.stop), length(r))
-
 ## CartesianIndices
 broadcasted(::typeof(+), I::CartesianIndices{N}, j::CartesianIndex{N}) where N =
     CartesianIndices(map((rng, offset)->rng .+ offset, I.indices, Tuple(j)))
