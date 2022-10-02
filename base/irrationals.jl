@@ -95,12 +95,6 @@ end
 <(x::Float32, y::AbstractIrrational) = x <= Float32(y,RoundDown)
 <(x::AbstractIrrational, y::Float16) = Float32(x,RoundUp) <= y
 <(x::Float16, y::AbstractIrrational) = x <= Float32(y,RoundDown)
-<(x::AbstractIrrational, y::Float64) = setprecision(precision(y)+32) do
-    Float64(x) < y
-end
-<(x::Float64, y::AbstractIrrational) = setprecision(precision(x)+32) do
-    x < Float64(y)
-end
 
 <=(x::AbstractIrrational, y::AbstractFloat) = x < y
 <=(x::AbstractFloat, y::AbstractIrrational) = x < y
