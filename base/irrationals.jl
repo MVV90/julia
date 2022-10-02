@@ -167,16 +167,8 @@ and arbitrary-precision definition in terms of `Float64`s given by the expressio
 macro irrational(sym, val, def)
     esym = esc(sym)
     qsym = esc(Expr(:quote, sym))
-    bigconvert = quote
-        function Base.Float64(::Irrational{$qsym}; precision=precision(Float64))
-            setprecision(Float64, precision) do
-                $(esc(def))
-            end
-        end
-    end
     quote
         const $esym = Irrational{$qsym}()
-        $bigconvert
         Base.Float64(::Irrational{$qsym}) = $val
         Base.Float32(::Irrational{$qsym}) = $(Float32(val))
         @assert isa(Float64($esym), Float64)
