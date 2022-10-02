@@ -627,7 +627,7 @@ end
 for i in 0:13
     tag = Int32(INT8_TAG + i)
     ty = TAGS[tag]
-    (ty === Int32 || ty === Int64) && continue
+    (ty === Int32 || ty === Int64 || ty === Int128) && continue
     @eval serialize(s::AbstractSerializer, n::$ty) = (writetag(s.io, $tag); write(s.io, n); nothing)
 end
 

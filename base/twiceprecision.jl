@@ -67,14 +67,8 @@ Example:
 julia> 1.0 + 1.0001e-15
 1.000000000000001
 
-julia> big(1.0) + big(1.0001e-15)
-1.000000000000001000100000000000020165767380775934141445417482375879192346701529
-
 julia> hi, lo = Base.add12(1.0, 1.0001e-15)
 (1.000000000000001, -1.1012302462515652e-16)
-
-julia> big(hi) + big(lo)
-1.000000000000001000100000000000020165767380775934141445417482375879192346701529
 ```
 
 `lo` differs from 1.0e-19 because `hi` is not exactly equal to
@@ -275,8 +269,6 @@ convert(::Type{TwicePrecision{T}}, x::Number) where {T} = TwicePrecision{T}(x)
 
 float(x::TwicePrecision{<:AbstractFloat}) = x
 float(x::TwicePrecision) = TwicePrecision(float(x.hi), float(x.lo))
-
-big(x::TwicePrecision) = big(x.hi) + big(x.lo)
 
 -(x::TwicePrecision) = TwicePrecision(-x.hi, -x.lo)
 
