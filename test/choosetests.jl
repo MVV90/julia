@@ -13,7 +13,7 @@ const TESTNAMES = [
         "arrayops", "tuple", "reduce", "reducedim", "abstractarray",
         "intfuncs", "simdloop", "vecelement", "rational",
         "bitarray", "copy", "math", "fastmath", "functional", "iterators",
-        "operators", "ordering", "path", "ccall", "parse", "loading"
+        "operators", "ordering", "path", "ccall", "parse", "loading",
         "sorting", "spawn", "backtrace", "exceptions",
         "file", "read", "version", "namedtuple",
         "broadcast", "complex",
