@@ -205,15 +205,11 @@ end
     for T in (Int8, Int16, Int32, Int64, Int128)
         @test parse(T,string(typemin(T))) == typemin(T)
         @test parse(T,string(typemax(T))) == typemax(T)
-        @test_throws OverflowError parse(T,string(big(typemin(T))-1))
-        @test_throws OverflowError parse(T,string(big(typemax(T))+1))
     end
 
     for T in (UInt8,UInt16,UInt32,UInt64,UInt128)
         @test parse(T,string(typemin(T))) == typemin(T)
         @test parse(T,string(typemax(T))) == typemax(T)
-        @test_throws ArgumentError parse(T,string(big(typemin(T))-1))
-        @test_throws OverflowError parse(T,string(big(typemax(T))+1))
     end
 end
 
