@@ -126,8 +126,8 @@ function <(x::Rational{T}, y::AbstractIrrational) where T
         return x < ry
     end
 end
-<(x::AbstractIrrational, y::Rational{Int128}) = Float64(x) < y
-<(x::Rational{Int128}, y::AbstractIrrational) = x < Float64(y)
+<(x::AbstractIrrational, y::Rational{Int128}) = Int128(x) < y
+<(x::Rational{Int128}, y::AbstractIrrational) = x < Int128(y)
 
 <=(x::AbstractIrrational, y::Rational) = x < y
 <=(x::Rational, y::AbstractIrrational) = x < y
@@ -176,8 +176,8 @@ macro irrational(sym, val, def)
     end
 end
 
-Float64(x::AbstractIrrational) = Float64(x)
-Float64(::Type{<:AbstractIrrational}) = Float64
+# Float64(x::AbstractIrrational) = Float64(x)
+# Float64(::Type{<:AbstractIrrational}) = Float64
 
 # align along = for nice Array printing
 function alignment(io::IO, x::AbstractIrrational)
