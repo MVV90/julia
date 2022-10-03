@@ -373,9 +373,11 @@ round(x::IEEEFloat, r::RoundingMode{:Nearest}) = rint_llvm(x)
 promote_rule(::Type{Float32}, ::Type{Float16}) = Float32
 promote_rule(::Type{Float64}, ::Type{Float16}) = Float64
 promote_rule(::Type{Float64}, ::Type{Float32}) = Float64
+promote_rule(::Type{Float64}, ::Type{Float64}) = Float64
 
 widen(::Type{Float16}) = Float32
 widen(::Type{Float32}) = Float64
+widen(::Type{Float64}) = Float64
 
 ## floating point arithmetic ##
 -(x::IEEEFloat) = neg_float(x)

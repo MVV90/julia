@@ -295,7 +295,7 @@ promote_rule(::Type{Float64}, ::Type{Float32}) = Float64
 ```
 
 one declares that when 64-bit and 32-bit floating-point values are promoted together, they should
-be promoted to 64-bit floating-point. 
+be promoted to 64-bit floating-point.
 
 The `promote_rule` function is used as a building block to define a second function called [`promote_type`](@ref),
 which, given any number of type objects, returns the common type to which those values, as arguments

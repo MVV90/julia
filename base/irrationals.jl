@@ -163,7 +163,6 @@ Define a new `Irrational` value, `sym`, with pre-computed `Float64` value `val`,
 and arbitrary-precision definition in terms of `Float64`s given by the expression `def`.
 """
 
-# TODO: We might have broke this removing mpfr?
 macro irrational(sym, val, def)
     esym = esc(sym)
     qsym = esc(Expr(:quote, sym))

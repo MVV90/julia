@@ -1070,16 +1070,16 @@ function add22condh(xh::Float64, xl::Float64, yh::Float64, yl::Float64)
 end
 
 # multiples of pi/2, as double-double (ie with "tail")
-const pi1o2_h  = 1.5707963267948966     
-const pi1o2_l  = 6.123233995736766e-17 
+const pi1o2_h  = 1.5707963267948966
+const pi1o2_l  = 6.123233995736766e-17
 
-const pi2o2_h  = 3.141592653589793      
-const pi2o2_l  = 1.2246467991473532e-16 
+const pi2o2_h  = 3.141592653589793
+const pi2o2_l  = 1.2246467991473532e-16
 
-const pi3o2_h  = 4.71238898038469       
-const pi3o2_l  = 1.8369701987210297e-16 
+const pi3o2_h  = 4.71238898038469
+const pi3o2_l  = 1.8369701987210297e-16
 
-const pi4o2_h  = 6.283185307179586      
+const pi4o2_h  = 6.283185307179586
 const pi4o2_l  = 2.4492935982947064e-16
 
 """

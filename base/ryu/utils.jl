@@ -4741,8 +4741,8 @@ is an unsigned integer twice as wide as `T` (i.e. a `UInt128` if `T == Float64`)
 """
 function pow5invsplit(::Type{T}, i) where {T<:AbstractFloat}
     W = widen(uinttype(T))
-    pow = UInt64(5)^i
-    inv = div(UInt64(1) << (ndigits(pow, base=2) - 1 + pow5_inv_bitcount(T)), pow) + 1
+    pow = UInt128(5)^i
+    inv = div(UInt128(1) << (ndigits(pow, base=2) - 1 + pow5_inv_bitcount(T)), pow) + 1
     return W(inv)
 end
 
@@ -4770,7 +4770,7 @@ unsigned integer twice as wide as `T` (i.e. a `UInt128` if `T == Float64`), with
 """
 function pow5split(::Type{T}, i) where {T<:AbstractFloat}
     W = widen(uinttype(T))
-    pow = UInt64(5)^i
+    pow = UInt128(5)^i
     return W(pow >> (ndigits(pow, base=2) - pow5_bitcount(T)))
 end
 
