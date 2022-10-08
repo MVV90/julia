@@ -805,10 +805,12 @@ widen(::Type{Int8}) = Int16
 widen(::Type{Int16}) = Int32
 widen(::Type{Int32}) = Int64
 widen(::Type{Int64}) = Int128
+widen(::Type{Int128}) = Int128
 widen(::Type{UInt8}) = UInt16
 widen(::Type{UInt16}) = UInt32
 widen(::Type{UInt32}) = UInt64
 widen(::Type{UInt64}) = UInt128
+widen(::Type{UInt128}) = UInt128
 
 # a few special cases,
 # Int64*UInt64 => Int128
