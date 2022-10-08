@@ -9,7 +9,7 @@ Number type representing an exact irrational value, which is automatically round
 arithmetic operations with other numeric quantities.
 
 Subtypes `MyIrrational <: AbstractIrrational` should implement at least `==(::MyIrrational, ::MyIrrational)`,
-`hash(x::MyIrrational, h::UInt)`, and `convert(::Type{F}, x::MyIrrational) where {F <: Union{Float64,Float32,Float64}}`.
+`hash(x::MyIrrational, h::UInt)`, and `convert(::Type{F}, x::MyIrrational) where {F <: Union{Float32,Float64}}`.
 
 If a subtype is used to represent values that may occasionally be rational (e.g. a square-root type that represents `√n`
 for integers `n` will give a rational result when `n` is a perfect square), then it should also implement
@@ -65,9 +65,7 @@ end
 Rational{Int128}(x::AbstractIrrational) = throw(ArgumentError("Cannot convert an AbstractIrrational to a Rational{Int128}: use rationalize(Int128, x) instead"))
 
 @pure function (t::Type{T})(x::AbstractIrrational, r::RoundingMode) where T<:Union{Float32,Float64}
-    setprecision(Float64, 256) do
-        T(Float64(x)::Float64, r)
-    end
+    T(T(x)::T, r)
 end
 
 float(::Type{<:AbstractIrrational}) = Float64
@@ -175,9 +173,6 @@ macro irrational(sym, val, def)
         @assert Float32($esym) == Float32(Float64($esym))
     end
 end
-
-# Float64(x::AbstractIrrational) = Float64(x)
-# Float64(::Type{<:AbstractIrrational}) = Float64
 
 # align along = for nice Array printing
 function alignment(io::IO, x::AbstractIrrational)
