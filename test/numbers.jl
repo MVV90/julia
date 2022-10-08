@@ -2574,7 +2574,10 @@ end
 @testset "constructor inferability for $T" for T in [AbstractFloat, Float16,
         Float32, Float64, Integer, Bool, Signed, Int128, Int16, Int32, Int64, Int8,
         Unsigned, UInt128, UInt16, UInt32, UInt64, UInt8]
-    @test all(R -> R<:T, Base.return_types(T))
+    for (i, R) in enumerate(Base.return_types(T))
+        def = methods(T)[i]
+        @test R<:T || "Failed in constructor definition. Please fix: $def"
+    end
 end
 
 @testset "generic isfinite" begin
