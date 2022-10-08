@@ -390,9 +390,6 @@ function powermod(x::Integer, p::Integer, m::T) where T<:Integer
     return r
 end
 
-# optimization: promote the modulus m to Int128 only once (cf. widemul in generic powermod above)
-powermod(x::Integer, p::Integer, m::Union{Int128,UInt128}) = oftype(m, powermod(x, p, big(m)))
-
 _nextpow2(x::Unsigned) = oneunit(x)<<((sizeof(x)<<3)-leading_zeros(x-oneunit(x)))
 _nextpow2(x::Integer) = reinterpret(typeof(x),x < 0 ? -_nextpow2(unsigned(-x)) : _nextpow2(unsigned(x)))
 _prevpow2(x::Unsigned) = one(x) << unsigned((sizeof(x)<<3)-leading_zeros(x)-1)
