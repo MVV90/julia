@@ -103,47 +103,6 @@ end
         x = Complex{T}(1//3 + 1//4*im)
         y = Complex{T}(1//2 + 1//5*im)
         yi = 4
-        @testset "Random values" begin
-            @test x^y ≈ big(x)^big(y)
-            @test x^yi ≈ big(x)^yi
-            @test x^true ≈ big(x)^true
-            @test x^false ≈ big(x)^false
-            @test x^1 ≈ big(x)^1
-            @test abs(x) ≈ abs(big(x))
-            @test abs2(x) ≈ abs2(big(x))
-            @test acos(x) ≈ acos(big(x))
-            @test acosh(1+x) ≈ acosh(1+big(x))
-            @test angle(x) ≈ angle(big(x))
-            @test asin(x) ≈ asin(big(x))
-            @test asinh(x) ≈ asinh(big(x))
-            @test atan(x) ≈ atan(big(x))
-            @test atanh(x) ≈ atanh(big(x))
-            @test cis(real(x)) ≈ cis(real(big(x)))
-            @test cis(x) ≈ cis(big(x))
-            @test cispi(real(x)) ≈ cispi(real(big(x)))
-            @test cispi(x) ≈ cispi(big(x))
-            @test cos(x) ≈ cos(big(x))
-            @test cosh(x) ≈ cosh(big(x))
-            @test exp(x) ≈ exp(big(x))
-            @test exp10(x) ≈ exp10(big(x))
-            @test exp2(x) ≈ exp2(big(x))
-            @test expm1(x) ≈ expm1(big(x)) atol=eps(T)
-            @test log(x) ≈ log(big(x))
-            @test log10(x) ≈ log10(big(x))
-            @test log1p(x) ≈ log1p(big(x))
-            @test log2(x) ≈ log2(big(x))
-            @test sin(x) ≈ sin(big(x))
-            @test sinh(x) ≈ sinh(big(x))
-            @test sqrt(x) ≈ sqrt(big(x))
-            @test tan(x) ≈ tan(big(x))
-            @test tanh(x) ≈ tanh(big(x))
-            @test sec(x) ≈ sec(big(x))
-            @test csc(x) ≈ csc(big(x))
-            @test secd(x) ≈ secd(big(x))
-            @test cscd(x) ≈ cscd(big(x))
-            @test sech(x) ≈ sech(big(x))
-            @test csch(x) ≈ csch(big(x))
-        end
         @testset "Inverses" begin
             @test acos(cos(x)) ≈ x
             @test acosh(cosh(x)) ≈ x
@@ -752,7 +711,7 @@ end
     @test isequal(atanh(complex( Inf, Inf)),complex(0.0, pi/2))
     @test isequal(atanh(complex( Inf,-Inf)),complex(0.0,-pi/2))
     @test isequal(atanh(complex( Inf, NaN)),complex(0.0, NaN))
-    # very big but not infinite
+    # very large but not infinite
     @test isequal(atanh(complex(4e200, NaN)),complex(NaN, NaN))
 
     @test isequal(atanh(complex(-Inf, 0.0)),complex(-0.0, pi/2))
@@ -972,9 +931,6 @@ end
         @inferred expm1(x)
     end
 end
-
-# issue #19240
-@test big(1)/(10+10im) ≈ (5-5im)/big(100) ≈ big"0.05" - big"0.05"*im
 
 @testset "Complex Irrationals, issue #21204" begin
     for x in (pi, ℯ, Base.MathConstants.catalan) # No need to test all of them
