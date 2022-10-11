@@ -1015,7 +1015,7 @@ end
         end
         # make sure that type promotion for ^(::Matrix{<:Integer}, ::Integer)
         # is analogous to type promotion for ^(::Integer, ::Integer)
-        for elty2 = (Int64)
+        for elty2 = (Int64,)
             TT = Base.promote_op(^, elty, elty2)
             @test (@inferred elty[1 1;1 0]^elty2(1))::Matrix{TT} == [1 1;1 0]
         end
