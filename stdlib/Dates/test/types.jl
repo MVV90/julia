@@ -130,8 +130,8 @@ end
     @test Dates.Date(Int128(1), Int128(1), Int128(1)) == test
     @test_throws InexactError Dates.Date(170141183460469231731687303715884105727, Int128(1), Int128(1))
     @test Dates.Date(UInt128(1), UInt128(1), UInt128(1)) == test
-    @test Dates.Date(big(1), big(1), big(1)) == test
-    @test Dates.Date(big(1), big(1), big(1)) == test
+    @test Dates.Date(Int(1), Int(1), Int(1)) == test
+    @test Dates.Date(Int(1), Int(1), Int(1)) == test
     # Potentially won't work if can't losslessly convert to Int64
     @test Dates.Date(complex(1), complex(1), complex(1)) == test
     @test Dates.Date(Float64(1), Float64(1), Float64(1)) == test
