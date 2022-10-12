@@ -51,12 +51,13 @@ floattypes = [
 ]
 inttypes = [
     Int,
+    Int128,
 ]
 # `Bool` can be added to `inttypes` but it's hard to handle
 # `InexactError` bug that is mentioned in:
 # https://github.com/JuliaLang/julia/issues/30094#issuecomment-440175887
 alleltypes = [floattypes; inttypes]
-celtypes = [Float64, ComplexF64, Int]
+celtypes = [Float64, ComplexF64, Int, Int128]
 
 mattypes = [
     Matrix,
@@ -86,6 +87,21 @@ function sample(S, n::Real)
     return length(xs) > 0 ? xs : rand(S, 1)  # sample at least one
 end
 
+function inputeltypes(celt, alleltypes = alleltypes)
+    # Skip if destination type is "too small"
+    celt <: Bool && return []
+    filter(alleltypes) do aelt
+        celt <: Real && aelt <: Complex && return false
+        !(celt <: Float64) && aelt <: Float64 && return false
+        !(celt <: Int128) && aelt <: Int128 && return false
+        celt <: IntegerOrC && aelt <: FloatOrC && return false
+        if celt <: IntegerOrC && !(celt <: Int128)
+            typemin(celt) > typemin(aelt) && return false
+            typemax(celt) < typemax(aelt) && return false
+        end
+        return true
+    end
+end
 # Note: using `randsubseq` instead of `rand` to avoid repetition.
 
 function inputmattypes(cmat, mattypes = mattypes)
@@ -107,6 +123,8 @@ for cmat in mattypes,
     amat in sample(inputmattypes(cmat), n_samples),
     bmat in sample(inputmattypes(cmat), n_samples),
     celt in celtypes,
+    aelt in sample(inputeltypes(celt), n_samples),
+    belt in sample(inputeltypes(celt), n_samples)
     push!(testdata, (cmat{celt}, amat{aelt}, bmat{belt}))
 end
 
