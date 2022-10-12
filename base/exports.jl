@@ -647,7 +647,6 @@ export
 # float & precision
     precision,
     rounding,
-    setprecision,
     setrounding,
     get_zero_subnormals,
     set_zero_subnormals,
