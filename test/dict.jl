@@ -917,8 +917,8 @@ Dict(1 => rand(2,3), 'c' => "asdf") # just make sure this does not trigger a dep
     # issue #26939
     d26939 = WeakKeyDict()
     @test_throws ErrorException (@noinline d -> d[big"1.0" + 1.1] = 1)(d26939)
-    @test_throws ArgumentError d[big"1.0"]
-    @test_throws ArgumentError d[1.0]
+    @test_throws KeyError d26939[big"1.0"]
+    @test_throws KeyError d26939[1.0]
     GC.gc() # primarily to make sure this doesn't segfault
     @test count(d26939) == 0
     @test length(d26939.ht) == 0
