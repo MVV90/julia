@@ -658,7 +658,7 @@ end
     @test a == [1, 4, 3, 1]
     @test replace(a, 1=>0) == [0, 4, 3, 0]
     @test replace(Tuple(a), 1=>0) === (0, 4, 3, 0)
-    for count = (1, 0x1, big(1))
+    for count = (1, 0x1, Int(1))
         @test replace(a, 1=>0, count=count) == [0, 4, 3, 1]
         @test replace(Tuple(a), 1=>0, count=count) === (0, 4, 3, 1)
     end
@@ -675,7 +675,7 @@ end
 
     s = Set([1, 2, 3])
     @test replace(x -> x > 1 ? 2x : x, s) == Set([1, 4, 6])
-    for count = (1, 0x1, big(1))
+    for count = (1, 0x1, UInt128(1))
         @test replace(x -> x > 1 ? 2x : x, s, count=count) in [Set([1, 4, 3]), Set([1, 2, 6])]
     end
     @test replace(s, 1=>4) == Set([2, 3, 4])
@@ -683,7 +683,7 @@ end
     @test s == Set([2, 3])
     @test replace!(x->2x, s, count=0x1) in [Set([4, 3]), Set([2, 6])]
 
-    for count = (0, 0x0, big(0)) # count == 0 --> no replacements
+    for count = (0, 0x0, Int(0)) # count == 0 --> no replacements
         @test replace([1, 2], 1=>0, 2=>0; count) == [1, 2]
         @test replace((1, 2), 1=>0, 2=>0; count) === (1, 2)
         for dict = (Dict(1=>2, 2=>3), IdDict(1=>2, 2=>3))
