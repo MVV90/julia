@@ -62,7 +62,7 @@ end
 
 # issue #9264
 @test hash(1//6,zero(UInt)) == invoke(hash, Tuple{Real, UInt}, 1//6, zero(UInt))
-@test hash(1//6) == hash(big(1)//big(6))
+@test hash(1//6) == hash(Int16(1)//UInt128(6))
 @test hash(1//6) == hash(0x01//0x06)
 
 # hashing collections (e.g. issue #6870)
