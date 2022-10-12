@@ -213,7 +213,7 @@ end
 @test prod(z) === 120
 @test prod(fz) === 120.0
 
-@test prod(1:big(16)) == big(20922789888000)
+@test prod(1:Int128(16)) == Int128(20922789888000)
 
 @test typeof(prod(Array(trues(10)))) == Bool
 
