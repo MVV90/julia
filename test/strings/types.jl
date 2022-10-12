@@ -85,7 +85,7 @@ let str="tempus fugit"              #length(str)==12
     @test SubString("", 12, 10) == ""
 end
 
-@test SubString("foobar", big(1), big(3)) == "foo"
+@test SubString("foobar", Int16(1), UInt128(3)) == "foo"
 
 let str = "aa\u2200\u2222bb"
     u = SubString(str, 3, 6)
