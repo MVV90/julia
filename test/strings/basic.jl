@@ -398,7 +398,7 @@ end
     @test gstr[1:1] == "1"
     @test gstr[[1]] == "1"
 
-    @test s"∀∃"[big(1)] == '∀'
+    @test s"∀∃"[UInt128(1)] == '∀'
     @test_throws StringIndexError GenericString("∀∃")[Int8(2)]
     @test_throws BoundsError GenericString("∀∃")[UInt16(10)]
 
