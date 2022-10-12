@@ -8,6 +8,8 @@ using Test, Serialization
 isdefined(Main, :MacroCalls) || @eval Main include("testhelpers/MacroCalls.jl")
 using Main.MacroCalls
 
+@testset "enums" begin
+
 @test_throws MethodError convert(Enum, 1.0)
 
 @test_throws ArgumentError("invalid type expression for enum 1 + 1") @macrocall(@enum 1 + 1 2)
@@ -212,4 +214,6 @@ let b = IOBuffer()
     str = String(take!(b))
     p = string(@__MODULE__)
     @test str == "Union{$p.Alphabet, $p.BritishFood}" || str == "Union{$p.BritishFood, $p.Alphabet}"
+end
+
 end
