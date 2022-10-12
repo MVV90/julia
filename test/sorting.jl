@@ -73,7 +73,7 @@ end
             @test partialsort(a, r, rev=true) == (11 .- [r;])
             @test partialsortperm(a, r, rev=true) == (11 .- [r;])
         end
-        for i in (2, UInt(2), Int128(1), big(10))
+        for i in (2, UInt(2), Int128(1))
             @test partialsort(a, i) == i
             @test partialsortperm(a, i) == i
             @test partialsort(a, i, rev=true) == (11 - i)
@@ -172,11 +172,11 @@ end
         for R in numTypes, T in numTypes
             for arr in Any[R[1:5;], R(1):R(5), R(1):2:R(5)]
                 @test eltype(searchsorted(arr, T(2))) == keytype(arr)
-                @test eltype(searchsorted(arr, T(2), big(1), big(4), Forward)) == keytype(arr)
+                @test eltype(searchsorted(arr, T(2), Int128(1), Int128(4), Forward)) == keytype(arr)
                 @test searchsortedfirst(arr, T(2)) isa keytype(arr)
-                @test searchsortedfirst(arr, T(2), big(1), big(4), Forward) isa keytype(arr)
+                @test searchsortedfirst(arr, T(2), Int128(1), Int128(4), Forward) isa keytype(arr)
                 @test searchsortedlast(arr, T(2)) isa keytype(arr)
-                @test searchsortedlast(arr, T(2), big(1), big(4), Forward) isa keytype(arr)
+                @test searchsortedlast(arr, T(2), Int128(1), Int128(4), Forward) isa keytype(arr)  # fix me
             end
         end
     end
@@ -602,7 +602,7 @@ end
     @test searchsortedlast(0:256, 0x80) == 129
 end
 # https://discourse.julialang.org/t/sorting-big-int-with-v-0-6/1241
-@test sort([big(3), big(2)]) == [big(2), big(3)]
+@test sort([Int128(3), Int128(2)]) == [Int128(2), Int128(3)]
 
 @testset "issue #30763" begin
     for T in [:Int8, :Int16, :Int32, :Int64, :Int128, :UInt8, :UInt16, :UInt32, :UInt64, :UInt128]
