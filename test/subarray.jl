@@ -353,7 +353,7 @@ end
     # issue #8807
     @test view(view([1:5;], 1:5), 1:5) == [1:5;]
     # Test with mixed types
-    @test sA[:, Int16[1,2], big(2)] == [31 40; 33 42]
+    @test sA[:, Int16[1,2], Int(2)] == [31 40; 33 42]
     test_bounds(sA)
     sA = view(A, 1:1, 1:5, [1 3; 4 2])
     @test ndims(sA) == 4
