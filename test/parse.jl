@@ -1,5 +1,7 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
+using Test
+
 @testset "integer parsing" begin
     @test parse(Int32,"0", base = 36) === Int32(0)
     @test parse(Int32,"1", base = 36) === Int32(1)
