@@ -583,7 +583,7 @@ end
     @test findnext(isequal(0x00), [0x00, 0x01, 0x00], 2) == 3
     @test findprev(isequal(0x00), [0x00, 0x01, 0x00], 2) == 1
 
-    @testset "issue 32568" for T = (UInt)
+    @testset "issue 32568" for T = (UInt,)
         @test findnext(!iszero, a, T(1)) isa keytype(a)
         @test findnext(!iszero, a, T(2)) isa keytype(a)
         @test findprev(!iszero, a, T(4)) isa keytype(a)
