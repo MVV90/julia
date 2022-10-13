@@ -2,7 +2,7 @@
 
 # test core language features
 
-using Random, InteractiveUtils
+using Test, Random, InteractiveUtils
 
 const Bottom = Union{}
 
