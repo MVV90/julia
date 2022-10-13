@@ -1,6 +1,6 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
-using Random
+using Test, Random
 
 is_effect_free(args...) = Core.Compiler.is_effect_free(Base.infer_effects(args...))
 
@@ -301,8 +301,8 @@ end
     end
     let (n, b) = rand(Int, 2)
         -1 <= b <= 1 && (b = 2) # invalid bases
-        @test ndigits(n) == ndigits(big(n)) == ndigits(n, base=10)
-        @test ndigits(n, base=b) == ndigits(big(n), base=b)
+        @test ndigits(n) == ndigits(Int(n)) == ndigits(n, base=10)
+        @test ndigits(n, base=b) == ndigits(Int(n), base=b)
     end
 
     for b in -1:1
@@ -323,11 +323,11 @@ end
     @test all(n -> n == 1, ndigits(x, base=b) for b in [-20:-2;2:20] for x in [true, false])
 
     # issue #29148
-    @test ndigits(typemax(UInt64), base=-2) == ndigits(big(typemax(UInt64)), base=-2)
+    @test ndigits(typemax(UInt64), base=-2) == ndigits(Int128(typemax(UInt64)), base=-2)
     for T in Base.BitInteger_types
         n = rand(T)
         b = -rand(2:100)
-        @test ndigits(n, base=b) == ndigits(big(n), base=b)
+        @test ndigits(n, base=b) == ndigits(Int128(n), base=b)
     end
 
 end
