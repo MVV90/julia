@@ -216,7 +216,7 @@ end
 end
 
 # make sure base can be any Integer
-@testset "issue #15597, T=$T" for T in (Int)
+@testset "issue #15597, T=$T" for T in (Int,)
     let n = parse(T, "123", base = Int8(10))
         @test n == 123
         @test isa(n, T)
@@ -241,7 +241,7 @@ end
 end
 
 # issue #17333: tryparse should still throw on invalid base
-for T in (Int32), base in (0,1,100)
+for T in (Int32,), base in (0,1,100)
     @test_throws ArgumentError tryparse(T, "0", base = base)
 end
 
