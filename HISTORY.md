@@ -3053,7 +3053,7 @@ Deprecated or removed
 
   * `Base.IntSet` has been deprecated in favor of `Base.BitSet` ([#24282]).
 
-  * `setrounding` has been deprecated for `Float32` and `Float64`, as the behaviour was too unreliable ([#26935]).
+  * `setrounding` has been deprecated entirely. `Float32` and `Float64` behaviour was too unreliable ([#26935]).
 
   * `gamma`, `lgamma`, `beta`, `lbeta` and `lfact` have been moved to
     [SpecialFunctions.jl](https://github.com/JuliaMath/SpecialFunctions.jl) ([#27459], [#27473]).
@@ -4444,12 +4444,6 @@ New architectures
 
 Deprecated or removed
 ---------------------
-
-  * The following function names have been simplified and unified ([#13232]):
-
-    * `get_rounding`            -> `rounding`
-    * `set_rounding`            -> `setrounding`
-    * `with_rounding`           -> `setrounding`
 
   * The method `A_ldiv_B!(SparseMatrixCSC, StridedVecOrMat)` has been deprecated
     in favor of versions that require the matrix to be in factored form

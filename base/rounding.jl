@@ -19,7 +19,7 @@ end
 export
     RoundingMode, RoundNearest, RoundToZero, RoundUp, RoundDown, RoundFromZero,
     RoundNearestTiesAway, RoundNearestTiesUp,
-    rounding, setrounding,
+    rounding,
     get_zero_subnormals, set_zero_subnormals
 
 ## rounding modes ##
@@ -27,7 +27,7 @@ export
     RoundingMode
 
 A type used for controlling the rounding mode of floating point operations (via
-[`rounding`](@ref)/[`setrounding`](@ref) functions), or as
+[`rounding`](@ref)), or as
 optional arguments for rounding to the nearest integer (via the [`round`](@ref)
 function).
 
@@ -121,23 +121,6 @@ function from_fenv(r::Integer)
 end
 
 """
-    setrounding(T, mode)
-
-Set the rounding mode of floating point type `T`, controlling the rounding of basic
-arithmetic functions ([`+`](@ref), [`-`](@ref), [`*`](@ref),
-[`/`](@ref) and [`sqrt`](@ref)) and type conversion. Other numerical
-functions may give incorrect or invalid values when using rounding modes other than the
-default [`RoundNearest`](@ref).
-
-!!! warning
-
-    This function is not thread-safe. It will affect code running on all threads, but
-    its behavior is undefined if called concurrently with computations that use the
-    setting.
-"""
-setrounding(T::Type, mode)
-
-"""
     rounding(T)
 
 Get the current floating point rounding mode for type `T`, controlling the rounding of basic
@@ -148,50 +131,9 @@ See [`RoundingMode`](@ref) for available modes.
 """
 :rounding
 
-setrounding_raw(::Type{<:Union{Float32,Float64}}, i::Integer) = ccall(:jl_set_fenv_rounding, Int32, (Int32,), i)
 rounding_raw(::Type{<:Union{Float32,Float64}}) = ccall(:jl_get_fenv_rounding, Int32, ())
 
 rounding(::Type{T}) where {T<:Union{Float32,Float64}} = from_fenv(rounding_raw(T))
-
-"""
-    setrounding(f::Function, T, mode)
-
-Change the rounding mode of floating point type `T` for the duration of `f`. It is logically
-equivalent to:
-
-    old = rounding(T)
-    setrounding(T, mode)
-    f()
-    setrounding(T, old)
-
-See [`RoundingMode`](@ref) for available rounding modes.
-"""
-function setrounding(f::Function, ::Type{T}, rounding::RoundingMode) where T
-    old_rounding_raw = rounding_raw(T)
-    setrounding(T,rounding)
-    try
-        return f()
-    finally
-        setrounding_raw(T,old_rounding_raw)
-    end
-end
-function setrounding_raw(f::Function, ::Type{T}, rounding) where T
-    old_rounding_raw = rounding_raw(T)
-    setrounding_raw(T,rounding)
-    try
-        return f()
-    finally
-        setrounding_raw(T,old_rounding_raw)
-    end
-end
-
-
-# Should be equivalent to:
-#   setrounding(Float64,r) do
-#       convert(T,x)
-#   end
-# but explicit checks are currently quicker (~20x).
-# Assumes conversion is performed by rounding to nearest value.
 
 (::Type{T})(x::Real, r::RoundingMode) where {T<:AbstractFloat} = _convert_rounding(T,x,r)::T
 
