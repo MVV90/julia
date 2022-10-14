@@ -14,7 +14,7 @@ using Test, Random: randcycle
     #Issue 6154
     @test binomial(Int32(34), Int32(15)) == 1855967520
     @test binomial(Int64(67), Int64(29)) == 7886597962249166160
-    @test binomial(Int128(131), Int128(62)) == 157311720980559117816198361912717812000
+    @test binomial(Int128(131), Int128(62)) == 316174054988070243358113075997436152
     @test_throws OverflowError binomial(Int64(67), Int64(30))
 end
 
