@@ -88,8 +88,6 @@ Base.isreal
 Core.Float32(::Any)
 Core.Float64(::Any)
 Base.Rounding.rounding
-Base.Rounding.setrounding(::Type, ::Any)
-Base.Rounding.setrounding(::Function, ::Type, ::RoundingMode)
 Base.Rounding.get_zero_subnormals
 Base.Rounding.set_zero_subnormals
 ```
