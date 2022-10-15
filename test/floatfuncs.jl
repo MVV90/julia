@@ -8,7 +8,7 @@ using Test, Random
     for elty in (Float32,Float64)
         x = convert(elty,-2.0)
         x = flipsign(x,-1.0)
-        @test flipsign(x,big(-1.0)) == convert(elty,-2.0)
+        @test flipsign(x,float(-1.0)) == convert(elty,-2.0)
     end
 end
 
@@ -90,7 +90,7 @@ end
 end
 
 @testset "Types" begin
-    for x in (Int16(0), 1, 2f0, pi, 3//4, big(5//6), 7.8, big(9), big(ℯ))
+    for x in (Int16(0), 1, 2f0, pi, 3//4, float(5//6), 7.8, float(9), float(ℯ))
         @test float(typeof(x)) == typeof(float(x))
         @test float(typeof(complex(x, x))) == typeof(float(complex(x, x)))
     end
@@ -193,10 +193,10 @@ end
     f2(x) = f(x, 2)
     f3(x) = f(x, 3)
     x = 1.0000000105367122
-    @test x^2 == f(x, 2) == f2(x) == x*x == Float64(big(x)*big(x))
-    @test x^3 == f(x, 3) == f3(x) == x*x*x == Float64(big(x)*big(x)*big(x))
+    @test x^2 == f(x, 2) == f2(x) == x*x == Float64(float(x)*float(x))
+    @test x^3 == f(x, 3) == f3(x) == x*x*x == Float64(float(x)*float(x)*float(x))
     x = 1.000000007393669
-    @test x^-1 == f(x, -1) == finv(x) == 1/x == inv(x) == Float64(1/big(x)) == Float64(inv(big(x)))
+    @test x^-1 == f(x, -1) == finv(x) == 1/x == inv(x) == Float64(1/float(x)) == Float64(inv(float(x)))
 end
 
 @testset "curried approximation" begin
