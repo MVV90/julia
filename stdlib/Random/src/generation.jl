@@ -265,7 +265,7 @@ function SamplerRangeNDL(r::AbstractUnitRange{T}) where {T}
     U = uint_sup(T)
     s = (last(r) - first(r)) % unsigned(T) % U + one(U) # overflow ok
     # mod(-s, s) could be put in the Sampler object for repeated calls, but
-    # this would be an advantage only for very big s and number of calls
+    # this would be an advantage only for a very large number of calls
     SamplerRangeNDL(a, s)
 end
 
