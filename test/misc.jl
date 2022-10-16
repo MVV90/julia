@@ -1099,22 +1099,10 @@ const outsidevar = 7
 end
 @test TestOutsideVar() == TestOutsideVar(7)
 
-
 @testset "exports of modules" begin
     for (_, mod) in Base.loaded_modules
-       for v in names(mod)
-           if isdefined(mod, v)
-             isdefined(mod, v)
-           else
-              print("~~~~~~~~~å\n")
-              print(mod, "\n")
-              print(v, "\n")
-              isdefined(mod, v)
-           end
-
-           # @test isdefined(mod, v)
-       end
-   end
+        @test isdefined(mod, v)
+    end
 end
 
 @testset "ordering UUIDs" begin
