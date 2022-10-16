@@ -19,7 +19,7 @@ import .Base.Math.@horner
   # s7 = 2.0^7
   # is7 = 1.0/s7
   # for j=0:128
-  #   l_big = Base.log(big(1.0+j*is7))
+  #   l_big = Base.log(Float64(1.0+j*is7))
   #   l_hi = isN*Float64(round(sN*l_big))
   #   l_lo = Float64(l_big-l_hi)
   #   j % 2 == 0 && print("\n    ")
