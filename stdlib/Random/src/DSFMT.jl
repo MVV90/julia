@@ -2,6 +2,8 @@
 
 module DSFMT
 
+# TODO: removing big broke some of this, like: Poly19937, DSFMT.calc_jump(1), Random.jump!
+
 import Base: copy, copy!, ==, hash
 
 export DSFMT_state, dsfmt_get_min_array_size, dsfmt_get_idstring,
@@ -174,10 +176,10 @@ function calc_jump(steps::Integer,
                    charpoly::GF2X=CharPoly())::GF2X
     steps < 0 && throw(DomainError("jump steps must be >= 0 (got $steps)"))
     if isempty(JumpPolys)
-        JumpPolys[big(10)^20] = GF2X(JPOLY1e20)
+        JumpPolys[Int128(10)^20] = GF2X(JPOLY1e20)
     end
     get!(JumpPolys, steps) do
-        powxmod(big(steps), charpoly)
+        powxmod(Int128(steps), charpoly)
     end
 end
 
