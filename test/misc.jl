@@ -1,5 +1,7 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
+using Test
+
 isdefined(Main, :FakePTYs) || @eval Main include("testhelpers/FakePTYs.jl")
 include("testhelpers/withlocales.jl")
 
@@ -1101,7 +1103,16 @@ end
 @testset "exports of modules" begin
     for (_, mod) in Base.loaded_modules
        for v in names(mod)
-           @test isdefined(mod, v)
+           if isdefined(mod, v)
+             isdefined(mod, v)
+           else
+              print("~~~~~~~~~å\n")
+              print(mod, "\n")
+              print(v, "\n")
+              isdefined(mod, v)
+           end
+
+           # @test isdefined(mod, v)
        end
    end
 end

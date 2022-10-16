@@ -596,7 +596,7 @@ See also: [`hypot`](@ref).
 
 # Examples
 ```jldoctest; filter = r"Stacktrace:(\\n \\[[0-9]+\\].*)*"
-julia> sqrt(big(81))
+julia> sqrt(81)
 9.0
 
 julia> .√(1:4)
@@ -1250,7 +1250,7 @@ compute the modulus of `x` relative to division by the floating-point number `2�
 !!! note
     Depending on the format of the input value, the closest representable value to 2π may
     be less than 2π. For example, the expression `mod2pi(2π)` will not return `0`, because
-    the intermediate value of `2*π` is a `Float64` and `2*Float64(π) < 2*big(π)`. See
+    the intermediate value of `2*π` is a `Float64` and `2*Float64(π) < 2*float(π)`. See
     [`rem2pi`](@ref) for more refined control of this behavior.
 
 # Examples

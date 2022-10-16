@@ -2,6 +2,7 @@
 
 # tests for codegen and optimizations
 
+using Test
 using Random
 using InteractiveUtils
 using Libdl

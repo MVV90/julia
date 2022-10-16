@@ -315,12 +315,12 @@ end
 # pow10bitsforindex(idx) = 16 * idx + 120
 # lengthforindex(idx) = div(((Int64(16 * idx) * 1292913986) >> 32) + 1 + 16 + 8, 9)
 #
-# const BIG_MASK = (big(1) << 64) - 1
+# const BIG_MASK = (float(1) << 64) - 1
 #
 # const POW10_SPLIT = collect(Iterators.flatten(map(0:63) do idx
 #     pow10bits = pow10bitsforindex(idx)
 #     map(0:lengthforindex(idx)-1) do i
-#         v = (div(big(1) << pow10bits, big(10)^(9 * i)) + 1) % ((big(10)^9) << 136)
+#         v = (div(float(1) << pow10bits, float(10)^(9 * i)) + 1) % ((float(10)^9) << 136)
 #         return (UInt64(v & BIG_MASK), UInt64((v >> 64) & BIG_MASK), UInt64((v >> 128) & BIG_MASK))
 #     end
 # end))
@@ -1559,18 +1559,18 @@ const POW10_SPLIT = [
 #
 # To generate constants' values, run this in vanilla Julia:
 #
-# const BIG_MASK = (big(1) << 64) - 1
+# const BIG_MASK = (float(1) << 64) - 1
 #
 # function generateinversetables()
 #     POW10_OFFSET_2 = Vector{UInt16}(undef, 68 + 1)
 #     MIN_BLOCK_2 = fill(0xff, 68 + 1)
 #     POW10_SPLIT_2 = Tuple{UInt64, UInt64, UInt64}[]
-#     lowerCutoff = big(1) << (54 + 8)
+#     lowerCutoff = float(1) << (54 + 8)
 #     for idx = 0:67
 #         POW10_OFFSET_2[idx + 1] = length(POW10_SPLIT_2)
 #         i = 0
 #         while true
-#             v = ((big(10)^(9 * (i + 1)) >> (-(120 - 16 * idx))) % (big(10)^9) << (120 + 16))
+#             v = ((float(10)^(9 * (i + 1)) >> (-(120 - 16 * idx))) % (float(10)^9) << (120 + 16))
 #             if MIN_BLOCK_2[idx + 1] == 0xff && ((v * lowerCutoff) >> 128) == 0
 #                 i += 1
 #                 continue

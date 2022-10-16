@@ -1118,7 +1118,7 @@ function _cosc(x::Number)
     end
 end
 # hard-code Float64/Float32 Taylor series, with coefficients
-#  Float64.([(-1)^n*big(pi)^(2n)/((2n+1)*factorial(2n-1)) for n = 1:6])
+#  Float64.([(-1)^n*float(pi)^(2n)/((2n+1)*factorial(2n-1)) for n = 1:6])
 _cosc(x::Union{Float64,ComplexF64}) =
     fastabs(x) < 0.14 ? x*evalpoly(x^2, (-3.289868133696453, 3.2469697011334144, -1.1445109447325053, 0.2091827825412384, -0.023460810354558236, 0.001781145516372852)) :
     isinf_real(x) ? zero(x) : ((pi*x)*cospi(x)-sinpi(x))/((pi*x)*x)

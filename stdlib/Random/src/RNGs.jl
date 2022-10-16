@@ -303,7 +303,7 @@ function make_seed(n::Integer)
 end
 
 # inverse of make_seed(::Integer)
-from_seed(a::Vector{UInt32})::Int128 = sum(a[i] * big(2)^(32*(i-1)) for i in 1:length(a))
+from_seed(a::Vector{UInt32})::Int128 = sum(a[i] * Int128(2)^(32*(i-1)) for i in 1:length(a))
 
 
 #### seed!()

@@ -252,7 +252,7 @@ An example of overflow behavior and how to potentially resolve it is as follows:
 julia> 10^19
 -8446744073709551616
 
-julia> big(10)^19
+julia> Int128(10)^19
 10000000000000000000
 ```
 

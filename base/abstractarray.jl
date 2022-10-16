@@ -3119,7 +3119,7 @@ function hash(A::AbstractArray, h::UInt)
         keyidx = linear_to_key[linidx]
 
         # Only increase the Fibonacci skip once every N iterations. This was chosen
-        # to be big enough that all elements of small arrays get hashed while
+        # to be large enough that all elements of small arrays get hashed while
         # obscenely large arrays are still tractable. With a choice of N=4096, an
         # entirely-distinct 8000-element array will have ~75% of its elements hashed,
         # with every other element hashed in the first half of the array. At the same

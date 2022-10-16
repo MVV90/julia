@@ -378,7 +378,7 @@ end
         ind_start, sidx = divrem((i1-1)*sizeof(T), sizeof(S))
         # Optimizations that avoid branches
         if sizeof(T) % sizeof(S) == 0
-            # T is bigger than S and contains an integer number of them
+            # T is larger than S and contains an integer number of them
             n = sizeof(T) ÷ sizeof(S)
             t = Ref{T}()
             GC.@preserve t begin
@@ -390,7 +390,7 @@ end
             end
             return t[]
         elseif sizeof(S) % sizeof(T) == 0
-            # S is bigger than T and contains an integer number of them
+            # S is larger than T and contains an integer number of them
             s = Ref{S}(a.parent[ind_start + 1, tailinds...])
             GC.@preserve s begin
                 tptr = Ptr{T}(unsafe_convert(Ref{S}, s))
@@ -458,7 +458,7 @@ end
         end
         return t[]
     end
-    # S is bigger than T and contains an integer number of them
+    # S is larger than T and contains an integer number of them
     # n = sizeof(S) ÷ sizeof(T)
     s = Ref{S}()
     GC.@preserve s begin
@@ -519,7 +519,7 @@ end
         ind_start, sidx = divrem((i1-1)*sizeof(T), sizeof(S))
         # Optimizations that avoid branches
         if sizeof(T) % sizeof(S) == 0
-            # T is bigger than S and contains an integer number of them
+            # T is larger than S and contains an integer number of them
             t = Ref{T}(v)
             GC.@preserve t begin
                 sptr = Ptr{S}(unsafe_convert(Ref{T}, t))
@@ -530,7 +530,7 @@ end
                 end
             end
         elseif sizeof(S) % sizeof(T) == 0
-            # S is bigger than T and contains an integer number of them
+            # S is larger than T and contains an integer number of them
             s = Ref{S}(a.parent[ind_start + 1, tailinds...])
             GC.@preserve s begin
                 tptr = Ptr{T}(unsafe_convert(Ref{S}, s))
@@ -615,7 +615,7 @@ end
             end
         end
     else
-        # S is bigger than T and contains an integer number of them
+        # S is larger than T and contains an integer number of them
         s = Ref{S}()
         GC.@preserve s begin
             tptr = Ptr{T}(unsafe_convert(Ref{S}, s))

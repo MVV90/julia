@@ -271,10 +271,10 @@ julia> repr(1)
 julia> repr(zeros(3))
 "[0.0, 0.0, 0.0]"
 
-julia> repr(big(1/3))
-"0.333333333333333314829616256247390992939472198486328125"
+julia> repr(float(1/3))
+"0.3333333333333333"
 
-julia> repr(big(1/3), context=:compact => true)
+julia> repr(float(1/3), context=:compact => true)
 "0.333333"
 
 ```

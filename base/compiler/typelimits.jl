@@ -582,7 +582,7 @@ function tmerge(@nospecialize(typea), @nospecialize(typeb))
         end
     end
     u = Union{types...}
-    # don't let type unions get too big, if the above didn't reduce it enough
+    # don't let type unions get too ginormous, if the above didn't reduce it enough
     if issimpleenoughtype(u)
         return u
     end

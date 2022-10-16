@@ -587,7 +587,7 @@ function abstract_call_method(interp::AbstractInterpreter, method::Method, @nosp
             hardlimit = true
         end
 
-        # see if the type is actually too big (relative to the caller), and limit it if required
+        # see if the type is too large (relative to the caller), and limit it, if required
         newsig = limit_type_size(sig, comparison, hardlimit ? comparison : sv.linfo.specTypes, InferenceParams(interp).TUPLE_COMPLEXITY_LIMIT_DEPTH, spec_len)
 
         if newsig !== sig

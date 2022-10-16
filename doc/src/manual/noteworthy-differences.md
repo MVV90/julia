@@ -360,7 +360,7 @@ For users coming to Julia from R, these are some noteworthy differences:
   - Integer division using `/` always returns a floating-point result, even if the computation is exact.
     - `//` always returns a rational result
     - `÷` always returns a (truncated) integer result
-  - Bignums are supported, but conversion is not automatic; ordinary integers [overflow](@ref faq-integer-arithmetic).
+  - Larger numbers are supported, but conversion is not automatic; ordinary integers [overflow](@ref faq-integer-arithmetic).
   - Complex numbers are supported, but to get complex results, [you need complex inputs](@ref faq-domain-errors).
   - There are multiple Complex and Rational types, with different component types.
 

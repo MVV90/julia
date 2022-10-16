@@ -186,7 +186,7 @@ Core.eval
 Give a hint to the compiler that this function is worth inlining.
 
 Small functions typically do not need the `@inline` annotation,
-as the compiler does it automatically. By using `@inline` on bigger functions,
+as the compiler does it automatically. By using `@inline` on larger functions,
 an extra nudge can be given to the compiler to inline it.
 
 `@inline` can be applied immediately before the definition or in its function body.

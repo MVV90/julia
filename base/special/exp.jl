@@ -7,7 +7,7 @@ MAGIC_ROUND_CONST(::Type{Float64}) = 6.755399441055744e15
 MAGIC_ROUND_CONST(::Type{Float32}) = 1.048576f7
 
 # max, min, and subnormal arguments
-# max_exp = T(exponent_bias(T)*log(base, big(2)) + log(base, 2 - big(2.0)^-significand_bits(T)))
+# max_exp = T(exponent_bias(T)*log(base, Int128(2)) + log(base, 2 - float(2.0)^-significand_bits(T)))
 MAX_EXP(n::Val{2}, ::Type{Float32}) = 128.0f0
 MAX_EXP(n::Val{2}, ::Type{Float64}) = 1024.0
 MAX_EXP(n::Val{:ℯ}, ::Type{Float32}) = 88.72284f0
@@ -15,7 +15,7 @@ MAX_EXP(n::Val{:ℯ}, ::Type{Float64}) = 709.7827128933841
 MAX_EXP(n::Val{10}, ::Type{Float32}) = 38.53184f0
 MAX_EXP(n::Val{10}, ::Type{Float64}) = 308.25471555991675
 
-# min_exp = T(-(exponent_bias(T)+significand_bits(T)) * log(base, big(2)))
+# min_exp = T(-(exponent_bias(T)+significand_bits(T)) * log(base, Int128(2)))
 MIN_EXP(n::Val{2}, ::Type{Float32}) = -150.0f0
 MIN_EXP(n::Val{2}, ::Type{Float64}) = -1075.0
 MIN_EXP(n::Val{:ℯ}, ::Type{Float32}) = -103.97208f0

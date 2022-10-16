@@ -44,7 +44,6 @@ Base.digits!
 Base.bitstring
 Base.parse
 Base.tryparse
-Base.big
 Base.signed
 Base.unsigned
 Base.float(::Any)

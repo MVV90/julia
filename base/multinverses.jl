@@ -37,7 +37,7 @@ abstract type  MultiplicativeInverse{T} end
 # shift depends on the specific denominator.
 #
 # Division of Int32 by 7 would be problematic, because a viable magic
-# number of (2^34+5)/7 is too big to represent as an Int32 (the
+# number of (2^34+5)/7 is too large to represent as an Int32 (the
 # unsigned representation needs 32 bits). We can exploit wrap-around
 # and use (2^34+5)/7 - 2^32 (an Int32 < 0), and then correct the
 # 64-bit product with an add (the `addmul` field below).

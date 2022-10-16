@@ -657,11 +657,11 @@ end
 #########
 
 function push!!(v::Vector, el)
-    # Since these types are typically non-inferrable, they are a big invalidation risk,
+    # Since these types are typically non-inferrable, they are an invalidation risk,
     # and since it's used by the package-loading infrastructure the cost of invalidation
     # is high. Therefore, this is written to reduce the "exposed surface area": e.g., rather
     # than writing `T[el]` we write it as `push!(Vector{T}(undef, 1), el)` so that there
-    # is no ambiguity about what types of objects will be created.
+    # is no confusion about what types of objects will be created.
     T = eltype(v)
     t = typeof(el)
     if el isa T || t === T
@@ -807,7 +807,7 @@ function parse_number_or_date_start(l::Parser)
     # Zero is allowed to follow by a end value char, a base x, o, b or a dot
     readed_zero = false
     if accept(l, '0')
-        readed_zero = true # Intentional bad grammar to remove the ambiguity in "read"...
+        readed_zero = true # Intentional bad grammar to remove the confusion surrounding "read"...
         if ok_end_value(peek(l))
             return Int64(0)
         elseif accept(l, 'x')

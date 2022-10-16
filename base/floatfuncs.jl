@@ -246,7 +246,7 @@ default `rtol` depends on the types of `x` and `y`. The keyword argument `nans` 
 whether or not NaN values are considered equal (defaults to false).
 
 For real or complex floating-point values, if an `atol > 0` is not specified, `rtol` defaults to
-the square root of [`eps`](@ref) of the type of `x` or `y`, whichever is bigger (least precise).
+the square root of [`eps`](@ref) of the type of `x` or `y`, whichever is larger (least precise).
 This corresponds to requiring equality of about half of the significant digits. Otherwise,
 e.g. for integer arguments or if an `atol > 0` is supplied, `rtol` defaults to zero.
 

@@ -226,7 +226,6 @@ export
     atan,
     atand,
     atanh,
-    big,
     binomial,
     bitreverse,
     bitrotate,

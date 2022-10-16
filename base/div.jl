@@ -109,8 +109,6 @@ julia> fld(6.0,0.1)
 59.0
 julia> 6.0/0.1
 60.0
-julia> 6.0/big(0.1)
-59.99999999999999666933092612453056361837965690217069245739573412231113406246995
 ```
 What is happening here is that the true value of the floating-point number written
 as `0.1` is slightly larger than the numerical value 1/10 while `6.0` represents

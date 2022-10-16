@@ -389,7 +389,7 @@ New language features
   product of two arrays of arrays ([#37583]).
 * The syntax `import A as B` (plus `import A: x as y`, `import A.x as y`, and `using A: x as y`)
   can now be used to rename imported modules and identifiers ([#1255]).
-* Unsigned literals (starting with `0x`) which are too big to fit in a `UInt128` object ([#23546]).
+* Unsigned literals (starting with `0x`) which are too large to fit in a `UInt128` object ([#23546]).
 * It is now possible to use `...` on the left-hand side of assignments for taking any
   number of items from the front of an iterable collection, while also collecting the rest,
   for example `a, b... = [1, 2, 3]`. This syntax is implemented using `Base.rest`,
@@ -1497,7 +1497,7 @@ Language changes
     Previously they were sometimes parsed as tuples, depending on whitespace ([#28506]).
   * Spaces were accidentally allowed in broadcast call syntax, e.g. `f. (x)`. They are now
     disallowed, consistent with normal function call syntax ([#29781]).
-  * Big integer literals and command syntax (backticks) are now parsed with the name of
+  * Very large integer literals and command syntax (backticks) are now parsed with the name of
     the macro (`@int128_str`, `@uint128_str`, `@big_str`, `@cmd`) qualified to refer
     to the `Core` module ([#29968]).
   * Using the same name for both a local variable and a static parameter is now an error instead
@@ -2102,7 +2102,7 @@ This section lists changes that do not have deprecation warnings.
     `^(A::Integer, p::Integer)`) ([#23366]).
 
   * `^(A::AbstractMatrix{<:Integer}, p::Integer)` now promotes the element type in the same
-    way as `^(A::Integer, p::Integer)`. This means, for instance, that `[1 1; 0 1]^big(1)`
+    way as `^(A::Integer, p::Integer)`. This means, for instance, that `[1 1; 0 1]^Int128(1)`
     will return a `Matrix{Int}` ([#23366]).
 
   * The element type of the input is now preserved in `unique`. Previously the element type
@@ -5242,8 +5242,6 @@ Library improvements
       `Complex{Bool}`. Making this work required changing the semantics of
       boolean multiplication to approximately, `true * x = x` and
       `false * x = zero(x)`, which can itself be considered useful ([#5468]).
-
-    * `big` is now vectorized ([#4766])
 
     * `nextpow` and `prevpow` now return the `a^n` values instead of the
       exponent `n` ([#4819])

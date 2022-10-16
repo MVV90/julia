@@ -169,7 +169,7 @@ BroadcastStyle(a::AbstractArrayStyle{M}, ::DefaultArrayStyle{N}) where {M,N} =
 struct Broadcasted{Style<:Union{Nothing,BroadcastStyle}, Axes, F, Args<:Tuple} <: Base.AbstractBroadcasted
     f::F
     args::Args
-    axes::Axes          # the axes of the resulting object (may be bigger than implied by `args` if this is nested inside a larger `Broadcasted`)
+    axes::Axes          # the axes of the resulting object (may be larger than implied by `args` if this is nested inside a larger `Broadcasted`)
 end
 
 Broadcasted(f::F, args::Args, axes=nothing) where {F, Args<:Tuple} =

@@ -115,7 +115,6 @@ emptyperiod = ((y + d) - d) - y
     @test Dates.Year(UInt64(1)) == y
     @test Dates.Year(UInt128(1)) == y
     @test Dates.Year(UInt128(1)) == y
-    @test Dates.Year(big(1)) == y
     @test Dates.Year(float(1)) == y
     @test Dates.Year(Float32(1)) == y
     @test Dates.Year(Rational(1)) == y
