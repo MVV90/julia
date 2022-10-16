@@ -184,7 +184,7 @@ end
     @test (Printf.@sprintf "%.0e" big"3e142") == "3e+142"
     @test (Printf.@sprintf "%#.0e" big"3e142") == "3.e+142"
 
-    @test (Printf.@sprintf "%.0e" big"3e1042") == "3e+1042"
+    @test (Printf.@sprintf "%.0e" big"3e142") == "3e+142"
 
     @test (Printf.@sprintf "%e" 3e42) == "3.000000e+42"
     @test (Printf.@sprintf "%E" 3e42) == "3.000000E+42"
