@@ -326,7 +326,7 @@ end
     @test ndigits(typemax(UInt64), base=-2) == ndigits(Int128(typemax(UInt64)), base=-2)
     for T in Base.BitInteger_types
         n = rand(T)
-        b = -rand(2:100)
+        b = -rand(2:10)
         @test ndigits(n, base=b) == ndigits(Int128(n), base=b)
     end
 
