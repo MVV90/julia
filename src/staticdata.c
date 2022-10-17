@@ -326,7 +326,6 @@ typedef struct {
 
 static jl_value_t *jl_idtable_type = NULL;
 static jl_typename_t *jl_idtable_typename = NULL;
-static int gmp_limb_size = 0;
 
 static jl_sym_t *jl_docmeta_sym = NULL;
 

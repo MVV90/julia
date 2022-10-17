@@ -117,7 +117,6 @@ typedef struct {
 
 static jl_value_t *jl_idtable_type = NULL;
 static jl_typename_t *jl_idtable_typename = NULL;
-static int gmp_limb_size = 0;
 
 static void write_uint64(ios_t *s, uint64_t i) JL_NOTSAFEPOINT
 {
