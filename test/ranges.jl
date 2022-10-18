@@ -149,34 +149,6 @@ end
             @test endswith(bitstring(hi), repeat('0', Base.Math.significand_bits(T) ÷ 2))
         end
     end
-
-    # # This tests every possible pair of Float16s. It takes too long for
-    # # ordinary use, which is why it's commented out.
-    # function pair16()
-    #     for yu in 0x0000:0xffff
-    #         for xu in 0x0000:0xffff
-    #             x, y = reinterpret(Float16, xu), reinterpret(Float16, yu)
-    #             highprec_pair(x, y)
-    #         end
-    #     end
-    # end
-
-    # for T in (Float16, Float32) # skip Float64
-    #     for i = 1:10^5
-    #         x, y = rand(T), rand(T)
-    #         highprec_pair(x, y)
-    #         highprec_pair(-x, y)
-    #         highprec_pair(x, -y)
-    #         highprec_pair(-x, -y)
-    #     end
-    #     # Make sure we test dynamic range too
-    #     for i = 1:10^5
-    #         x, y = rand(T), rand(T)
-    #         x == 0 || y == 0 && continue
-    #         x, y = log(x), log(y)
-    #         highprec_pair(x, y)
-    #     end
-    # end
 end
 
 asww(x) = widen(widen(x.hi)) + widen(widen(x.lo))
