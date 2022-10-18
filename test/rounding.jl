@@ -56,27 +56,8 @@ end
         @test v > 0 ? pz == pd : pz == pu
         @test pu - pd == eps(pz)
     end
-
-    # for T in [Float32,Float64]
-    #     for v in [sqrt(float(2.0)),-float(1.0)/float(3.0),nextfloat(float(1.0)),
-    #               prevfloat(float(1.0)),nextfloat(float(0.0)),prevfloat(float(0.0)),
-    #               pi,ℯ,eulergamma,catalan,golden,
-    #               typemax(Int64),typemax(UInt64),typemax(Int128),typemax(UInt128),0xa2f30f6001bb2ec6]
-    #         pn = T(v,RoundNearest)
-    #         @test pn == convert(T,Float64(v))
-    #         pz = T(v,RoundToZero)
-    #         @test pz == setrounding(()->convert(T,Float64(v)), Float64, RoundToZero)
-    #         pd = T(v,RoundDown)
-    #         @test pd == setrounding(()->convert(T,Float64(v)), Float64, RoundDown)
-    #         pu = T(v,RoundUp)
-    #         @test pu == setrounding(()->convert(T,Float64(v)), Float64, RoundUp)
-
-    #         @test pn == pd || pn == pu
-    #         @test v > 0 ? pz == pd : pz == pu
-    #         @test isinf(pu) || pu - pd == eps(pz)
-    #     end
-    # end
 end
+
 @testset "fenv" begin
     @test Base.Rounding.from_fenv(Base.Rounding.to_fenv(RoundNearest)) == RoundNearest
     @test Base.Rounding.from_fenv(Base.Rounding.to_fenv(RoundToZero)) == RoundToZero
