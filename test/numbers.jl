@@ -1,5 +1,6 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
+using Test
 using Base.MathConstants
 using Random
 using LinearAlgebra
@@ -977,8 +978,8 @@ end
 @testset "Irrationals compared with Rationals and Floats" begin
     @test Float64(pi,RoundDown) < pi
     @test Float64(pi,RoundUp) > pi
-    # @test !(Float64(pi,RoundDown) > pi)
-    # @test !(Float64(pi,RoundUp) < pi)
+    @test !(Float64(pi,RoundDown) > float(pi))
+    @test !(Float64(pi,RoundUp) < float(pi))
     @test Float64(pi,RoundDown) <= pi
     @test Float64(pi,RoundUp) >= pi
     @test Float64(pi,RoundDown) != pi
@@ -986,18 +987,15 @@ end
 
     @test Float32(pi,RoundDown) < pi
     @test Float32(pi,RoundUp) > pi
-    # @test !(Float32(pi,RoundDown) > pi)
-    # @test !(Float32(pi,RoundUp) < pi)
+    @test !(Float32(pi,RoundDown) > Float32(pi))
+    @test !(Float32(pi,RoundUp) < Float32(pi))
 
     @test prevfloat(Float64(pi)) < pi
     @test nextfloat(Float64(pi)) > pi
     @test !(prevfloat(Float64(pi)) > pi)
     @test !(nextfloat(Float64(pi)) < pi)
 
-    # @test 2646693125139304345//842468587426513207 < pi
-    # @test !(2646693125139304345//842468587426513207 > pi)
     @test 2646693125139304345//842468587426513207 != pi
-
     @test sqrt(2) == 1.4142135623730951
 end
 @testset "Irrational printing" begin
@@ -1617,7 +1615,6 @@ end
     @test isa(0o111111111111111111111111111111111111111111,UInt128)
     @test isa(0o1111111111111111111111111111111111111111111,UInt128)
     @test isa(0o3777777777777777777777777777777777777777777,UInt128)
-    # @test 0o4000000000000000000000000000000000000000000 == 340282366920938463463374607431768211456
     @test isa(0o077, UInt8)
     @test isa(0o377, UInt8)
     @test isa(0o400, UInt16)
