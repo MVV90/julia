@@ -385,8 +385,6 @@ For arbitrary precision numerics, you might extend the method like:
 tofloat(x) = Float64(x)
 tofloat(x::Base.IEEEFloat) = x
 
-# const __BIG_FLOAT_MAX__ = 8192
-
 @inline function fmt(buf, pos, arg, spec::Spec{T}) where {T <: Floats}
     leftalign, plus, space, zero, hash, width, prec =
         spec.leftalign, spec.plus, spec.space, spec.zero, spec.hash, spec.width, spec.precision
