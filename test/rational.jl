@@ -303,9 +303,6 @@ end
 @testset "issue 16513" begin
     @test convert(Rational{Int32}, pi) == float(1068966896 // 340262731)
     @test convert(Rational{Int64}, pi) == float(1068966896 // 340262731)
-    # TODO: we do loose some precision:
-    # @test convert(Rational{Int64}, pi) == float(2646693125139304345 // 842468587426513207)
-    # @test convert(Rational{Int128}, pi) == float(60728338969805745700507212595448411044 // 19330430665609526556707216376512714945)
 end
 @testset "issue 5935" begin
     @test rationalize(Int8,  nextfloat(0.1)) == 1//10
