@@ -50,18 +50,6 @@ Complex{T}(x::AbstractIrrational) where {T<:Real} = Complex{T}(T(x))
 
 @pure function Rational{T}(x::AbstractIrrational) where T<:Integer
     return Float64(x)
-    # o = precision(Float64)
-    # p = 256
-    # while true
-    #     setprecision(Float64, p)
-    #     bx = Float64(x)
-    #     r = rationalize(T, bx, tol=0)
-    #     if abs(Float64(r) - bx) > eps(bx)
-    #         setprecision(Float64, o)
-    #         return r
-    #     end
-    #     p += 32
-    # end
 end
 Rational{Int128}(x::AbstractIrrational) = throw(ArgumentError("Cannot convert an AbstractIrrational to a Rational{Int128}: use rationalize(Int128, x) instead"))
 
