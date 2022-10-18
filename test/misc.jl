@@ -1101,10 +1101,10 @@ end
 
 @testset "exports of modules" begin
     for (_, mod) in Base.loaded_modules
-        for v in names(mod)
-            @test isdefined(mod, v)
-        end
-    end
+       for v in names(mod)
+           @test isdefined(mod, v)
+       end
+   end
 end
 
 @testset "ordering UUIDs" begin
