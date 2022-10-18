@@ -1,5 +1,6 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
+using Test
 using Random
 using LinearAlgebra
 using Base.Experimental: @force_compile
@@ -121,6 +122,173 @@ end
             @test ldexp(prevfloat(floatmin(T)), typemax(Int128)) === T(Inf)
             @test ldexp(prevfloat(floatmin(T)), typemin(Int128)) === T(0.0)
         end
+    end
+end
+
+@testset "basic math functions" begin
+    @testset "$T" for T in (Float16, Float32, Float64)
+        x = T(1//3)
+        y = T(1//2)
+        yi = 4
+        @testset "Random values" begin
+            @test x^y === T((x)^(y))
+            @test x^1 === x
+            @test x^yi === T((x)^yi)
+            @test (-x)^yi == x^yi
+            @test (-x)^(yi+1) == -(x^(yi+1))
+            @test acos(x) ≈ acos((x))
+            @test acosh(1+x) ≈ acosh((1+x))
+            @test asin(x) ≈ asin((x))
+            @test asinh(x) ≈ asinh((x))
+            @test atan(x) ≈ atan((x))
+            @test atan(x,y) ≈ atan((x),(y))
+            @test atanh(x) ≈ atanh((x))
+            @test cbrt(x) ≈ cbrt((x))
+            @test cos(x) ≈ cos((x))
+            @test cosh(x) ≈ cosh((x))
+            @test exp(x) ≈ exp((x))
+            @test exp10(x) ≈ exp10((x))
+            @test exp2(x) ≈ exp2((x))
+            @test expm1(x) ≈ expm1((x))
+            @test hypot(x,y) ≈ hypot((x),(y))
+            @test hypot(x,x,y) ≈ hypot(hypot((x),(x)),(y))
+            @test hypot(x,x,y,y) ≈ hypot(hypot((x),(x)),hypot((y),(y)))
+            @test log(x) ≈ log((x))
+            @test log10(x) ≈ log10((x))
+            @test log1p(x) ≈ log1p((x))
+            @test log2(x) ≈ log2((x))
+            @test sin(x) ≈ sin((x))
+            @test sinh(x) ≈ sinh((x))
+            @test sqrt(x) ≈ sqrt((x))
+            @test tan(x) ≈ tan((x))
+            @test tanh(x) ≈ tanh((x))
+            @test sec(x) ≈ sec((x))
+            @test csc(x) ≈ csc((x))
+            @test secd(x) ≈ secd((x))
+            @test cscd(x) ≈ cscd((x))
+            @test sech(x) ≈ sech((x))
+            @test csch(x) ≈ csch((x))
+        end
+        @testset "Special values" begin
+            @test isequal(T(1//4)^T(1//2), T(1//2))
+            @test isequal(T(1//4)^2, T(1//16))
+            @test isequal(acos(T(1)), T(0))
+            @test isequal(acosh(T(1)), T(0))
+            @test asin(T(1)) ≈ T(pi)/2 atol=eps(T)
+            @test atan(T(1)) ≈ T(pi)/4 atol=eps(T)
+            @test atan(T(1),T(1)) ≈ T(pi)/4 atol=eps(T)
+            @test isequal(cbrt(T(0)), T(0))
+            @test isequal(cbrt(T(1)), T(1))
+            @test isequal(cbrt(T(1000000000))^3, T(1000)^3)
+            @test isequal(cos(T(0)), T(1))
+            @test cos(T(pi)/2) ≈ T(0) atol=eps(T)
+            @test isequal(cos(T(pi)), T(-1))
+            @test exp(T(1)) ≈ T(ℯ) atol=2*eps(T)
+            @test isequal(exp10(T(1)), T(10))
+            @test isequal(exp2(T(1)), T(2))
+            @test isequal(expm1(T(0)), T(0))
+            @test isequal(expm1(-floatmax(T)), -one(T))
+            @test isequal(expm1(floatmax(T)), T(Inf))
+            @test expm1(T(1)) ≈ T(ℯ)-1 atol=2*eps(T)
+            @test isequal(hypot(T(3),T(4)), T(5))
+            @test isequal(hypot(floatmax(T),T(1)),floatmax(T))
+            @test isequal(hypot(floatmin(T)*sqrt(eps(T)),T(0)),floatmin(T)*sqrt(eps(T)))
+            @test isequal(floatmin(T)*hypot(1.368423059742933,1.3510496552495361),hypot(floatmin(T)*1.368423059742933,floatmin(T)*1.3510496552495361))
+            @test isequal(log(T(1)), T(0))
+            @test isequal(log(ℯ,T(1)), T(0))
+            @test log(T(ℯ)) ≈ T(1) atol=eps(T)
+            @test isequal(log10(T(1)), T(0))
+            @test isequal(log10(T(10)), T(1))
+            @test isequal(log1p(T(0)), T(0))
+            @test log1p(T(ℯ)-1) ≈ T(1) atol=eps(T)
+            @test isequal(log2(T(1)), T(0))
+            @test isequal(log2(T(2)), T(1))
+            @test isequal(sin(T(0)), T(0))
+            @test isequal(sin(T(pi)/2), T(1))
+            @test sin(T(pi)) ≈ T(0) atol=eps(T)
+            @test isequal(sqrt(T(0)), T(0))
+            @test isequal(sqrt(T(1)), T(1))
+            @test isequal(sqrt(T(100000000))^2, T(10000)^2)
+            @test isequal(tan(T(0)), T(0))
+            @test tan(T(pi)/4) ≈ T(1) atol=eps(T)
+            @test isequal(sec(T(pi)), -one(T))
+            @test isequal(csc(T(pi)/2), one(T))
+            @test isequal(secd(T(180)), -one(T))
+            @test isequal(cscd(T(90)), one(T))
+            @test isequal(sech(log(one(T))), one(T))
+            @test isequal(csch(zero(T)), T(Inf))
+            @test zero(T)^y === zero(T)
+            @test zero(T)^zero(T) === one(T)
+            @test zero(T)^(-y) === T(Inf)
+            @test zero(T)^T(NaN) === T(NaN)
+            @test one(T)^y === one(T)
+            @test one(T)^zero(T) === one(T)
+            @test one(T)^T(NaN) === one(T)
+            @test isnan(T(NaN)^T(-.5))
+        end
+        @testset "Inverses" begin
+            @test acos(cos(x)) ≈ x
+            @test acosh(cosh(x)) ≈ x
+            @test asin(sin(x)) ≈ x
+            @test cbrt(x)^3 ≈ x
+            @test cbrt(x^3) ≈ x
+            @test asinh(sinh(x)) ≈ x
+            @test atan(tan(x)) ≈ x
+            @test atan(x,y) ≈ atan(x/y)
+            @test atanh(tanh(x)) ≈ x
+            @test cos(acos(x)) ≈ x
+            @test cosh(acosh(1+x)) ≈ 1+x
+            @test exp(log(x)) ≈ x
+            @test exp10(log10(x)) ≈ x
+            @test exp2(log2(x)) ≈ x
+            @test expm1(log1p(x)) ≈ x
+            @test log(exp(x)) ≈ x
+            @test log10(exp10(x)) ≈ x
+            @test log1p(expm1(x)) ≈ x
+            @test log2(exp2(x)) ≈ x
+            @test sin(asin(x)) ≈ x
+            @test sinh(asinh(x)) ≈ x
+            @test sqrt(x)^2 ≈ x
+            @test sqrt(x^2) ≈ x
+            @test tan(atan(x)) ≈ x
+            @test tanh(atanh(x)) ≈ x
+        end
+        @testset "Relations between functions" begin
+            @test cosh(x) ≈ (exp(x)+exp(-x))/2
+            @test cosh(x)^2-sinh(x)^2 ≈ 1
+            @test hypot(x,y) ≈ sqrt(x^2+y^2)
+            @test sin(x)^2+cos(x)^2 ≈ 1
+            @test sinh(x) ≈ (exp(x)-exp(-x))/2
+            @test tan(x) ≈ sin(x)/cos(x)
+            @test tanh(x) ≈ sinh(x)/cosh(x)
+            @test sec(x) ≈ inv(cos(x))
+            @test csc(x) ≈ inv(sin(x))
+            @test secd(x) ≈ inv(cosd(x))
+            @test cscd(x) ≈ inv(sind(x))
+            @test sech(x) ≈ inv(cosh(x))
+            @test csch(x) ≈ inv(sinh(x))
+        end
+        @testset "Edge cases" begin
+            @test isinf(log(zero(T)))
+            @test isnan_type(T, log(convert(T,NaN)))
+            @test_throws DomainError log(-one(T))
+            @test isinf(log1p(-one(T)))
+            @test isnan_type(T, log1p(convert(T,NaN)))
+            @test_throws DomainError log1p(convert(T,-2.0))
+            @test hypot(T(0), T(0)) === T(0)
+            @test hypot(T(Inf), T(Inf)) === T(Inf)
+            @test hypot(T(Inf), T(x)) === T(Inf)
+            @test hypot(T(Inf), T(NaN)) === T(Inf)
+            @test isnan_type(T, hypot(T(x), T(NaN)))
+            @test tanh(T(Inf)) === T(1)
+        end
+    end
+    @testset "Float16 expm1" begin
+        T=Float16
+        @test isequal(expm1(T(0)), T(0))
+        @test isequal(expm1(-floatmax(T)), -one(T))
+        @test isequal(expm1(floatmax(T)), T(Inf))
+        @test expm1(T(1)) ≈ T(ℯ)-1 atol=2*eps(T)
     end
 end
 
