@@ -85,9 +85,9 @@ if the value can be represented by a tag – it will never be marked `byte = 0x8
 It is not necessary to also test the type-tag when testing `isa`.
 
 The `union*` memory region may be allocated at *any* size.
-The only constraint is that it is big enough to contain the data
+The only constraint is that it is large enough to contain the data
 currently specified by `selector`.
-It might not be big enough to contain the union of all types that
+It might not be large enough to contain the union of all types that
 could be stored there according to the associated Union type field.
 Use appropriate care when copying.
 

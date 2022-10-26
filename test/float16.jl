@@ -204,7 +204,7 @@ const minsubf16_32 = Float32(minsubf16)
 @test Float16(1f5) == Inf16
 
 @testset "conversion to Float16 from" begin
-    for T in (Float32, Float64, BigFloat)
+    for T in (Float32, Float64)
         @testset "conversion from $T" begin
             for i in 1:2^16
                 f = reinterpret(Float16, UInt16(i-1))

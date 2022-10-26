@@ -1,12 +1,11 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
-using Random
+using Test, Random
 
 is_effect_free(args...) = Core.Compiler.is_effect_free(Base.infer_effects(args...))
 
 @testset "gcd/lcm" begin
     # All Integer data types take different code paths -- test all
-    # TODO: Test gcd and lcm for BigInt.
     for T in (Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Int128, UInt128)
         @test gcd(T(3)) === T(3)
         @test gcd(T(3), T(5)) === T(1)
@@ -156,7 +155,6 @@ is_effect_free(args...) = Core.Compiler.is_effect_free(Base.infer_effects(args..
 end
 
 @testset "gcd/lcm for arrays" begin
-    # TODO: Test gcd and lcm for BigInt arrays.
     for T in (Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Int128, UInt128)
         @test gcd(T[]) === T(0)
         @test gcd(T[3, 5]) === T(1)
@@ -188,7 +186,6 @@ end
 end
 
 @testset "gcdx" begin
-    # TODO: Test gcdx for BigInt.
     for T in (Int8, Int16, Int32, Int64, Int128)
         @test gcdx(T(5), T(12)) === (T(1), T(5), T(-2))
         @test gcdx(T(5), T(-12)) === (T(1), T(5), T(2))
@@ -229,7 +226,7 @@ end
     @test invmod(UInt32(1), typemax(UInt32)) === 0x0000_0001
     @test invmod(UInt64(1), typemax(UInt64)) === 0x0000_0000_0000_0001
 
-    for T in (UInt8, UInt16, UInt32, UInt64, UInt128, Int8, Int16, Int32, Int64, Int128, BigInt)
+    for T in (UInt8, UInt16, UInt32, UInt64, UInt128, Int8, Int16, Int32, Int64, Int128)
         @test invmod(T(3), T(124))::T == 83
     end
 
@@ -304,8 +301,8 @@ end
     end
     let (n, b) = rand(Int, 2)
         -1 <= b <= 1 && (b = 2) # invalid bases
-        @test ndigits(n) == ndigits(big(n)) == ndigits(n, base=10)
-        @test ndigits(n, base=b) == ndigits(big(n), base=b)
+        @test ndigits(n) == ndigits(Int(n)) == ndigits(n, base=10)
+        @test ndigits(n, base=b) == ndigits(Int(n), base=b)
     end
 
     for b in -1:1
@@ -326,11 +323,11 @@ end
     @test all(n -> n == 1, ndigits(x, base=b) for b in [-20:-2;2:20] for x in [true, false])
 
     # issue #29148
-    @test ndigits(typemax(UInt64), base=-2) == ndigits(big(typemax(UInt64)), base=-2)
+    @test ndigits(typemax(UInt64), base=-2) == ndigits(Int128(typemax(UInt64)), base=-2)
     for T in Base.BitInteger_types
         n = rand(T)
         b = -rand(2:100)
-        @test ndigits(n, base=b) == ndigits(big(n), base=b)
+        @test ndigits(n, base=b) == ndigits(T(n), base=b)
     end
 
 end
@@ -392,18 +389,16 @@ end
     end
 
     @testset "digits/base with negative bases" begin
-        @testset "digits(n::$T, base = b)" for T in (Int, UInt, BigInt, Int32, UInt32)
+        @testset "digits(n::$T, base = b)" for T in (Int, UInt, Int32, UInt32)
             @test digits(T(8163), base = -10) == [3, 4, 2, 2, 1]
             if !(T<:Unsigned)
                 @test digits(T(-8163), base = -10) == [7, 7, 9, 9]
             end
-            if T !== BigInt
                 b = rand(-32:-2)
                 for n = T[rand(T), typemax(T), typemin(T)]
                     # issue #29183
                     @test digits(n, base=b) == digits(signed(widen(n)), base=b)
                 end
-            end
         end
         @test [string(n, base = b)
                for n = [-10^9, -10^5, -2^20, -2^10, -100, -83, -50, -34, -27, -16, -7, -3, -2, -1,

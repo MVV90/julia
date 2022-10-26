@@ -291,7 +291,7 @@ end
             end
         end
         fds = [abs.(d) for d in ds]
-        @test abs.(A)::mat_type == mat_type(fds...)
+        @test abs.(A) == mat_type(fds...)
         @testset "Multiplication with strided matrix/vector" begin
             @test (x = fill(1.,n); A*x ≈ Array(A)*x)
             @test (X = fill(1.,n,2); A*X ≈ Array(A)*X)

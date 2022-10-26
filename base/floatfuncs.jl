@@ -246,7 +246,7 @@ default `rtol` depends on the types of `x` and `y`. The keyword argument `nans` 
 whether or not NaN values are considered equal (defaults to false).
 
 For real or complex floating-point values, if an `atol > 0` is not specified, `rtol` defaults to
-the square root of [`eps`](@ref) of the type of `x` or `y`, whichever is bigger (least precise).
+the square root of [`eps`](@ref) of the type of `x` or `y`, whichever is larger (least precise).
 This corresponds to requiring equality of about half of the significant digits. Otherwise,
 e.g. for integer arguments or if an `atol > 0` is supplied, `rtol` defaults to zero.
 
@@ -424,9 +424,3 @@ fma_llvm(x::Float64, y::Float64, z::Float64) = fma_float(x, y, z)
 function fma(a::Float16, b::Float16, c::Float16)
     Float16(muladd(Float32(a), Float32(b), Float32(c))) #don't use fma if the hardware doesn't have it.
 end
-
-# This is necessary at least on 32-bit Intel Linux, since fma_llvm may
-# have called glibc, and some broken glibc fma implementations don't
-# properly restore the rounding mode
-Rounding.setrounding_raw(Float32, Rounding.JL_FE_TONEAREST)
-Rounding.setrounding_raw(Float64, Rounding.JL_FE_TONEAREST)

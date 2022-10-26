@@ -326,8 +326,6 @@ typedef struct {
 
 static jl_value_t *jl_idtable_type = NULL;
 static jl_typename_t *jl_idtable_typename = NULL;
-static jl_value_t *jl_bigint_type = NULL;
-static int gmp_limb_size = 0;
 
 static jl_sym_t *jl_docmeta_sym = NULL;
 
@@ -1020,24 +1018,6 @@ static void jl_write_values(jl_serializer_state *s)
             assert(t->layout->npointers == 0);
             if (t->size > 0)
                 ios_write(s->s, (char*)v, t->size);
-        }
-        else if (jl_bigint_type && jl_typeis(v, jl_bigint_type)) {
-            // foreign types require special handling
-            jl_value_t *sizefield = jl_get_nth_field(v, 1);
-            int32_t sz = jl_unbox_int32(sizefield);
-            int32_t nw = (sz == 0 ? 1 : (sz < 0 ? -sz : sz));
-            size_t nb = nw * gmp_limb_size;
-            ios_write(s->s, (char*)&nw, sizeof(int32_t));
-            ios_write(s->s, (char*)&sz, sizeof(int32_t));
-            uintptr_t data = LLT_ALIGN(ios_pos(s->const_data), 8);
-            write_padding(s->const_data, data - ios_pos(s->const_data));
-            data /= sizeof(void*);
-            assert(data < ((uintptr_t)1 << RELOC_TAG_OFFSET) && "offset to constant data too large");
-            arraylist_push(&s->relocs_list, (void*)(reloc_offset + 8)); // relocation location
-            arraylist_push(&s->relocs_list, (void*)(((uintptr_t)ConstDataRef << RELOC_TAG_OFFSET) + data)); // relocation target
-            void *pdata = jl_unbox_voidpointer(jl_get_nth_field(v, 2));
-            ios_write(s->const_data, (char*)pdata, nb);
-            write_pointer(s->s);
         }
         else {
             // Generic object::DataType serialization by field
@@ -1860,11 +1840,6 @@ static void jl_save_system_image_to_stream(ios_t *f) JL_GC_DISABLED
 
     jl_idtable_type = jl_base_module ? jl_get_global(jl_base_module, jl_symbol("IdDict")) : NULL;
     jl_idtable_typename = jl_base_module ? ((jl_datatype_t*)jl_unwrap_unionall((jl_value_t*)jl_idtable_type))->name : NULL;
-    jl_bigint_type = jl_base_module ? jl_get_global(jl_base_module, jl_symbol("BigInt")) : NULL;
-    if (jl_bigint_type) {
-        gmp_limb_size = jl_unbox_long(jl_get_global((jl_module_t*)jl_get_global(jl_base_module, jl_symbol("GMP")),
-                                                    jl_symbol("BITS_PER_LIMB"))) / 8;
-    }
     if (jl_base_module) {
         jl_value_t *docs = jl_get_global(jl_base_module, jl_symbol("Docs"));
         if (docs && jl_is_module(docs)) {

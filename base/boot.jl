@@ -526,7 +526,7 @@ end
 atdoc     = (source, mod, str, expr) -> Expr(:escape, expr)
 atdoc!(λ) = global atdoc = λ
 
-# macros for big integer syntax
+# macros for large integer syntax
 macro int128_str end
 macro uint128_str end
 macro big_str end

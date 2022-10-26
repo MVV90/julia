@@ -18,7 +18,7 @@ include("testutils.jl") # test_approx_eq_modphase
 n = 10 #Size of test matrix
 Random.seed!(1)
 
-@testset for relty in (Int, Float32, Float64, BigFloat), elty in (relty, Complex{relty})
+@testset for relty in (Int, Float32, Float64), elty in (relty, Complex{relty})
     if relty <: AbstractFloat
         dv = convert(Vector{elty}, randn(n))
         ev = convert(Vector{elty}, randn(n-1))
@@ -128,7 +128,6 @@ Random.seed!(1)
             @test size(T) == (n, n)
             @test Array(T) == diagm(0 => dv, (uplo == :U ? 1 : -1) => ev)
             @test Bidiagonal(Array(T), uplo) == T
-            @test big.(T) == T
             @test Array(abs.(T)) == abs.(diagm(0 => dv, (uplo == :U ? 1 : -1) => ev))
             @test Array(real(T)) == real(diagm(0 => dv, (uplo == :U ? 1 : -1) => ev))
             @test Array(imag(T)) == imag(diagm(0 => dv, (uplo == :U ? 1 : -1) => ev))
@@ -232,7 +231,7 @@ Random.seed!(1)
             end
             condT = cond(map(ComplexF64,Tfull))
             promty = typeof((zero(relty)*zero(relty) + zero(relty)*zero(relty))/one(relty))
-            if relty != BigFloat
+
                 x = transpose(T)\transpose(c)
                 tx = transpose(Tfull) \ transpose(c)
                 elty <: AbstractFloat && @test norm(x-tx,Inf) <= 4*condT*max(eps()*norm(tx,Inf), eps(promty)*norm(x,Inf))
@@ -245,16 +244,12 @@ Random.seed!(1)
                 tx = Tfull\transpose(c)
                 @test norm(x-tx,Inf) <= 4*condT*max(eps()*norm(tx,Inf), eps(promty)*norm(x,Inf))
                 @test_throws DimensionMismatch T\transpose(b)
-            end
+
             offsizemat = Matrix{elty}(undef, n+1, 2)
             @test_throws DimensionMismatch T \ offsizemat
             @test_throws DimensionMismatch transpose(T) \ offsizemat
             @test_throws DimensionMismatch T' \ offsizemat
 
-            if elty <: BigFloat
-                @test_throws SingularException ldiv!(Bidiagonal(zeros(elty, n), ones(elty, n-1), :U), rand(elty, n))
-                @test_throws SingularException ldiv!(Bidiagonal(zeros(elty, n), ones(elty, n-1), :L), rand(elty, n))
-            end
             let bb = b, cc = c
                 for atype in ("Array", "SubArray")
                     if atype == "Array"
@@ -282,9 +277,7 @@ Random.seed!(1)
                 @testset "Generic Mat-vec ops" begin
                     @test T*b ≈ Tfull*b
                     @test T'*b ≈ Tfull'*b
-                    if relty != BigFloat # not supported by pivoted QR
-                        @test T/b' ≈ Tfull/b'
-                    end
+                    @test T/b' ≈ Tfull/b'
                 end
             end
             zdv = Vector{elty}(undef, 0)

@@ -448,7 +448,7 @@ function longpath(path::AbstractString)
             UInt32, (Ptr{UInt16}, Ptr{UInt16}, UInt32),
             p, buf, length(buf))
         windowserror(:longpath, n == 0)
-        x = n < length(buf) # is the buffer big enough?
+        x = n < length(buf) # is the buffer large enough?
         resize!(buf, n) # shrink if x, grow if !x
         x && return transcode(String, buf)
     end

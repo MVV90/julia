@@ -453,8 +453,8 @@ kron(a::AdjOrTransAbsVec, b::AdjOrTransAbsVec) = transpose(kron(transpose(a), tr
 # Matrix power
 (^)(A::AbstractMatrix, p::Integer) = p < 0 ? power_by_squaring(inv(A), -p) : power_by_squaring(A, p)
 function (^)(A::AbstractMatrix{T}, p::Integer) where T<:Integer
-    # make sure that e.g. [1 1;1 0]^big(3)
-    # gets promotes in a similar way as 2^big(3)
+    # make sure that e.g. [1 1;1 0]^3
+    # gets promotes in a similar way as 2^3
     TT = promote_op(^, T, typeof(p))
     return power_by_squaring(convert(AbstractMatrix{TT}, A), p)
 end

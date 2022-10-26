@@ -753,13 +753,13 @@ length(r::OneTo) = Integer(r.stop - zero(r.stop))
 length(r::StepRangeLen) = r.len
 length(r::LinRange) = r.len
 
-let bigints = Union{Int, UInt, Int64, UInt64, Int128, UInt128}
+let large_i = Union{Int, UInt, Int64, UInt64, Int128, UInt128}
     global length, checked_length
     # compile optimization for which promote_type(T, Int) == T
-    length(r::OneTo{T}) where {T<:bigints} = r.stop
+    length(r::OneTo{T}) where {T<:large_i} = r.stop
     # slightly more accurate length and checked_length in extreme cases
     # (near typemax) for types with known `unsigned` functions
-    function length(r::OrdinalRange{T}) where T<:bigints
+    function length(r::OrdinalRange{T}) where T<:large_i
         s = step(r)
         isempty(r) && return zero(T)
         diff = last(r) - first(r)
@@ -775,7 +775,7 @@ let bigints = Union{Int, UInt, Int64, UInt64, Int128, UInt128}
         end
         return Integer(a) + oneunit(a)
     end
-    function checked_length(r::OrdinalRange{T}) where T<:bigints
+    function checked_length(r::OrdinalRange{T}) where T<:large_i
         s = step(r)
         isempty(r) && return zero(T)
         stop, start = last(r), first(r)

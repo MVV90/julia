@@ -262,7 +262,6 @@ end
 end
 
 # Ensure only LLVM-supported types can be atomic
-@test_throws TypeError Atomic{BigInt}
 @test_throws TypeError Atomic{ComplexF64}
 
 if Sys.ARCH == :i686 || startswith(string(Sys.ARCH), "arm") ||

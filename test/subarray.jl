@@ -353,7 +353,7 @@ end
     # issue #8807
     @test view(view([1:5;], 1:5), 1:5) == [1:5;]
     # Test with mixed types
-    @test sA[:, Int16[1,2], big(2)] == [31 40; 33 42]
+    @test sA[:, Int16[1,2], Int(2)] == [31 40; 33 42]
     test_bounds(sA)
     sA = view(A, 1:1, 1:5, [1 3; 4 2])
     @test ndims(sA) == 4
@@ -702,16 +702,6 @@ end
 
 isdefined(Main, :InfiniteArrays) || @eval Main include("testhelpers/InfiniteArrays.jl")
 using .Main.InfiniteArrays, Base64
-
-@testset "PR #37741: non-Int sizes" begin
-    r = BigInt(1):BigInt(100_000_000)^100
-    v = SubArray(r, (r,))
-    @test size(v) == (last(r),)
-
-    v = SubArray(OneToInf(), (OneToInf(),))
-    @test size(v) == (Infinity(),)
-    @test stringmime("text/plain", v; context=(:limit => true)) == "$(Infinity())-element view(::$(OneToInf{Int}), 1:1:$(Infinity())) with eltype $Int with indices 1:1:$(Infinity()):\n  1\n  2\n  3\n  4\n  5\n  6\n  7\n  8\n  9\n 10\n  ⋮"
-end
 
 @testset "PR #39809: copy on 0-dimensional SubArray" begin
     v = [[1]]

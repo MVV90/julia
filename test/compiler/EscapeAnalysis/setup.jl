@@ -37,7 +37,7 @@ isinvoke(pred::Function, @nospecialize(x)) = Meta.isexpr(x, :invoke) && pred(x.a
 """
     is_load_forwardable(x::EscapeInfo) -> Bool
 
-Queries if `x` is elibigle for store-to-load forwarding optimization.
+Queries if `x` is eligible for store-to-load forwarding optimization.
 """
 function is_load_forwardable(x::EA.EscapeInfo)
     AliasInfo = x.AliasInfo

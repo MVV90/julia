@@ -227,8 +227,6 @@ $(eval $(call symlink_system_library,BLAS,$(LIBBLASNAME)))
 ifneq ($(LIBLAPACKNAME),$(LIBBLASNAME))
 $(eval $(call symlink_system_library,LAPACK,$(LIBLAPACKNAME)))
 endif
-$(eval $(call symlink_system_library,GMP,libgmp))
-$(eval $(call symlink_system_library,MPFR,libmpfr))
 $(eval $(call symlink_system_library,MBEDTLS,libmbedtls))
 $(eval $(call symlink_system_library,MBEDTLS,libmbedcrypto))
 $(eval $(call symlink_system_library,MBEDTLS,libmbedx509))

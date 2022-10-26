@@ -390,9 +390,6 @@ function powermod(x::Integer, p::Integer, m::T) where T<:Integer
     return r
 end
 
-# optimization: promote the modulus m to BigInt only once (cf. widemul in generic powermod above)
-powermod(x::Integer, p::Integer, m::Union{Int128,UInt128}) = oftype(m, powermod(x, p, big(m)))
-
 _nextpow2(x::Unsigned) = oneunit(x)<<((sizeof(x)<<3)-leading_zeros(x-oneunit(x)))
 _nextpow2(x::Integer) = reinterpret(typeof(x),x < 0 ? -_nextpow2(unsigned(-x)) : _nextpow2(unsigned(x)))
 _prevpow2(x::Unsigned) = one(x) << unsigned((sizeof(x)<<3)-leading_zeros(x)-1)
@@ -983,7 +980,7 @@ end
 
 Factorial of `n`. If `n` is an [`Integer`](@ref), the factorial is computed as an
 integer (promoted to at least 64 bits). Note that this may overflow if `n` is not small,
-but you can use `factorial(big(n))` to compute the result exactly in arbitrary precision.
+but you can use `factorial(n)` to compute the result exactly in arbitrary precision.
 
 See also [`binomial`](@ref).
 
@@ -993,11 +990,11 @@ julia> factorial(6)
 720
 
 julia> factorial(21)
-ERROR: OverflowError: 21 is too large to look up in the table; consider using `factorial(big(21))` instead
+ERROR: OverflowError: 21 is too large to look up in the table; consider using `factorial(21)` instead
 Stacktrace:
 [...]
 
-julia> factorial(big(21))
+julia> factorial(21)
 51090942171709440000
 ```
 

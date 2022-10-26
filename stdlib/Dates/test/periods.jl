@@ -85,8 +85,6 @@ emptyperiod = ((y + d) - d) - y
     @test Dates.Year(convert(UInt64, 1)) == y
     @test Dates.Year(convert(Int128, 1)) == y
     @test Dates.Year(convert(UInt128, 1)) == y
-    @test Dates.Year(convert(BigInt, 1)) == y
-    @test Dates.Year(convert(BigFloat, 1)) == y
     @test Dates.Year(convert(Complex, 1)) == y
     @test Dates.Year(convert(Rational, 1)) == y
     @test Dates.Year(convert(Float16, 1)) == y
@@ -117,13 +115,10 @@ emptyperiod = ((y + d) - d) - y
     @test Dates.Year(UInt64(1)) == y
     @test Dates.Year(UInt128(1)) == y
     @test Dates.Year(UInt128(1)) == y
-    @test Dates.Year(big(1)) == y
-    @test Dates.Year(BigFloat(1)) == y
     @test Dates.Year(float(1)) == y
     @test Dates.Year(Float32(1)) == y
     @test Dates.Year(Rational(1)) == y
     @test Dates.Year(complex(1)) == y
-    @test_throws InexactError Dates.Year(BigFloat(1.2)) == y
     @test_throws InexactError Dates.Year(1.2) == y
     @test_throws InexactError Dates.Year(Float32(1.2)) == y
     @test_throws InexactError Dates.Year(3//4) == y

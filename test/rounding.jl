@@ -56,27 +56,8 @@ end
         @test v > 0 ? pz == pd : pz == pu
         @test pu - pd == eps(pz)
     end
-
-    for T in [Float32,Float64]
-        for v in [sqrt(big(2.0)),-big(1.0)/big(3.0),nextfloat(big(1.0)),
-                  prevfloat(big(1.0)),nextfloat(big(0.0)),prevfloat(big(0.0)),
-                  pi,ℯ,eulergamma,catalan,golden,
-                  typemax(Int64),typemax(UInt64),typemax(Int128),typemax(UInt128),0xa2f30f6001bb2ec6]
-            pn = T(v,RoundNearest)
-            @test pn == convert(T,BigFloat(v))
-            pz = T(v,RoundToZero)
-            @test pz == setrounding(()->convert(T,BigFloat(v)), BigFloat, RoundToZero)
-            pd = T(v,RoundDown)
-            @test pd == setrounding(()->convert(T,BigFloat(v)), BigFloat, RoundDown)
-            pu = T(v,RoundUp)
-            @test pu == setrounding(()->convert(T,BigFloat(v)), BigFloat, RoundUp)
-
-            @test pn == pd || pn == pu
-            @test v > 0 ? pz == pd : pz == pu
-            @test isinf(pu) || pu - pd == eps(pz)
-        end
-    end
 end
+
 @testset "fenv" begin
     @test Base.Rounding.from_fenv(Base.Rounding.to_fenv(RoundNearest)) == RoundNearest
     @test Base.Rounding.from_fenv(Base.Rounding.to_fenv(RoundToZero)) == RoundToZero
@@ -259,13 +240,13 @@ end
     @test round(pi, sigdigits=1) ≈ 3.
     @test round(pi, sigdigits=3) ≈ 3.14
     @test round(pi, sigdigits=4, base=2) ≈ 3.25
-    @test round(big(pi)) ≈ big"3."
-    @test round(big(pi), digits=0) ≈ big"3."
-    @test round(big(pi), digits=1) ≈ big"3.1"
-    @test round(big(pi), digits=3, base=2) ≈ big"3.125"
-    @test round(big(pi), sigdigits=1) ≈ big"3."
-    @test round(big(pi), sigdigits=3) ≈ big"3.14"
-    @test round(big(pi), sigdigits=4, base=2) ≈ big"3.25"
+    @test round(float(pi)) ≈ big"3."
+    @test round(float(pi), digits=0) ≈ big"3."
+    @test round(float(pi), digits=1) ≈ big"3.1"
+    @test round(float(pi), digits=3, base=2) ≈ big"3.125"
+    @test round(float(pi), sigdigits=1) ≈ big"3."
+    @test round(float(pi), sigdigits=3) ≈ big"3.14"
+    @test round(float(pi), sigdigits=4, base=2) ≈ big"3.25"
     @test round(10*pi, digits=-1) ≈ 30.
     @test round(.1, digits=0) == 0.
     @test round(-.1, digits=0) == -0.

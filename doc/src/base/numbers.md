@@ -20,7 +20,6 @@ Base.AbstractIrrational
 Core.Float16
 Core.Float32
 Core.Float64
-Base.BigFloat
 Core.Bool
 Core.Int8
 Core.UInt8
@@ -32,7 +31,6 @@ Core.Int64
 Core.UInt64
 Core.Int128
 Core.UInt128
-Base.BigInt
 Base.Complex
 Base.Rational
 Base.Irrational
@@ -46,7 +44,6 @@ Base.digits!
 Base.bitstring
 Base.parse
 Base.tryparse
-Base.big
 Base.signed
 Base.unsigned
 Base.float(::Any)
@@ -90,8 +87,6 @@ Base.isreal
 Core.Float32(::Any)
 Core.Float64(::Any)
 Base.Rounding.rounding
-Base.Rounding.setrounding(::Type, ::Any)
-Base.Rounding.setrounding(::Function, ::Type, ::RoundingMode)
 Base.Rounding.get_zero_subnormals
 Base.Rounding.set_zero_subnormals
 ```
@@ -109,20 +104,4 @@ Base.isodd
 Base.iseven
 Base.@int128_str
 Base.@uint128_str
-```
-
-## [BigFloats and BigInts](@id BigFloats-and-BigInts)
-
-The [`BigFloat`](@ref) and [`BigInt`](@ref) types implements
-arbitrary-precision floating point and integer arithmetic, respectively. For
-[`BigFloat`](@ref) the [GNU MPFR library](https://www.mpfr.org/) is used,
-and for [`BigInt`](@ref) the [GNU Multiple Precision Arithmetic Library (GMP)]
-(https://gmplib.org) is used.
-
-```@docs
-Base.MPFR.BigFloat(::Any, rounding::RoundingMode)
-Base.precision
-Base.MPFR.setprecision
-Base.GMP.BigInt(::Any)
-Base.@big_str
 ```

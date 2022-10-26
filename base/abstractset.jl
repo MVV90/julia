@@ -329,7 +329,7 @@ function issubset(a, b)
         if isa(a, AbstractSet) && length(a) > blen
             return false
         end
-        # when `in` would be too slow and b is big enough, convert it to a Set
+        # when `in` would be too slow and b is large enough, convert it to a Set
         # this threshold was empirically determined (cf. #26198)
         if !hasfastin(b) && blen > FASTIN_SET_THRESHOLD
             return issubset(a, Set(b))

@@ -7,7 +7,7 @@ MAGIC_ROUND_CONST(::Type{Float64}) = 6.755399441055744e15
 MAGIC_ROUND_CONST(::Type{Float32}) = 1.048576f7
 
 # max, min, and subnormal arguments
-# max_exp = T(exponent_bias(T)*log(base, big(2)) + log(base, 2 - big(2.0)^-significand_bits(T)))
+# max_exp = T(exponent_bias(T)*log(base, Int128(2)) + log(base, 2 - float(2.0)^-significand_bits(T)))
 MAX_EXP(n::Val{2}, ::Type{Float32}) = 128.0f0
 MAX_EXP(n::Val{2}, ::Type{Float64}) = 1024.0
 MAX_EXP(n::Val{:ℯ}, ::Type{Float32}) = 88.72284f0
@@ -15,7 +15,7 @@ MAX_EXP(n::Val{:ℯ}, ::Type{Float64}) = 709.7827128933841
 MAX_EXP(n::Val{10}, ::Type{Float32}) = 38.53184f0
 MAX_EXP(n::Val{10}, ::Type{Float64}) = 308.25471555991675
 
-# min_exp = T(-(exponent_bias(T)+significand_bits(T)) * log(base, big(2)))
+# min_exp = T(-(exponent_bias(T)+significand_bits(T)) * log(base, Int128(2)))
 MIN_EXP(n::Val{2}, ::Type{Float32}) = -150.0f0
 MIN_EXP(n::Val{2}, ::Type{Float64}) = -1075.0
 MIN_EXP(n::Val{:ℯ}, ::Type{Float32}) = -103.97208f0
@@ -109,20 +109,6 @@ const JL_MASK = typemax(UInt64)>>8
 const JU_CONST = 0x3FF0000000000000
 const JL_CONST = 0x3C00000000000000
 
-
-#function make_table(size)
-#    t_array = zeros(UInt64, size);
-#    for j in 1:size
-#        val = 2.0^(BigFloat(j-1)/size)
-#        valU = Float64(val, RoundDown)
-#        valL = Float64(val-valU)
-#        valU = reinterpret(UInt64, valU) & JU_MASK
-#        valL = ((reinterpret(UInt64, valL) & JL_MASK)>>44)<<52
-#        t_array[j] = valU | valL
-#    end
-#    return Tuple(t_array)
-#end
-#const J_TABLE = make_table(256);
 const J_TABLE = (0x0000000000000000, 0xaac00b1afa5abcbe, 0x9b60163da9fb3335, 0xab502168143b0280, 0xadc02c9a3e778060,
                  0x656037d42e11bbcc, 0xa7a04315e86e7f84, 0x84c04e5f72f654b1, 0x8d7059b0d3158574, 0xa510650a0e3c1f88,
                  0xa8d0706b29ddf6dd, 0x83207bd42b72a836, 0x6180874518759bc8, 0xa4b092bdf66607df, 0x91409e3ecac6f383,

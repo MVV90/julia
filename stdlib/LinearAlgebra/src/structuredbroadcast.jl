@@ -97,7 +97,6 @@ structured_broadcast_alloc(bc, ::Type{<:Matrix}, ::Type{ElType}, n) where {ElTyp
 # preserve both zeros and ones (for Unit***erTriangular) and symmetry (for SymTridiagonal)
 const TypeFuncs = Union{typeof(round),typeof(trunc),typeof(floor),typeof(ceil)}
 isstructurepreserving(bc::Broadcasted) = isstructurepreserving(bc.f, bc.args...)
-isstructurepreserving(::Union{typeof(abs),typeof(big)}, ::StructuredMatrix) = true
 isstructurepreserving(::TypeFuncs, ::StructuredMatrix) = true
 isstructurepreserving(::TypeFuncs, ::Ref{<:Type}, ::StructuredMatrix) = true
 function isstructurepreserving(::typeof(Base.literal_pow), ::Ref{typeof(^)}, ::StructuredMatrix, ::Ref{Val{N}}) where N

@@ -26,7 +26,7 @@ dlimg  = randn(n-1)/2
 dreal = randn(n)/2
 dimg  = randn(n)/2
 
-@testset for eltya in (Float32, Float64, ComplexF32, ComplexF64, BigFloat, Int)
+@testset for eltya in (Float32, Float64, ComplexF32, ComplexF64, Int)
     a = eltya == Int ? rand(1:7, n, n) :
         convert(Matrix{eltya}, eltya <: Complex ? complex.(areal, aimg) : areal)
     d = if eltya == Int
@@ -69,9 +69,9 @@ dimg  = randn(n)/2
         @test copy(lua) == lua
         if eltya <: BlasFloat
             # test conversion of LU factorization's numerical type
-            bft = eltya <: Real ? LinearAlgebra.LU{BigFloat} : LinearAlgebra.LU{Complex{BigFloat}}
+            bft = eltya <: Real ? LinearAlgebra.LU{Float64} : LinearAlgebra.LU{Complex{Float64}}
             bflua = convert(bft, lua)
-            @test bflua.L*bflua.U ≈ big.(a)[p,:] rtol=εa*norm(a)
+            @test bflua.L*bflua.U ≈ eltya.(a)[p,:] rtol=εa*norm(a)
             @test Factorization{eltya}(lua) === lua
             # test Factorization with different eltype
             if eltya <: BlasReal
@@ -252,38 +252,6 @@ end
     falu = convert(typeof(falu),alu)
     @test Array(alu) == fa
     @test AbstractArray(alu) == fa
-end
-
-@testset "Rational Matrices" begin
-    ## Integrate in general tests when more linear algebra is implemented in julia
-    a = convert(Matrix{Rational{BigInt}}, rand(1:10//1,n,n))/n
-    b = rand(1:10,n,2)
-    @inferred lu(a)
-    lua   = factorize(a)
-    l,u,p = lua.L, lua.U, lua.p
-    @test l*u ≈ a[p,:]
-    @test l[invperm(p),:]*u ≈ a
-    @test a*inv(lua) ≈ Matrix(I, n, n)
-    let Bs = b
-        for b in (Bs, view(Bs, 1:n, 1))
-            @test a*(lua\b) ≈ b
-        end
-    end
-    @test @inferred(det(a)) ≈ det(Array{Float64}(a))
-end
-
-@testset "Rational{BigInt} and BigFloat Hilbert Matrix" begin
-    ## Hilbert Matrix (very ill conditioned)
-    ## Testing Rational{BigInt} and BigFloat version
-    nHilbert = 50
-    H = Rational{BigInt}[1//(i+j-1) for i = 1:nHilbert,j = 1:nHilbert]
-    Hinv = Rational{BigInt}[(-1)^(i+j)*(i+j-1)*binomial(nHilbert+i-1,nHilbert-j)*
-        binomial(nHilbert+j-1,nHilbert-i)*binomial(i+j-2,i-1)^2
-        for i = big(1):nHilbert,j=big(1):nHilbert]
-    @test inv(H) == Hinv
-    setprecision(2^10) do
-        @test norm(Array{Float64}(inv(float(H)) - float(Hinv))) < 1e-100
-    end
 end
 
 @testset "logdet" begin

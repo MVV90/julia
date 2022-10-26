@@ -23,7 +23,7 @@ BUILDDIR := $(BUILDDIR)$(MAYBE_HOST)
 # additionally all targets should be listed in the getall target for easier off-line compilation
 # if you are adding a new target, it can help to copy an similar, existing target
 #
-# autoconf configure-driven scripts: pcre unwind gmp mpfr patchelf libuv curl
+# autoconf configure-driven scripts: pcre unwind patchelf libuv curl
 # custom Makefile rules: openlibm dsfmt lapack blastrampoline openblas utf8proc objconv libwhich
 # CMake libs: llvm llvmunwind libgit2 libssh2 mbedtls
 #
@@ -102,10 +102,6 @@ endif
 endif
 endif
 
-ifeq ($(USE_SYSTEM_GMP), 0)
-DEP_LIBS += gmp
-endif
-
 ifeq ($(USE_SYSTEM_LIBGIT2), 0)
 ifeq ($(USE_SYSTEM_MBEDTLS), 0)
 DEP_LIBS += mbedtls
@@ -125,10 +121,6 @@ endif
 
 DEP_LIBS += libgit2
 endif # USE_SYSTEM_LIBGIT2
-
-ifeq ($(USE_SYSTEM_MPFR), 0)
-DEP_LIBS += mpfr
-endif
 
 ifeq ($(USE_SYSTEM_UTF8PROC), 0)
 DEP_LIBS += utf8proc
@@ -161,7 +153,7 @@ endif
 
 # list all targets
 DEP_LIBS_STAGED_ALL := llvm llvm-tools clang llvmunwind unwind libuv pcre \
-	openlibm dsfmt blastrampoline openblas lapack gmp mpfr patchelf utf8proc \
+	openlibm dsfmt blastrampoline openblas lapack patchelf utf8proc \
 	objconv mbedtls libssh2 nghttp2 curl libgit2 libwhich zlib p7zip csl
 DEP_LIBS_ALL := $(DEP_LIBS_STAGED_ALL)
 
@@ -204,8 +196,6 @@ include $(SRCDIR)/openblas.mk
 include $(SRCDIR)/utf8proc.mk
 include $(SRCDIR)/zlib.mk
 include $(SRCDIR)/unwind.mk
-include $(SRCDIR)/gmp.mk
-include $(SRCDIR)/mpfr.mk
 include $(SRCDIR)/patchelf.mk
 include $(SRCDIR)/mbedtls.mk
 include $(SRCDIR)/libssh2.mk

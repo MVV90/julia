@@ -496,21 +496,6 @@ B92 = view(A92, :, :, Base.IdentityUnitRange(-1:0))
 @test norm(A) ≈ norm(parent(A))
 @test dot(v, v) ≈ dot(v0, v0)
 
-# Prior to its removal from Base, cumsum_kbn was used here. To achieve the same level of
-# accuracy in the tests, we need to use BigFloats with enlarged precision.
-@testset "high-precision array reduction" begin
-    setprecision(BigFloat, 500) do
-        v  = OffsetArray(BigFloat[1,1e100,1,-1e100], (-3,)) .* 1000
-        v2 = OffsetArray(BigFloat[1,-1e100,1,1e100], ( 5,)) .* 1000
-        @test isa(v, OffsetArray)
-        cv  = OffsetArray(BigFloat[1, 1e100, 1e100,2], (-3,)) .* 1000
-        cv2 = OffsetArray(BigFloat[1,-1e100,-1e100,2], ( 5,)) .* 1000
-        @test cumsum(v) ≈ cv
-        @test cumsum(v2) ≈ cv2
-        @test sum(v) ≈ sum(parent(v))
-    end
-end
-
 io = IOBuffer()
 writedlm(io, A)
 seek(io, 0)

@@ -504,7 +504,7 @@ ideal for a high-level programming language to expose this to the user. For nume
 efficiency and transparency are at a premium, however, the alternatives are worse.
 
 One alternative to consider would be to check each integer operation for overflow and promote
-results to bigger integer types such as [`Int128`](@ref) or [`BigInt`](@ref) in the case of overflow.
+results to bigger integer types such as [`Int128`](@ref) in the case of overflow.
 Unfortunately, this introduces major overhead on every integer operation (think incrementing a
 loop counter) – it requires emitting code to perform run-time overflow checks after arithmetic
 instructions and branches to handle potential overflows. Worse still, this would cause every computation
@@ -514,7 +514,7 @@ being integers, it's impossible to generate fast, simple code the way C and Fort
 do.
 
 A variation on this approach, which avoids the appearance of type instability is to merge the
-`Int` and [`BigInt`](@ref) types into a single hybrid integer type, that internally changes representation
+`Int` types into a single hybrid integer type, that internally changes representation
 when a result no longer fits into the size of a machine integer. While this superficially avoids
 type-instability at the level of Julia code, it just sweeps the problem under the rug by foisting
 all of the same difficulties onto the C code implementing this hybrid integer type. This approach
@@ -531,7 +531,7 @@ to represent integer arrays without additional heap storage, and unpredictable p
 make even the cleverest hybrid integer implementations a poor choice for high-performance numerical
 work.
 
-An alternative to using hybrid integers or promoting to BigInts is to use saturating integer arithmetic,
+An alternative to using hybrid integers is to use saturating integer arithmetic,
 where adding to the largest integer value leaves it unchanged and likewise for subtracting from
 the smallest integer value. This is precisely what Matlab™ does:
 

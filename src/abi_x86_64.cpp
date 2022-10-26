@@ -73,7 +73,7 @@ struct Classification {
 
         // Note that we don't need to bother checking if it crosses 8 bytes.
         // We don't get here with unaligned fields, and anything that can be
-        // big enough to cross 8 bytes (cdoubles, reals, structs and arrays)
+        // large enough to cross 8 bytes (cdoubles, reals, structs and arrays)
         // is special-cased in classifyType()
         int idx = (offset < 8 ? 0 : 1);
 

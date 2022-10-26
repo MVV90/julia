@@ -379,47 +379,16 @@ Printf.tofloat(x::MyCustomType) = convert_my_custom_type_to_float(x)
 
 For arbitrary precision numerics, you might extend the method like:
 
-```julia
-Printf.tofloat(x::MyArbitraryPrecisionType) = BigFloat(x)
-```
-
 !!! compat "Julia 1.6"
     This function requires Julia 1.6 or later.
 """
 tofloat(x) = Float64(x)
 tofloat(x::Base.IEEEFloat) = x
-tofloat(x::BigFloat) = x
-
-_snprintf(ptr, siz, str, arg) =
-    @ccall "libmpfr".mpfr_snprintf(ptr::Ptr{UInt8}, siz::Csize_t, str::Ptr{UInt8};
-                                   arg::Ref{BigFloat})::Cint
-
-const __BIG_FLOAT_MAX__ = 8192
 
 @inline function fmt(buf, pos, arg, spec::Spec{T}) where {T <: Floats}
     leftalign, plus, space, zero, hash, width, prec =
         spec.leftalign, spec.plus, spec.space, spec.zero, spec.hash, spec.width, spec.precision
     x = tofloat(arg)
-    if x isa BigFloat
-        if isfinite(x)
-            GC.@preserve buf begin
-                siz = length(buf) - pos + 1
-                str = string(spec; modifier="R")
-                len = _snprintf(pointer(buf, pos), siz, str, x)
-                if len > siz
-                    maxout = max(__BIG_FLOAT_MAX__,
-                                 ceil(Int, precision(x) * log(2) / log(10)) + 25)
-                    len > maxout &&
-                        error("Over $maxout bytes $len needed to output BigFloat $x")
-                    resize!(buf, len + 1)
-                    len = _snprintf(pointer(buf, pos), len + 1, str, x)
-                end
-                len > 0 || throw(ArgumentError("invalid printf formatting $str for BigFloat"))
-                return pos + len
-            end
-        end
-        x = Float64(x)
-    end
     if T == Val{'e'} || T == Val{'E'}
         newpos = Ryu.writeexp(buf, pos, x, prec, plus, space, hash, char(T), UInt8('.'))
     elseif T == Val{'f'} || T == Val{'F'}

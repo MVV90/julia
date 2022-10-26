@@ -25,8 +25,6 @@ export
     AbstractMatch,
     AbstractPattern,
     AbstractDict,
-    BigFloat,
-    BigInt,
     BitArray,
     BitMatrix,
     BitVector,
@@ -228,7 +226,6 @@ export
     atan,
     atand,
     atanh,
-    big,
     binomial,
     bitreverse,
     bitrotate,
@@ -646,11 +643,9 @@ export
     @warn,
     @error,
 
-# bigfloat & precision
+# float & precision
     precision,
     rounding,
-    setprecision,
-    setrounding,
     get_zero_subnormals,
     set_zero_subnormals,
 

@@ -106,7 +106,7 @@ New library features
 * `@time` and `@timev` now take an optional description to allow annotating the source of time reports,
   e.g. `@time "Evaluating foo" foo()` ([#42431]).
 * `range` accepts either `stop` or `length` as a sole keyword argument ([#39241]).
-* `precision` and `setprecision` now accept a `base` keyword argument ([#42428]).
+* `precision` now accepts a `base` keyword argument ([#42428]).
 * TCP socket objects now expose `closewrite` functionality and support half-open mode usage ([#40783]).
 * `extrema` now accepts an `init` keyword argument ([#36265], [#43604]).
 * `Iterators.countfrom` now accepts any type that defines `+` ([#37747]).

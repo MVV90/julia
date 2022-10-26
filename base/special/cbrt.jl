@@ -24,10 +24,10 @@ The prefix operator `∛` is equivalent to `cbrt`.
 
 # Examples
 ```jldoctest
-julia> cbrt(big(27))
+julia> cbrt(Int128(27))
 3.0
 
-julia> cbrt(big(-27))
+julia> cbrt(Int(-27))
 -3.0
 ```
 """

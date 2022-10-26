@@ -1,5 +1,7 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
+using Test
+
 # Array test
 isdefined(Main, :OffsetArrays) || @eval Main include("testhelpers/OffsetArrays.jl")
 using .Main.OffsetArrays
@@ -581,7 +583,7 @@ end
     @test findnext(isequal(0x00), [0x00, 0x01, 0x00], 2) == 3
     @test findprev(isequal(0x00), [0x00, 0x01, 0x00], 2) == 1
 
-    @testset "issue 32568" for T = (UInt, BigInt)
+    @testset "issue 32568" for T = (UInt,)
         @test findnext(!iszero, a, T(1)) isa keytype(a)
         @test findnext(!iszero, a, T(2)) isa keytype(a)
         @test findprev(!iszero, a, T(4)) isa keytype(a)
@@ -2727,7 +2729,7 @@ end
     # issues #27865 and #26011
     @test hash([["asd"], ["asd"], ["asad"]]) == hash(Any[["asd"], ["asd"], ["asad"]])
     @test hash([["asd"], ["asd"], ["asad"]]) != hash([["asd"], ["asd"], ["asadq"]])
-    @test hash([1,2,[3]]) == hash([1,2,Any[3]]) == hash([1,2,Int8[3]]) == hash([1,2,BigInt[3]]) == hash([1,2,[3.0]])
+    @test hash([1,2,[3]]) == hash([1,2,Any[3]]) == hash([1,2,Int8[3]]) == hash([1,2,[3.0]])
     @test hash([1,2,[3]]) != hash([1,2,[3,4]])
 end
 

@@ -1,5 +1,7 @@
 # This file is a part of Julia. License is MIT: https://julialang.org/license
 
+using Test
+
 isdefined(Main, :FakePTYs) || @eval Main include("testhelpers/FakePTYs.jl")
 include("testhelpers/withlocales.jl")
 
@@ -1096,7 +1098,6 @@ const outsidevar = 7
     a::Int=outsidevar
 end
 @test TestOutsideVar() == TestOutsideVar(7)
-
 
 @testset "exports of modules" begin
     for (_, mod) in Base.loaded_modules

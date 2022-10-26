@@ -49,8 +49,6 @@ USE_SYSTEM_DSFMT:=0
 USE_SYSTEM_LIBBLASTRAMPOLINE:=0
 USE_SYSTEM_BLAS:=0
 USE_SYSTEM_LAPACK:=0
-USE_SYSTEM_GMP:=0
-USE_SYSTEM_MPFR:=0
 USE_SYSTEM_LIBUV:=0
 USE_SYSTEM_UTF8PROC:=0
 USE_SYSTEM_MBEDTLS:=0
@@ -1150,7 +1148,7 @@ LIBGFORTRAN_VERSION := $(subst libgfortran,,$(filter libgfortran%,$(subst -,$(SP
 # Note: we explicitly _do not_ define `CSL` here, since it requires some more
 # advanced techniques to decide whether it should be installed from a BB source
 # or not.  See `deps/csl.mk` for more detail.
-BB_PROJECTS := BLASTRAMPOLINE OPENBLAS LLVM OPENLIBM GMP MBEDTLS LIBSSH2 NGHTTP2 MPFR CURL LIBGIT2 PCRE LIBUV LIBUNWIND DSFMT OBJCONV ZLIB P7ZIP
+BB_PROJECTS := BLASTRAMPOLINE OPENBLAS LLVM OPENLIBM MBEDTLS LIBSSH2 NGHTTP2 CURL LIBGIT2 PCRE LIBUV LIBUNWIND DSFMT OBJCONV ZLIB P7ZIP
 define SET_BB_DEFAULT
 # First, check to see if BB is disabled on a global setting
 ifeq ($$(USE_BINARYBUILDER),0)

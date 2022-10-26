@@ -373,9 +373,11 @@ round(x::IEEEFloat, r::RoundingMode{:Nearest}) = rint_llvm(x)
 promote_rule(::Type{Float32}, ::Type{Float16}) = Float32
 promote_rule(::Type{Float64}, ::Type{Float16}) = Float64
 promote_rule(::Type{Float64}, ::Type{Float32}) = Float64
+promote_rule(::Type{Float64}, ::Type{Float64}) = Float64
 
 widen(::Type{Float16}) = Float32
 widen(::Type{Float32}) = Float64
+widen(::Type{Float64}) = Float64
 
 ## floating point arithmetic ##
 -(x::IEEEFloat) = neg_float(x)
@@ -642,8 +644,7 @@ end
     precision(T::Type; base::Integer=2)
 
 Get the precision of a floating point number, as defined by the effective number of bits in
-the significand, or the precision of a floating-point type `T` (its current default, if
-`T` is a variable-precision type like [`BigFloat`](@ref)).
+the significand, or the precision of a floating-point type `T`.
 
 If `base` is specified, then it returns the maximum corresponding
 number of significand digits in that base.

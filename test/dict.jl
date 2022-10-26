@@ -916,7 +916,7 @@ Dict(1 => rand(2,3), 'c' => "asdf") # just make sure this does not trigger a dep
 
     # issue #26939
     d26939 = WeakKeyDict()
-    (@noinline d -> d[big"1.0" + 1.1] = 1)(d26939)
+    (@noinline d -> d[string(big"1.0" + 1.1)] = 1)(d26939)
     GC.gc() # primarily to make sure this doesn't segfault
     @test count(d26939) == 0
     @test length(d26939.ht) == 1
@@ -924,7 +924,7 @@ Dict(1 => rand(2,3), 'c' => "asdf") # just make sure this does not trigger a dep
     @test isempty(d26939)
     empty!(d26939)
     for i in 1:8
-        (@noinline (d, i) -> d[big(i + 12345)] = 1)(d26939, i)
+        (@noinline (d, i) -> d[string(float(i + 12345))] = 1)(d26939, i)
     end
     lock(GC.gc, d26939)
     @test length(d26939.ht) == 8

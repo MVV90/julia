@@ -448,7 +448,7 @@ flt2 = 3.1415
 flt3 = -0.01
 
 # exponent
-flt4 = 5e+22
+flt4 = 5e+2
 flt5 = 1e06
 flt6 = -2E-2
 
@@ -461,7 +461,7 @@ d = parse(str)
 @test d["flt1"] == +1.0
 @test d["flt2"] == 3.1415
 @test d["flt3"] == -0.01
-@test d["flt4"] == 5e+22
+@test d["flt4"] == 5e+2
 @test d["flt5"] == 1e+6
 @test d["flt6"] == -2E-2
 @test d["flt7"] == 6.626e-34

@@ -549,8 +549,8 @@ end
     @test findprev(isequal(1), (2, 3), 2) === nothing
 
     @testset "issue 32568" begin
-        @test findnext(isequal(1), (1, 2), big(1)) isa Int
-        @test findprev(isequal(1), (1, 2), big(2)) isa Int
+        @test findnext(isequal(1), (1, 2), UInt128(1)) isa Int
+        @test findprev(isequal(1), (1, 2), Int8(2)) isa Int
         @test findnext(isequal(1), (1, 1), UInt(2)) isa Int
         @test findprev(isequal(1), (1, 1), UInt(1)) isa Int
     end

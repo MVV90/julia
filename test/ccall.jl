@@ -6,6 +6,8 @@ using InteractiveUtils: code_llvm
 
 import Libdl
 
+using Test
+
 # for cfunction_closure
 include("testenv.jl")
 # for cfunction error

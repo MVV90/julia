@@ -259,9 +259,6 @@ Float64
 julia> promote_type(Int32, Int64)
 Int64
 
-julia> promote_type(Float32, BigInt)
-BigFloat
-
 julia> promote_type(Int16, Float16)
 Float16
 

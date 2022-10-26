@@ -2,17 +2,17 @@
 
 # Test integer conversion routines from int.jl
 
-using Random
+using Test, Random
 
 @testset "flipsign/copysign" begin
-    for y in (-4, Float32(-4), -4.0, big(-4.0))
+    for y in (-4, Float32(-4), -4.0, float(-4.0))
         @test flipsign(3, y)  == -3
         @test flipsign(-3, y) == 3
         @test copysign(3, y)  == -3
         @test copysign(-3, y) == -3
     end
 
-    for y in (4, Float32(4), 4.0, big(4.0))
+    for y in (4, Float32(4), 4.0, float(4.0))
         @test flipsign(3, y)  == 3
         @test flipsign(-3, y) == -3
         @test copysign(3, y)  == 3
@@ -20,11 +20,11 @@ using Random
     end
 
     # Result type must be type of first argument, except for Bool
-    for U in (Base.BitInteger_types..., BigInt,
-              Rational{Int}, Rational{BigInt},
+    for U in (Base.BitInteger_types...,
+              Rational{Int},
               Float16, Float32, Float64)
-        for T in (Base.BitInteger_types..., BigInt,
-                  Rational{Int}, Rational{BigInt},
+        for T in (Base.BitInteger_types...,
+                  Rational{Int},
                   Float16, Float32, Float64)
             @test typeof(copysign(T(3), U(4))) === T
             @test typeof(flipsign(T(3), U(4))) === T
@@ -40,7 +40,7 @@ using Random
     end
 
     @testset "flipsign/copysign(typemin($T), -1)" for T in Base.BitInteger_types
-        for U in (Base.BitSigned_types..., BigInt, Float16, Float32, Float64)
+        for U in (Base.BitSigned_types..., Float16, Float32, Float64)
             @test flipsign(typemin(T), U(-1)) == typemin(T)
             @test copysign(typemin(T), U(-1)) == typemin(T)
         end
@@ -109,14 +109,6 @@ end
 
     @test floor(3) == 3
     @test ceil(3) == 3
-end
-
-@testset "big" begin
-    @test big"2"^100 == BigInt(2)^100
-    @test isa(big"2", BigInt)
-    @test big"1.0" == BigFloat(1.0)
-    @test_throws ArgumentError big"1.0.3"
-    @test_throws ArgumentError big"pi"
 end
 
 @test round(UInt8, 123) == 123
@@ -226,7 +218,6 @@ end
     @test typeof(widen(UInt16(3))) == UInt32
     @test typeof(widen(UInt32(3))) == UInt64
     @test typeof(widen(UInt64(3))) == UInt128
-    @test typeof(widen(UInt128(3))) == BigInt
 
     @test widen(Int8(-3)) === Int16(-3)
     @test widen(Int16(-3)) === Int32(-3)
@@ -238,7 +229,6 @@ end
     @test typeof(widen(Int16(-3))) == Int32
     @test typeof(widen(Int32(-3))) == Int64
     @test typeof(widen(Int64(-3))) == Int128
-    @test typeof(widen(Int128(-3))) == BigInt
 
     @test widemul(false, false) == false
     @test widemul(false, 3) == 0
@@ -271,8 +261,8 @@ end
     @test unsafe_trunc(Int8, -128) === Int8(-128)
     @test unsafe_trunc(Int8, -129) === Int8(127)
 end
-@testset "x % T returns a T, T = $T" for T in [Base.BitInteger_types..., BigInt],
-    U in [Base.BitInteger_types..., BigInt]
+@testset "x % T returns a T, T = $T" for T in [Base.BitInteger_types...],
+    U in [Base.BitInteger_types...]
     @test typeof(rand(U(0):U(127)) % T) === T
 end
 
@@ -296,12 +286,6 @@ end
     @test UInt64(15) ⊻ -4 === 0xfffffffffffffff3
 end
 
-@testset "left shift with Vector{Int} on BigInt-scalar #13832" begin
-    x = BigInt(1) .<< [1:70;]
-    @test x[end] == 1180591620717411303424
-    @test eltype(x) == BigInt
-end
-
 # issue #9292
 @testset "mixed signedness arithmetic" begin
     for T in Base.BitInteger_types
@@ -322,18 +306,6 @@ end
             end
         end
     end
-end
-
-@testset "Underscores in big_str" begin
-    @test big"1_0_0_0" == BigInt(1000)
-    @test_throws ArgumentError big"1_0_0_0_"
-    @test_throws ArgumentError big"_1_0_0_0"
-
-    @test big"1_0.2_5" == BigFloat(10.25)
-    @test_throws ArgumentError big"_1_0.2_5"
-    @test_throws ArgumentError big"1_0.2_5_"
-    @test_throws ArgumentError big"1_0_.2_5"
-    @test_throws ArgumentError big"1_0._2_5"
 end
 
 # issue #26779

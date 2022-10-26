@@ -176,8 +176,6 @@ endif
 JL_PRIVATE_LIBS-$(USE_SYSTEM_LIBBLASTRAMPOLINE) += libblastrampoline
 JL_PRIVATE_LIBS-$(USE_SYSTEM_PCRE) += libpcre2-8
 JL_PRIVATE_LIBS-$(USE_SYSTEM_DSFMT) += libdSFMT
-JL_PRIVATE_LIBS-$(USE_SYSTEM_GMP) += libgmp libgmpxx
-JL_PRIVATE_LIBS-$(USE_SYSTEM_MPFR) += libmpfr
 JL_PRIVATE_LIBS-$(USE_SYSTEM_LIBSSH2) += libssh2
 JL_PRIVATE_LIBS-$(USE_SYSTEM_NGHTTP2) += libnghttp2
 JL_PRIVATE_LIBS-$(USE_SYSTEM_MBEDTLS) += libmbedtls libmbedcrypto libmbedx509
@@ -471,7 +469,7 @@ endif
 
 	# Include all git-tracked filenames
 	git ls-files >> light-source-dist.tmp
-	
+
 	# Include documentation filenames
 	find doc/_build/html >> light-source-dist.tmp
 

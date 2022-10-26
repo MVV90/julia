@@ -9,7 +9,7 @@ Number type representing an exact irrational value, which is automatically round
 arithmetic operations with other numeric quantities.
 
 Subtypes `MyIrrational <: AbstractIrrational` should implement at least `==(::MyIrrational, ::MyIrrational)`,
-`hash(x::MyIrrational, h::UInt)`, and `convert(::Type{F}, x::MyIrrational) where {F <: Union{BigFloat,Float32,Float64}}`.
+`hash(x::MyIrrational, h::UInt)`, and `convert(::Type{F}, x::MyIrrational) where {F <: Union{Float32,Float64}}`.
 
 If a subtype is used to represent values that may occasionally be rational (e.g. a square-root type that represents `√n`
 for integers `n` will give a rational result when `n` is a perfect square), then it should also implement
@@ -49,25 +49,12 @@ Float16(x::AbstractIrrational) = Float16(Float32(x)::Float32)
 Complex{T}(x::AbstractIrrational) where {T<:Real} = Complex{T}(T(x))
 
 @pure function Rational{T}(x::AbstractIrrational) where T<:Integer
-    o = precision(BigFloat)
-    p = 256
-    while true
-        setprecision(BigFloat, p)
-        bx = BigFloat(x)
-        r = rationalize(T, bx, tol=0)
-        if abs(BigFloat(r) - bx) > eps(bx)
-            setprecision(BigFloat, o)
-            return r
-        end
-        p += 32
-    end
+    return Float64(x)
 end
-Rational{BigInt}(x::AbstractIrrational) = throw(ArgumentError("Cannot convert an AbstractIrrational to a Rational{BigInt}: use rationalize(BigInt, x) instead"))
+Rational{Int128}(x::AbstractIrrational) = throw(ArgumentError("Cannot convert an AbstractIrrational to a Rational{Int128}: use rationalize(Int128, x) instead"))
 
 @pure function (t::Type{T})(x::AbstractIrrational, r::RoundingMode) where T<:Union{Float32,Float64}
-    setprecision(BigFloat, 256) do
-        T(BigFloat(x)::BigFloat, r)
-    end
+    T(T(x)::T, r)
 end
 
 float(::Type{<:AbstractIrrational}) = Float64
@@ -95,24 +82,18 @@ end
 <(x::Float32, y::AbstractIrrational) = x <= Float32(y,RoundDown)
 <(x::AbstractIrrational, y::Float16) = Float32(x,RoundUp) <= y
 <(x::Float16, y::AbstractIrrational) = x <= Float32(y,RoundDown)
-<(x::AbstractIrrational, y::BigFloat) = setprecision(precision(y)+32) do
-    big(x) < y
-end
-<(x::BigFloat, y::AbstractIrrational) = setprecision(precision(x)+32) do
-    x < big(y)
-end
 
 <=(x::AbstractIrrational, y::AbstractFloat) = x < y
 <=(x::AbstractFloat, y::AbstractIrrational) = x < y
 
 # Irrational vs Rational
 @pure function rationalize(::Type{T}, x::AbstractIrrational; tol::Real=0) where T
-    return rationalize(T, big(x), tol=tol)
+    return rationalize(T, Float64(x), tol=tol)
 end
 @pure function lessrational(rx::Rational{<:Integer}, x::AbstractIrrational)
     # an @pure version of `<` for determining if the rationalization of
     # an irrational number required rounding up or down
-    return rx < big(x)
+    return rx < Float64(x)
 end
 function <(x::AbstractIrrational, y::Rational{T}) where T
     T <: Unsigned && x < 0.0 && return true
@@ -132,8 +113,8 @@ function <(x::Rational{T}, y::AbstractIrrational) where T
         return x < ry
     end
 end
-<(x::AbstractIrrational, y::Rational{BigInt}) = big(x) < y
-<(x::Rational{BigInt}, y::AbstractIrrational) = x < big(y)
+<(x::AbstractIrrational, y::Rational{Int128}) = Int128(x) < y
+<(x::Rational{Int128}, y::AbstractIrrational) = x < Int128(y)
 
 <=(x::AbstractIrrational, y::Rational) = x < y
 <=(x::Rational, y::AbstractIrrational) = x < y
@@ -166,38 +147,21 @@ round(x::Irrational, r::RoundingMode) = round(float(x), r)
     @irrational(sym, val, def)
 
 Define a new `Irrational` value, `sym`, with pre-computed `Float64` value `val`,
-and arbitrary-precision definition in terms of `BigFloat`s given by the expression `def`.
+and arbitrary-precision definition in terms of `Float64`s given by the expression `def`.
 """
+
 macro irrational(sym, val, def)
     esym = esc(sym)
     qsym = esc(Expr(:quote, sym))
-    bigconvert = isa(def,Symbol) ? quote
-        function Base.BigFloat(::Irrational{$qsym}, r::MPFR.MPFRRoundingMode=MPFR.ROUNDING_MODE[]; precision=precision(BigFloat))
-            c = BigFloat(;precision=precision)
-            ccall(($(string("mpfr_const_", def)), :libmpfr),
-                  Cint, (Ref{BigFloat}, MPFR.MPFRRoundingMode), c, r)
-            return c
-        end
-    end : quote
-        function Base.BigFloat(::Irrational{$qsym}; precision=precision(BigFloat))
-            setprecision(BigFloat, precision) do
-                $(esc(def))
-            end
-        end
-    end
     quote
         const $esym = Irrational{$qsym}()
-        $bigconvert
         Base.Float64(::Irrational{$qsym}) = $val
         Base.Float32(::Irrational{$qsym}) = $(Float32(val))
-        @assert isa(big($esym), BigFloat)
-        @assert Float64($esym) == Float64(big($esym))
-        @assert Float32($esym) == Float32(big($esym))
+        @assert isa(Float64($esym), Float64)
+        @assert Float64($esym) == Float64(Float64($esym))
+        @assert Float32($esym) == Float32(Float64($esym))
     end
 end
-
-big(x::AbstractIrrational) = BigFloat(x)
-big(::Type{<:AbstractIrrational}) = BigFloat
 
 # align along = for nice Array printing
 function alignment(io::IO, x::AbstractIrrational)

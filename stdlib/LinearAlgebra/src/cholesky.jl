@@ -13,8 +13,8 @@
 # and cholesky! pivoting is supported through a RowMaximum() argument. A type argument is
 # necessary for type stability since the output of cholesky and cholesky! is either
 # Cholesky or CholeskyPivoted. The latter is only
-# supported for the four LAPACK element types. For other types, e.g. BigFloats RowMaximum() will
-# give an error. It is required that the input is Hermitian (including real symmetric) either
+# supported for the four LAPACK element types.
+# It is required that the input is Hermitian (including real symmetric) either
 # through the Hermitian and Symmetric views or exact symmetric or Hermitian elements which
 # is checked for and an error is thrown if the check fails.
 

@@ -432,7 +432,7 @@ end
 end
 
 # issue 32568
-for T = (UInt, BigInt)
+for T = (UInt,)
     for x = (4, 5)
         @test eltype(findnext(r"l", astr, T(x))) == Int
         @test findnext(isequal('l'), astr, T(x)) isa Int

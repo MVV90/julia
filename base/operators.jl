@@ -537,7 +537,7 @@ const ⊽ = nor
 
 # foldl for argument lists. expand fully up to a point, then
 # switch to a loop. this allows small cases like `a+b+c+d` to be managed
-# efficiently, without a major slowdown for `+(x...)` when `x` is big.
+# efficiently, without a major slowdown for `+(x...)` when `x` is large.
 # n.b.: keep this method count small, so it can be inferred without hitting the
 # method count limit in inference
 afoldl(op, a) = a
@@ -729,9 +729,6 @@ julia> bitstring(Int8(-14))
 julia> bitstring(Int8(60))
 "00111100"
 ```
-
-[`BigInt`](@ref)s are treated as if having infinite size, so no filling is required and this
-is equivalent to [`>>`](@ref).
 
 See also [`>>`](@ref), [`<<`](@ref).
 """

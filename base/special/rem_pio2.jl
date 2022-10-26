@@ -11,18 +11,6 @@
 ## software is freely granted, provided that this notice
 ## is preserved.
 
-# Bits of 1/2π
-#   1/2π == sum(x / 0x1p64^i for i,x = enumerate(INV_2PI))
-# Can be obtained by:
-#
-#    setprecision(BigFloat, 4096)
-#    I = 0.5/big(pi)
-#    for i = 1:19
-#        I *= 0x1p64
-#        k = trunc(UInt64, I)
-#        @printf "0x%016x,\n" k
-#        I -= k
-#    end
 const INV_2PI = (
     0x28be_60db_9391_054a,
     0x7f09_d5f4_7d4d_3770,
@@ -149,21 +137,7 @@ Base.@assume_effects :consistent function paynehanek(x::Float64)
     #    α*x mod 1 ≡ [(α*2^k mod 1)*X] mod 1
     #
     # so we can ignore the first k bits of α. Extract the next 3 64-bit parts of α.
-    #
-    # i.e. equivalent to
-    #     setprecision(BigFloat,4096)
-    #     α  = 1/(2*big(pi))
-    #     A  = mod(ldexp(α,k), 1)
-    #     z1 = ldexp(A,64)
-    #     a1 = trunc(UInt64, z1)
-    #     z2 = ldexp(z1-a1, 64)
-    #     a2 = trunc(UInt64, z2)
-    #     z3 = ldexp(z2-a2, 64)
-    #     a3 = trunc(UInt64, z3)
 
-    # This is equivalent to
-    #     idx, shift = divrem(k, 64)
-    # but divrem is slower.
     idx = k >> 6
 
     shift = k - (idx << 6)

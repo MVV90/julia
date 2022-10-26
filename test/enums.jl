@@ -8,53 +8,53 @@ using Test, Serialization
 isdefined(Main, :MacroCalls) || @eval Main include("testhelpers/MacroCalls.jl")
 using Main.MacroCalls
 
+@testset "enums" begin
+
 @test_throws MethodError convert(Enum, 1.0)
 
 @test_throws ArgumentError("invalid type expression for enum 1 + 1") @macrocall(@enum 1 + 1 2)
 @test_throws ArgumentError("no arguments given for Enum Foo") @macrocall(@enum Foo)
-@test_throws ArgumentError("invalid base type for Enum Foo2, Foo2::Float64=::Float64; base type must be an integer primitive type") @macrocall(@enum Foo2::Float64 apple=1.)
+@test_throws ArgumentError("invalid base type for Enum Foo2, Foo2::Float64=::Float64; base type must be an integer primitive type") @macrocall(@enum Foo2::Float64 いちご=1.)
 
-@enum Fruit apple orange kiwi
+@enum Fruit いちご orange kiwi
 @test typeof(Fruit) == DataType
 @test isbitstype(Fruit)
-@test isbits(apple)
-@test typeof(apple) <: Fruit <: Enum
-@test Int(apple) == 0
+@test isbits(いちご)
+@test typeof(いちご) <: Fruit <: Enum
+@test Int(いちご) == 0
 @test Int(orange) == 1
 @test Int(kiwi) == 2
-@test Fruit(0) == apple
+@test Fruit(0) == いちご
 @test Fruit(1) == orange
 @test Fruit(2) == kiwi
 @test_throws ArgumentError Fruit(3)
 @test_throws ArgumentError Fruit(-1)
-@test Fruit(0x00) == apple
-@test Fruit(big(0)) == apple
+@test Fruit(0x00) == いちご
+@test Fruit(Integer(0)) == いちご
 @test_throws MethodError Fruit(0.0)
-@test typemin(Fruit) == apple
+@test typemin(Fruit) == いちご
 @test typemax(Fruit) == kiwi
-@test Fruit(0) == apple
+@test Fruit(0) == いちご
 @test Fruit(1) == orange
 @test Fruit(2) == kiwi
 @test_throws ArgumentError Fruit(3)
 @test_throws ArgumentError Fruit(-1)
-@test UInt8(apple) === 0x00
+@test UInt8(いちご) === 0x00
 @test UInt16(orange) === 0x0001
 @test UInt128(kiwi) === 0x00000000000000000000000000000002
-@test typeof(BigInt(apple)) <: BigInt
-@test BigInt(apple) == 0
-@test Bool(apple) == false
+@test Bool(いちご) == false
 @test Bool(orange) == true
 @test_throws InexactError Bool(kiwi)
-@test instances(Fruit) == (apple, orange, kiwi)
+@test instances(Fruit) == (いちご, orange, kiwi)
 
 f(x::Fruit) = "hey, I'm a Fruit"
-@test f(apple) == "hey, I'm a Fruit"
+@test f(いちご) == "hey, I'm a Fruit"
 
-d = Dict(apple=>"apple",orange=>"orange",kiwi=>"kiwi")
-@test d[apple] == "apple"
+d = Dict(いちご=>"いちご",orange=>"orange",kiwi=>"kiwi")
+@test d[いちご] == "いちご"
 @test d[orange] == "orange"
 @test d[kiwi] == "kiwi"
-vals = [apple,orange,kiwi]
+vals = [いちご,orange,kiwi]
 for (i,enum) in enumerate(instances(Fruit))
     @test enum == vals[i]
 end
@@ -80,8 +80,6 @@ end
 
 @test_throws ArgumentError("invalid value for Enum Test1, _zerofp = 0.0; values must be integers") @macrocall(@enum Test1 _zerofp=0.0)
 @test_throws ArgumentError("invalid value for Enum Test11, _zerofp2 = 0.5; values must be integers") @macrocall(@enum Test11 _zerofp2=0.5)
-@enum Test111 _zerobi=BigInt(1)
-@test Integer(_zerobi) == 1
 
 # can't use non-identifiers as enum members
 @test_throws ArgumentError("""invalid argument for Enum Test2: if x
@@ -132,10 +130,10 @@ end
 # and names
 @test_throws ArgumentError("name \"_zero_Test15\" in Enum Test15 is not unique") @macrocall(@enum(Test15, _zero_Test15, _one_Test15, _zero_Test15))
 
-@test repr(apple) == "$(@__MODULE__).apple"
-@test string(apple) == "apple"
+@test repr(いちご) == "$(@__MODULE__).いちご"
+@test string(いちご) == "いちご"
 
-@test repr("text/plain", Fruit) == "Enum $(string(Fruit)):\napple = 0\norange = 1\nkiwi = 2"
+@test repr("text/plain", Fruit) == "Enum $(string(Fruit)):\nいちご = 0\norange = 1\nkiwi = 2"
 @test repr("text/plain", orange) == "orange::Fruit = 1"
 let io = IOBuffer()
     ioc = IOContext(io, :compact=>false)
@@ -152,9 +150,9 @@ end
 
 # serialization
 let b = IOBuffer()
-    serialize(b, apple)
+    serialize(b, いちご)
     seekstart(b)
-    @test deserialize(b) === apple
+    @test deserialize(b) === いちご
 end
 
 @enum UI8::UInt8 ten=0x0A thr=0x03 sevn=0x07 fiftn=0xF0
@@ -175,7 +173,7 @@ end
 end
 @test Int(haggis) == 4
 
-@test (Vector{Fruit}(undef, 3) .= apple) == [apple, apple, apple]
+@test (Vector{Fruit}(undef, 3) .= いちご) == [いちご, いちご, いちご]
 
 # long, discongruous
 @enum Alphabet begin
@@ -216,4 +214,6 @@ let b = IOBuffer()
     str = String(take!(b))
     p = string(@__MODULE__)
     @test str == "Union{$p.Alphabet, $p.BritishFood}" || str == "Union{$p.BritishFood, $p.Alphabet}"
+end
+
 end

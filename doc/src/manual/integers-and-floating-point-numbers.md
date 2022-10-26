@@ -244,8 +244,7 @@ true
 Thus, arithmetic with Julia integers is actually a form of [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic).
 This reflects the characteristics of the underlying arithmetic of integers as implemented on modern
 computers. In applications where overflow is possible, explicit checking for wraparound produced
-by overflow is essential; otherwise, the [`BigInt`](@ref) type in [Arbitrary Precision Arithmetic](@ref)
-is recommended instead.
+by overflow is essential.
 
 An example of overflow behavior and how to potentially resolve it is as follows:
 
@@ -253,7 +252,7 @@ An example of overflow behavior and how to potentially resolve it is as follows:
 julia> 10^19
 -8446744073709551616
 
-julia> big(10)^19
+julia> Int128(10)^19
 10000000000000000000
 ```
 
@@ -552,61 +551,13 @@ most books on scientific computation, and also in the following references:
 
 ## Arbitrary Precision Arithmetic
 
-To allow computations with arbitrary-precision integers and floating point numbers, Julia wraps
-the [GNU Multiple Precision Arithmetic Library (GMP)](https://gmplib.org) and the [GNU MPFR Library](https://www.mpfr.org),
-respectively. The [`BigInt`](@ref) and [`BigFloat`](@ref) types are available in Julia for arbitrary
-precision integer and floating point numbers respectively.
-
 Constructors exist to create these types from primitive numerical types, and the
 [string literal](@ref non-standard-string-literals) [`@big_str`](@ref) or [`parse`](@ref)
 can be used to construct them from `AbstractString`s.
-`BigInt`s can also be input as integer literals when
-they are too big for other built-in integer types. Note that as there
-is no unsigned arbitrary-precision integer type in `Base` (`BigInt` is
-sufficient in most cases), hexadecimal, octal and binary literals can
-be used (in addition to decimal literals).
 
 Once created, they participate in arithmetic
 with all other numeric types thanks to Julia's
 [type promotion and conversion mechanism](@ref conversion-and-promotion):
-
-```jldoctest
-julia> BigInt(typemax(Int64)) + 1
-9223372036854775808
-
-julia> big"123456789012345678901234567890" + 1
-123456789012345678901234567891
-
-julia> parse(BigInt, "123456789012345678901234567890") + 1
-123456789012345678901234567891
-
-julia> string(big"2"^200, base=16)
-"100000000000000000000000000000000000000000000000000"
-
-julia> 0x100000000000000000000000000000000-1 == typemax(UInt128)
-true
-
-julia> 0x000000000000000000000000000000000
-0
-
-julia> typeof(ans)
-BigInt
-
-julia> big"1.23456789012345678901"
-1.234567890123456789010000000000000000000000000000000000000000000000000000000004
-
-julia> parse(BigFloat, "1.23456789012345678901")
-1.234567890123456789010000000000000000000000000000000000000000000000000000000004
-
-julia> BigFloat(2.0^66) / 3
-2.459565876494606882133333333333333333333333333333333333333333333333333333333344e+19
-
-julia> factorial(BigInt(40))
-815915283247897734345611269596115894272000000000
-```
-
-However, type promotion between the primitive types above and [`BigInt`](@ref)/[`BigFloat`](@ref)
-is not automatic and must be explicitly stated.
 
 ```jldoctest
 julia> x = typemin(Int64)
@@ -617,38 +568,6 @@ julia> x = x - 1
 
 julia> typeof(x)
 Int64
-
-julia> y = BigInt(typemin(Int64))
--9223372036854775808
-
-julia> y = y - 1
--9223372036854775809
-
-julia> typeof(y)
-BigInt
-```
-
-The default precision (in number of bits of the significand) and rounding mode of [`BigFloat`](@ref)
-operations can be changed globally by calling [`setprecision`](@ref) and [`setrounding`](@ref),
-and all further calculations will take these changes in account.  Alternatively, the precision
-or the rounding can be changed only within the execution of a particular block of code by using
-the same functions with a `do` block:
-
-```jldoctest
-julia> setrounding(BigFloat, RoundUp) do
-           BigFloat(1) + parse(BigFloat, "0.1")
-       end
-1.100000000000000000000000000000000000000000000000000000000000000000000000000003
-
-julia> setrounding(BigFloat, RoundDown) do
-           BigFloat(1) + parse(BigFloat, "0.1")
-       end
-1.099999999999999999999999999999999999999999999999999999999999999999999999999986
-
-julia> setprecision(40) do
-           BigFloat(1) + parse(BigFloat, "0.1")
-       end
-1.1000000000004
 ```
 
 ## [Numeric Literal Coefficients](@id man-numeric-literal-coefficients)
@@ -771,7 +690,4 @@ julia> zero(1.0)
 
 julia> one(Int32)
 1
-
-julia> one(BigFloat)
-1.0
 ```

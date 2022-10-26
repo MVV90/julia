@@ -196,7 +196,7 @@ function show(io::IO, z::Complex)
     show(io, r)
     if signbit(i) && !isnan(i)
         print(io, compact ? "-" : " - ")
-        if isa(i,Signed) && !isa(i,BigInt) && i == typemin(typeof(i))
+        if isa(i,Signed) && i == typemin(typeof(i))
             show(io, -widen(i))
         else
             show(io, -i)
@@ -1085,9 +1085,6 @@ end
 
 float(z::Complex{<:AbstractFloat}) = z
 float(z::Complex) = Complex(float(real(z)), float(imag(z)))
-
-big(::Type{Complex{T}}) where {T<:Real} = Complex{big(T)}
-big(z::Complex{T}) where {T<:Real} = Complex{big(T)}(z)
 
 ## Array operations on complex numbers ##
 

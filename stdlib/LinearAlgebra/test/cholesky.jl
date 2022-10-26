@@ -52,7 +52,7 @@ end
     breal = randn(n,2)/2
     bimg  = randn(n,2)/2
 
-    for eltya in (Float32, Float64, ComplexF32, ComplexF64, BigFloat, Int)
+    for eltya in (Float32, Float64, ComplexF32, ComplexF64, Int)
         a = eltya == Int ? rand(1:7, n, n) : convert(Matrix{eltya}, eltya <: Complex ? complex.(areal, aimg) : areal)
         a2 = eltya == Int ? rand(1:7, n, n) : convert(Matrix{eltya}, eltya <: Complex ? complex.(a2real, a2img) : a2real)
 
@@ -142,14 +142,12 @@ end
         end
 
         #pivoted upper Cholesky
-        if eltya != BigFloat
             cpapd = cholesky(apdh, RowMaximum())
             unary_ops_tests(apdh, cpapd, ε*κ*n)
             @test rank(cpapd) == n
             @test all(diff(diag(real(cpapd.factors))).<=0.) # diagonal should be non-increasing
 
             @test cpapd.P*cpapd.L*cpapd.U*cpapd.P' ≈ apd
-        end
 
         for eltyb in (Float32, Float64, ComplexF32, ComplexF64, Int)
             b = eltyb == Int ? rand(1:5, n, 2) : convert(Matrix{eltyb}, eltyb <: Complex ? complex.(breal, bimg) : breal)
@@ -166,13 +164,9 @@ end
 
                 @test norm(a*(capd\(a'*b)) - b,1)/norm(b,1) <= ε*κ*n # Ad hoc, revisit
 
-                if eltya != BigFloat && eltyb != BigFloat
                     lapd = cholesky(apdhL)
                     @test norm(apd * (lapd\b) - b)/norm(b) <= ε*κ*n
                     @test norm(apd * (lapd\b[1:n]) - b[1:n])/norm(b[1:n]) <= ε*κ*n
-                end
-
-                if eltya != BigFloat && eltyb != BigFloat # Note! Need to implement pivoted Cholesky decomposition in julia
 
                     cpapd = cholesky(apdh, RowMaximum())
                     @test norm(apd * (cpapd\b) - b)/norm(b) <= ε*κ*n # Ad hoc, revisit
@@ -181,70 +175,9 @@ end
                     lpapd = cholesky(apdhL, RowMaximum())
                     @test norm(apd * (lpapd\b) - b)/norm(b) <= ε*κ*n # Ad hoc, revisit
                     @test norm(apd * (lpapd\b[1:n]) - b[1:n])/norm(b[1:n]) <= ε*κ*n
-                end
             end
         end
 
-        for eltyb in (Float64, ComplexF64)
-            Breal = convert(Matrix{BigFloat}, randn(n,n)/2)
-            Bimg  = convert(Matrix{BigFloat}, randn(n,n)/2)
-            B = (eltya <: Complex || eltyb <: Complex) ? complex.(Breal, Bimg) : Breal
-            εb = eps(abs(float(one(eltyb))))
-            ε = max(εa,εb)
-
-            for B in (B, view(B, 1:n, 1:n)) # Array and SubArray
-
-                # Test error bound on linear solver: LAWNS 14, Theorem 2.1
-                # This is a surprisingly loose bound
-                BB = copy(B)
-                ldiv!(capd, BB)
-                @test norm(apd \ B - BB, 1) / norm(BB, 1) <= (3n^2 + n + n^3*ε)*ε/(1-(n+1)*ε)*κ
-                @test norm(apd * BB - B, 1) / norm(B, 1) <= (3n^2 + n + n^3*ε)*ε/(1-(n+1)*ε)*κ
-                if eltya != BigFloat
-                    cpapd = cholesky(apdh, RowMaximum())
-                    BB = copy(B)
-                    ldiv!(cpapd, BB)
-                    @test norm(apd \ B - BB, 1) / norm(BB, 1) <= (3n^2 + n + n^3*ε)*ε/(1-(n+1)*ε)*κ
-                    @test norm(apd * BB - B, 1) / norm(B, 1) <= (3n^2 + n + n^3*ε)*ε/(1-(n+1)*ε)*κ
-                end
-            end
-        end
-
-        @testset "solve with generic Cholesky" begin
-            Breal = convert(Matrix{BigFloat}, randn(n,n)/2)
-            Bimg  = convert(Matrix{BigFloat}, randn(n,n)/2)
-            B = eltya <: Complex ? complex.(Breal, Bimg) : Breal
-            εb = eps(abs(float(one(eltype(B)))))
-            ε = max(εa,εb)
-
-            for B in (B, view(B, 1:n, 1:n)) # Array and SubArray
-
-                # Test error bound on linear solver: LAWNS 14, Theorem 2.1
-                # This is a surprisingly loose bound
-                cpapd = cholesky(eltya <: Complex ? apdh : apds)
-                BB = copy(B)
-                rdiv!(BB, cpapd)
-                @test norm(B / apd - BB, 1) / norm(BB, 1) <= (3n^2 + n + n^3*ε)*ε/(1-(n+1)*ε)*κ
-                @test norm(BB * apd - B, 1) / norm(B, 1) <= (3n^2 + n + n^3*ε)*ε/(1-(n+1)*ε)*κ
-                cpapd = cholesky(eltya <: Complex ? apdhL : apdsL)
-                BB = copy(B)
-                rdiv!(BB, cpapd)
-                @test norm(B / apd - BB, 1) / norm(BB, 1) <= (3n^2 + n + n^3*ε)*ε/(1-(n+1)*ε)*κ
-                @test norm(BB * apd - B, 1) / norm(B, 1) <= (3n^2 + n + n^3*ε)*ε/(1-(n+1)*ε)*κ
-                if eltya != BigFloat
-                    cpapd = cholesky(eltya <: Complex ? apdh : apds, RowMaximum())
-                    BB = copy(B)
-                    rdiv!(BB, cpapd)
-                    @test norm(B / apd - BB, 1) / norm(BB, 1) <= (3n^2 + n + n^3*ε)*ε/(1-(n+1)*ε)*κ
-                    @test norm(BB * apd - B, 1) / norm(B, 1) <= (3n^2 + n + n^3*ε)*ε/(1-(n+1)*ε)*κ
-                    cpapd = cholesky(eltya <: Complex ? apdhL : apdsL, RowMaximum())
-                    BB = copy(B)
-                    rdiv!(BB, cpapd)
-                    @test norm(B / apd - BB, 1) / norm(BB, 1) <= (3n^2 + n + n^3*ε)*ε/(1-(n+1)*ε)*κ
-                    @test norm(BB * apd - B, 1) / norm(B, 1) <= (3n^2 + n + n^3*ε)*ε/(1-(n+1)*ε)*κ
-                end
-            end
-        end
         if eltya <: BlasFloat
             @testset "generic cholesky!" begin
                 if eltya <: Complex
@@ -467,13 +400,6 @@ end
         @test l == C.L
         @test u == C.U
     end
-end
-
-@testset "issue #37356, diagonal elements of hermitian generic matrix" begin
-    B = Hermitian(hcat([one(BigFloat) + im]))
-    @test Matrix(cholesky(B)) ≈ B
-    C = Hermitian(hcat([one(BigFloat) + im]), :L)
-    @test Matrix(cholesky(C)) ≈ C
 end
 
 @testset "constructing a Cholesky factor from a triangular matrix" begin

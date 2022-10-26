@@ -67,7 +67,7 @@ end
 
 # Wraps a type and represents that the value may also be undef at this point.
 # (only used in optimize, not abstractinterpret)
-# N.B. in the lattice, this is epsilon bigger than `typ` (even Any)
+# N.B. in the lattice, this is epsilon larger than `typ` (even Any)
 struct MaybeUndef
     typ
     MaybeUndef(@nospecialize(typ)) = new(typ)

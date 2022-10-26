@@ -190,8 +190,7 @@ Standard library changes
   as their optional `pivot` argument: defaults are `qr(A, NoPivot())` (vs. `qr(A, ColumnNorm())`
   for pivoting) and `lu(A, RowMaximum())` (vs. `lu(A, NoPivot())` without pivoting); the former
   `Val{true/false}`-based calls are deprecated ([#40623]).
-* `det(M::AbstractMatrix{BigInt})` now calls `det_bareiss(M)`, which uses the
-  [Bareiss](https://en.wikipedia.org/wiki/Bareiss_algorithm) algorithm to calculate precise
+* [Bareiss](https://en.wikipedia.org/wiki/Bareiss_algorithm) algorithm to calculate precise
   values ([#40868]).
 
 #### Markdown
@@ -390,8 +389,7 @@ New language features
   product of two arrays of arrays ([#37583]).
 * The syntax `import A as B` (plus `import A: x as y`, `import A.x as y`, and `using A: x as y`)
   can now be used to rename imported modules and identifiers ([#1255]).
-* Unsigned literals (starting with `0x`) which are too big to fit in a `UInt128` object
-  are now interpreted as `BigInt` ([#23546]).
+* Unsigned literals (starting with `0x`) which are too large to fit in a `UInt128` object ([#23546]).
 * It is now possible to use `...` on the left-hand side of assignments for taking any
   number of items from the front of an iterable collection, while also collecting the rest,
   for example `a, b... = [1, 2, 3]`. This syntax is implemented using `Base.rest`,
@@ -571,7 +569,7 @@ Standard library changes
 * Complete overhaul of internal code to use the ryu float printing algorithms (from Julia 1.4); leads to
   consistent 2-5x performance improvements.
 * New `Printf.tofloat` function allowing custom float types to more easily integrate with Printf formatting
-  by converting their type to `Float16`, `Float32`, `Float64`, or `BigFloat`.
+  by converting their type to `Float16`, `Float32`, `Float64`.
 * New `Printf.format"..."` and `Printf.Format(...)` functions that allow creating `Printf.Format` objects
   that can be passed to `Printf.format` for easier dynamic printf formatting.
 * `Printf.format(f::Printf.Format, args...)` as a non-macro function that applies a printf format `f` to
@@ -1389,9 +1387,6 @@ Standard library changes
 * `mktempdir` now accepts a `prefix` keyword argument to customize the file name ([#31230], [#22922]).
 * `keytype` and `valtype` now work on `AbstractArray`, and return the `eltype` of `keys(...)` and
   `values(...)` respectively ([#27749]).
-* `nextfloat(::BigFloat)` and `prevfloat(::BigFloat)` now returns a value with the same precision
-  as their argument, which means that (in particular) `nextfloat(prevfloat(x)) == x` whereas
-  previously this could result in a completely different value with a different precision ([#31310]).
 * `mapreduce` now accepts multiple iterators, similar to `map` ([#31532]).
 * `filter` now supports `SkipMissing`-wrapped arrays ([#31235]).
 * Objects created by calling `skipmissing` on an array can now be indexed using indices
@@ -1399,8 +1394,6 @@ Standard library changes
   `findall`, `findfirst`, `argmin`/`argmax` and `findmin`/`findmax` to work with these
   objects, returning the index of matching non-missing elements in the parent ([#31008]).
 * `inv(::Missing)` has now been added and returns `missing` ([#31451]).
-* `nextfloat(::BigFloat, n::Integer)` and `prevfloat(::BigFloat, n::Integer)` methods
-  have been added ([#31310]).
 
 #### LinearAlgebra
 * Added keyword arguments `rtol`, `atol` to `pinv` and `nullspace` ([#29998]).
@@ -1504,7 +1497,7 @@ Language changes
     Previously they were sometimes parsed as tuples, depending on whitespace ([#28506]).
   * Spaces were accidentally allowed in broadcast call syntax, e.g. `f. (x)`. They are now
     disallowed, consistent with normal function call syntax ([#29781]).
-  * Big integer literals and command syntax (backticks) are now parsed with the name of
+  * Very large integer literals and command syntax (backticks) are now parsed with the name of
     the macro (`@int128_str`, `@uint128_str`, `@big_str`, `@cmd`) qualified to refer
     to the `Core` module ([#29968]).
   * Using the same name for both a local variable and a static parameter is now an error instead
@@ -1555,12 +1548,6 @@ Standard library changes
   * Channels now convert inserted values (like containers) instead of requiring types to match ([#29092]).
   * `range` can accept the stop value as a positional argument, e.g. `range(1,10,step=2)` ([#28708]).
   * `diff` now supports arrays of arbitrary dimensionality and can operate over any dimension ([#29827]).
-  * The constructor `BigFloat(::BigFloat)` now respects the global precision setting and always
-    returns a `BigFloat` with precision equal to `precision(BigFloat)` ([#29127]). The optional
-    `precision` argument to override the global setting is now a keyword instead of positional
-    argument ([#29157]).
-  * The use of scientific notation when printing `BigFloat` values is now consistent with other floating point
-    types ([#29211]).
   * `Regex` now behaves like a scalar when used in broadcasting ([#29913]).
   * `Char` now behaves like a read-only 0-dimensional array ([#29819]).
   * `parse` now allows strings representing integer 0 and 1 for type `Bool` ([#29980]).
@@ -2115,8 +2102,8 @@ This section lists changes that do not have deprecation warnings.
     `^(A::Integer, p::Integer)`) ([#23366]).
 
   * `^(A::AbstractMatrix{<:Integer}, p::Integer)` now promotes the element type in the same
-    way as `^(A::Integer, p::Integer)`. This means, for instance, that `[1 1; 0 1]^big(1)`
-    will return a `Matrix{BigInt}` instead of a `Matrix{Int}` ([#23366]).
+    way as `^(A::Integer, p::Integer)`. This means, for instance, that `[1 1; 0 1]^Int128(1)`
+    will return a `Matrix{Int}` ([#23366]).
 
   * The element type of the input is now preserved in `unique`. Previously the element type
     of the output was shrunk to fit the union of the type of each element in the input.
@@ -2392,8 +2379,6 @@ Library improvements
 
   * Mutating versions of `randperm` and `randcycle` have been added:
     `randperm!` and `randcycle!` ([#22723]).
-
-  * `BigFloat` random numbers can now be generated ([#22720]).
 
   * The efficiency of random generation for MersenneTwister RNGs has been improved for
     integers, `Float64` and ranges; as a result, given a seed, the produced stream of numbers
@@ -2837,11 +2822,6 @@ Deprecated or removed
 
   * `eu` (previously an alias for `ℯ`) has been deprecated in favor of `ℯ` (or `MathConstants.e`) ([#23427]).
 
-  * `GMP.gmp_version()`, `GMP.GMP_VERSION`, `GMP.gmp_bits_per_limb()`, and `GMP.GMP_BITS_PER_LIMB`
-    have been renamed to `GMP.version()`, `GMP.VERSION`, `GMP.bits_per_limb()`, and `GMP.BITS_PER_LIMB`,
-    respectively. Similarly, `MPFR.get_version()`, has been renamed to `MPFR.version()` ([#23323]). Also,
-    `LinAlg.LAPACK.laver()` has been renamed to `LinAlg.LAPACK.version()` and now returns a `VersionNumber`.
-
   * `select`, `select!`, `selectperm` and `selectperm!` have been renamed respectively to
     `partialsort`, `partialsort!`, `partialsortperm` and `partialsortperm!` ([#23051]).
 
@@ -3073,7 +3053,7 @@ Deprecated or removed
 
   * `Base.IntSet` has been deprecated in favor of `Base.BitSet` ([#24282]).
 
-  * `setrounding` has been deprecated for `Float32` and `Float64`, as the behaviour was too unreliable ([#26935]).
+  * `setrounding` has been deprecated entirely. `Float32` and `Float64` behaviour was too unreliable ([#26935]).
 
   * `gamma`, `lgamma`, `beta`, `lbeta` and `lfact` have been moved to
     [SpecialFunctions.jl](https://github.com/JuliaMath/SpecialFunctions.jl) ([#27459], [#27473]).
@@ -4465,16 +4445,6 @@ New architectures
 Deprecated or removed
 ---------------------
 
-  * The following function names have been simplified and unified ([#13232]):
-
-    * `get_bigfloat_precision`  -> `precision(BigFloat)`
-    * `set_bigfloat_precision`  -> `setprecision`
-    * `with_bigfloat_precision` -> `setprecision`
-
-    * `get_rounding`            -> `rounding`
-    * `set_rounding`            -> `setrounding`
-    * `with_rounding`           -> `setrounding`
-
   * The method `A_ldiv_B!(SparseMatrixCSC, StridedVecOrMat)` has been deprecated
     in favor of versions that require the matrix to be in factored form
     ([#13496]).
@@ -4688,9 +4658,6 @@ Language changes
 
   * Module `__init__` methods no longer swallow thrown exceptions; they now
     throw an `InitError` wrapping the thrown exception ([#12576]).
-
-  * Unsigned `BigInt` literal syntax has been removed ([#11105]).
-    Unsigned literals larger than `UInt128` now throw a syntax error.
 
   * `error(::Exception)` and `error(::Type{Exception})` have been deprecated
      in favor of using an explicit `throw` ([#9690]).
@@ -4950,7 +4917,6 @@ Library improvements
     All APIs can now take an `AbstractRNG` argument ([#8854], [#9065]). The seed argument to `srand` is now optional ([#8320], [#8854]).
     The APIs accepting a range argument are extended to accept an arbitrary
     `AbstractArray` ([#9049]).
-    Passing a range of `BigInt` to `rand` or `rand!` is now supported ([#9122]).
     There are speed improvements across the board ([#8808], [#8941], [#8958], [#9083]).
 
     * Significantly faster `randn` ([#9126], [#9132]).
@@ -5086,12 +5052,6 @@ Deprecated or removed
 
   * Low-level functions from the C library and dynamic linker have been moved to
     modules `Libc` and `Libdl`, respectively ([#10328]).
-
-  * The functions `parseint`, `parsefloat`, `float32_isvalid`,
-  `float64_isvalid`, and the string-argument `BigInt` and `BigFloat` have
-  been replaced by `parse` and `tryparse` with a type argument. The string
-  macro `big"xx"` can be used to construct `BigInt` and `BigFloat` literals
-  ([#3631], [#5704], [#9487], [#10543], [#10955]).
 
   * the `--int-literals` compiler option is no longer accepted ([#9597]).
 
@@ -5283,8 +5243,6 @@ Library improvements
       boolean multiplication to approximately, `true * x = x` and
       `false * x = zero(x)`, which can itself be considered useful ([#5468]).
 
-    * `big` is now vectorized ([#4766])
-
     * `nextpow` and `prevpow` now return the `a^n` values instead of the
       exponent `n` ([#4819])
 
@@ -5445,8 +5403,6 @@ Library improvements
       constructors accept end points instead of lengths. Both are subtypes of a
       new abstract type `OrdinalRange`.
 
-    * Ranges now support `BigInt` and general ordinal types.
-
     * Very large ranges (e.g. `0:typemax(Int)`) can now be constructed, but some
       operations (e.g. `length`) will raise an `OverflowError`.
 
@@ -5493,10 +5449,6 @@ Deprecated or removed
   * `dense` is deprecated in favor of `full` ([#4759]).
 
   * The `Stat` type is renamed `StatStruct` ([#4670]).
-
-  * `setrounding`, `rounding` and `setrounding` now take an additional
-    argument specifying the floating point type to which they apply. The old
-    behaviour and `[get/set/with]_bigfloat_rounding` functions are deprecated ([#5007]).
 
   * `cholpfact` and `qrpfact` are deprecated in favor of keyword arguments in
     `cholfact(..., pivot=true)` and `qrfact(..., pivot=true)` ([#5330]).
@@ -5607,8 +5559,6 @@ New library functions
     `code_lowered`, `code_typed`, `code_llvm`, and `code_native`.
 
   * Multimedia I/O API (display, writemime, etcetera) ([#3932]).
-
-  * MPFR-based `BigFloat` ([#2814]), and many new `BigFloat` operations.
 
   * New half-precision IEEE floating-point type, `Float16` ([#3467]).
 

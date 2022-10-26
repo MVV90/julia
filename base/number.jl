@@ -252,9 +252,6 @@ See also [`promote`](@ref), [`Base.add_sum`](@ref).
 
 # Examples
 ```jldoctest
-julia> widemul(Float32(3.0), 4.0) isa BigFloat
-true
-
 julia> typemax(Int8) * typemax(Int8)
 1
 
@@ -284,7 +281,7 @@ See also [`iszero`](@ref), [`one`](@ref), [`oneunit`](@ref), [`oftype`](@ref).
 julia> zero(1)
 0
 
-julia> zero(big"2.0")
+julia> zero(Float64(2.0))
 0.0
 
 julia> zero(rand(2,2))
@@ -356,23 +353,3 @@ julia> import Dates; oneunit(Dates.Day)
 """
 oneunit(x::T) where {T} = T(one(x))
 oneunit(::Type{T}) where {T} = T(one(T))
-
-"""
-    big(T::Type)
-
-Compute the type that represents the numeric type `T` with arbitrary precision.
-Equivalent to `typeof(big(zero(T)))`.
-
-# Examples
-```jldoctest
-julia> big(Rational)
-Rational{BigInt}
-
-julia> big(Float64)
-BigFloat
-
-julia> big(Complex{Int})
-Complex{BigInt}
-```
-"""
-big(::Type{T}) where {T<:Number} = typeof(big(zero(T)))
