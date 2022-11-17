@@ -242,9 +242,6 @@ endif
 ifeq ($(OS),WINNT)
 	-$(INSTALL_M) $(filter-out $(build_bindir)/libjulia-debug.dll,$(wildcard $(build_bindir)/*.dll)) $(DESTDIR)$(bindir)/
 	-$(INSTALL_M) $(build_libdir)/libjulia.dll.a $(DESTDIR)$(libdir)/
-
-	# We have a single exception; we want 7z.dll to live in libexec, not bin, so that 7z.exe can find it.
-	-mv $(DESTDIR)$(bindir)/7z.dll $(DESTDIR)$(libexecdir)/
 ifeq ($(BUNDLE_DEBUG_LIBS),1)
 	-$(INSTALL_M) $(build_bindir)/libjulia-debug.dll $(DESTDIR)$(bindir)/
 	-$(INSTALL_M) $(build_libdir)/libjulia-debug.dll.a $(DESTDIR)$(libdir)/
@@ -297,9 +294,6 @@ endif
 		done \
 	done
 endif
-	# Install `7z` into libexec/
-	$(INSTALL_M) $(build_bindir)/7z$(EXE) $(DESTDIR)$(libexecdir)/
-
 	# Copy public headers
 	cp -R -L $(build_includedir)/julia/* $(DESTDIR)$(includedir)/julia
 	# Copy system image
@@ -562,7 +556,7 @@ test-revise-%:
 # download target for some hardcoded windows dependencies
 .PHONY: win-extras wine_path
 win-extras:
-	@$(MAKE) -C $(BUILDROOT)/deps install-p7zip
+	@$(MAKE) -C $(BUILDROOT)/deps
 	mkdir -p $(JULIAHOME)/dist-extras
 	cd $(JULIAHOME)/dist-extras && \
 	$(JLDOWNLOAD) https://www.jrsoftware.org/download.php/is.exe && \
