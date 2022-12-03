@@ -59,7 +59,6 @@ USE_SYSTEM_LIBGIT2:=0
 USE_SYSTEM_PATCHELF:=0
 USE_SYSTEM_LIBWHICH:=0
 USE_SYSTEM_ZLIB:=0
-USE_SYSTEM_P7ZIP:=0
 
 # Link to the LLVM shared library
 USE_LLVM_SHLIB := 1
@@ -1148,7 +1147,7 @@ LIBGFORTRAN_VERSION := $(subst libgfortran,,$(filter libgfortran%,$(subst -,$(SP
 # Note: we explicitly _do not_ define `CSL` here, since it requires some more
 # advanced techniques to decide whether it should be installed from a BB source
 # or not.  See `deps/csl.mk` for more detail.
-BB_PROJECTS := BLASTRAMPOLINE OPENBLAS LLVM OPENLIBM MBEDTLS LIBSSH2 NGHTTP2 CURL LIBGIT2 PCRE LIBUV LIBUNWIND DSFMT OBJCONV ZLIB P7ZIP
+BB_PROJECTS := BLASTRAMPOLINE OPENBLAS LLVM OPENLIBM MBEDTLS LIBSSH2 NGHTTP2 CURL LIBGIT2 PCRE LIBUV LIBUNWIND DSFMT OBJCONV ZLIB
 define SET_BB_DEFAULT
 # First, check to see if BB is disabled on a global setting
 ifeq ($$(USE_BINARYBUILDER),0)
