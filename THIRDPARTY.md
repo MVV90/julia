@@ -46,7 +46,6 @@ Julia's build process uses the following external tools:
 
 Julia bundles the following external programs and libraries:
 
-- [7-Zip](https://www.7-zip.org/license.txt)
 - [ZLIB](https://zlib.net/zlib_license.html)
 
 On some platforms, distributions of Julia contain SSL certificate authority certificates,

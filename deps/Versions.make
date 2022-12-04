@@ -81,10 +81,6 @@ OPENLIBM_JLL_NAME := OpenLibm
 # Patchelf (we don't ship this or even use a JLL, we just always build it)
 PATCHELF_VER := 0.13
 
-# p7zip
-P7ZIP_VER := 17.04
-P7ZIP_JLL_NAME := p7zip
-
 # PCRE
 PCRE_VER := 10.40
 PCRE_JLL_NAME := PCRE2

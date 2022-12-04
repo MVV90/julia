@@ -1601,7 +1601,6 @@ Standard library changes
 External dependencies
 ---------------------
 
-  * 7zip (bundled with Julia on Windows) has been upgraded from version 16.04 to 18.05 ([#30035]).
   * Busybox is no longer bundled with Julia on Windows ([#30022]).
   * OpenBLAS has been upgraded from 0.3.2 to 0.3.3 ([#29845]).
   * The source code for Pkg is no longer included in JuliaLang/julia. Pkg is instead
@@ -2745,10 +2744,6 @@ Deprecated or removed
 
   * Calling `write` on non-isbits arrays is deprecated in favor of explicit loops or
     `serialize` ([#6466]).
-
-  * The default `startup.jl` file on Windows has been removed. Now must explicitly include the
-    full path if you need access to executables or libraries in the `Sys.BINDIR` directory, e.g.
-    `joinpath(Sys.BINDIR, "7z.exe")` for `7z.exe` ([#21540]).
 
   * `sqrtm` has been deprecated in favor of `sqrt` ([#23504]).
 

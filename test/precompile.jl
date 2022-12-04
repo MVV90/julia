@@ -349,10 +349,10 @@ precompile_test_harness(false) do dir
                      Base.PkgId(m) => Base.module_build_id(m)
                  end for s in
                 [:ArgTools, :Artifacts, :Base64, :CRC32c, :Dates, :DelimitedFiles,
-                 :Distributed, :Downloads, :FileWatching, :Future, :InteractiveUtils,
+                 :Distributed, :Downloads, :FileWatching, :Future, :GZip, :InteractiveUtils,
                  :LazyArtifacts, :LibCURL, :LibCURL_jll, :LibGit2, :Libdl, :LinearAlgebra,
                  :Logging, :Markdown, :Mmap, :MozillaCACerts_jll, :NetworkOptions, :Pkg, :Printf,
-                 :Profile, :p7zip_jll, :REPL, :Random, :SHA, :Serialization, :SharedArrays, :Sockets,
+                 :Profile, :REPL, :Random, :SHA, :Serialization, :SharedArrays, :Sockets,
                  :SparseArrays, :Statistics, :TOML, :Tar, :Test, :UUIDs, :Unicode,
                  :nghttp2_jll]
             ),

@@ -49,7 +49,7 @@ MinGW-w64 compilers available through Cygwin's package manager.
 
     Advanced: you may skip steps 2-4 by running:
 
-        setup-x86_64.exe -s <url> -q -P cmake,gcc-g++,git,make,patch,curl,m4,python3,p7zip,mingw64-i686-gcc-g++,mingw64-i686-gcc-fortran,mingw64-x86_64-gcc-g++,mingw64-x86_64-gcc-fortran
+        setup-x86_64.exe -s <url> -q -P cmake,gcc-g++,git,make,patch,curl,m4,python3,mingw64-i686-gcc-g++,mingw64-i686-gcc-fortran,mingw64-x86_64-gcc-g++,mingw64-x86_64-gcc-fortran
         :: replace <url> with a site from https://cygwin.com/mirrors.html
         :: or run setup manually first and select a mirror
 
@@ -60,7 +60,6 @@ MinGW-w64 compilers available through Cygwin's package manager.
     1.  From the *Devel* category: `cmake`, `gcc-g++`, `git`, `make`, `patch`
     2.  From the *Net* category: `curl`
     3.  From *Interpreters* (or *Python*) category: `m4`, `python3`
-    4.  From the *Archive* category: `p7zip`
     5.  For 32 bit Julia, and also from the *Devel* category:
         `mingw64-i686-gcc-g++` and `mingw64-i686-gcc-fortran`
     6.  For 64 bit Julia, and also from the *Devel* category:
@@ -136,7 +135,7 @@ interfere with this method if using WSL.
 
 **On Ubuntu** (on other Linux systems the dependency names are likely to be similar):
 ```sh
-apt-get install wine-stable gcc wget p7zip-full winbind mingw-w64 gfortran-mingw-w64
+apt-get install wine-stable gcc wget winbind mingw-w64 gfortran-mingw-w64
 dpkg --add-architecture i386 && apt-get update && apt-get install wine32 # add sudo to each if needed
 # switch all of the following to their "-posix" variants (interactively):
 for pkg in i686-w64-mingw32-g++ i686-w64-mingw32-gcc i686-w64-mingw32-gfortran x86_64-w64-mingw32-g++ x86_64-w64-mingw32-gcc x86_64-w64-mingw32-gfortran; do sudo update-alternatives --config $pkg; done

@@ -44,6 +44,7 @@ let
         :Printf,
         :Random,
         :Tar,
+        :GZip,
 
         # 2-depth packages
         :Dates,
